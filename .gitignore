@@ -28,7 +28,6 @@ zhelpers.hpp
 
 # doc and priv files #
 #########################
-doc/*
 priv/*
 bin/*
 .*
