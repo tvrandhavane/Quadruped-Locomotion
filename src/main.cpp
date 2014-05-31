@@ -17,7 +17,7 @@ static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
     const int N = 12;
     dContact contact[N];
 
-    int isGround = ((plane_geom == o1) || (plane_geom == o2));
+    bool isGround = ((plane_geom == o1) || (plane_geom == o2));
 
     if (isGround)  {
         for (int i=0;i<N;i++) {
@@ -29,7 +29,7 @@ static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
             contact[i].surface.soft_cfm = 0.01;
         }
         int n =  dCollide(o1,o2,N,&contact[0].geom,sizeof(dContact));
-        cout<<n<<endl;
+        
         for (int i = 0; i < n; i++) {
             dJointID c = dJointCreateContact(world,cgroup,&contact[i]);
             dJointAttach (c,dGeomGetBody(o1),dGeomGetBody(o2));
@@ -44,11 +44,7 @@ void Draw() {
 
     dJointGroupEmpty(cgroup);
     glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
-    //glColor3f(1.0, 0.0, 1.0);
-
-    //glLoadIdentity();
-    //glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
-
+   
     if (angle>360.0) {
         angle=0.0;
 
@@ -56,7 +52,6 @@ void Draw() {
     angle+=1;
     glNormal3f(0.5, 0.5, 0.1);
     glPushMatrix();
-    glutSolidSphere(5, 10, 10);
         glTranslatef (100.0, 200.0, 0.0);
         const dReal *realP = dBodyGetPosition(ball_body);
         glTranslatef(realP[0], realP[1], realP[2]);
@@ -66,16 +61,14 @@ void Draw() {
 }
 
 void Initialize() {
-    glClearColor(0.8, 0.9, 0.8, 0.0);
-    //glClearDepth(1.0);                // Enables Clearing Of The Depth Buffer
+    glClearColor(0.8, 0.9, 0.8, 0.0);       //background colour
+
     glDepthFunc(GL_LESS);                   // The Type Of Depth Test To Do
     glEnable(GL_NORMALIZE);
     glEnable(GL_DEPTH_TEST);                // Enables Depth Testing
-    glDisable(GL_LIGHTING);
-
+    
     glEnable(GL_LIGHTING);
 
-    //glMatrixMode(GL_MODELVIEW);
     // Lighting set up
     glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
     glShadeModel(GL_SMOOTH);
@@ -91,8 +84,11 @@ void Initialize() {
     // Set the light position
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0.0, 200.0, 200.0, 0.0, -10.0, 1000.0);
-    //gluPerspective(45.0f,1.0f,0.1f,100.0f);   // Calculate The Aspect Ratio Of The Window
+    gluPerspective(45.0,                  //The camera angle
+                   800.0 / 600.0, //The width-to-height ratio
+                   1.0,                   //The near z clipping coordinate
+                   1000.0);               //The far z clipping coordinate
+
     GLfloat qaLightPosition[]   = {0.0, 0.0, 10.0, 0.0};
     glLightfv(GL_LIGHT0, GL_POSITION, qaLightPosition);
     glEnable(GL_LIGHT0);
@@ -105,8 +101,10 @@ void Initialize() {
     glMaterialfv(GL_FRONT, GL_DIFFUSE, qaWhite);
     glMaterialfv(GL_FRONT, GL_SPECULAR, qaGreen);
     glMaterialf(GL_FRONT, GL_SHININESS, 120.0);
-    gluLookAt (100.0, 100.0, 500, 0.5, 0.5, 0, 0, 1, 0);
+    
+    gluLookAt(0.0, 0.0, 400.0, 100.0, 100.0, 0.0, 0.0f, -1.0f, 0.0f);
 }
+
 void Timer(int iUnused)
 {
     glutPostRedisplay();
@@ -115,11 +113,11 @@ void Timer(int iUnused)
 
 
 int main(int argc, char** argv) {
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE |  GLUT_DEPTH);
-    glutInitWindowSize(480, 480);
+    glutInit(&argc, argv);  //initialize glut library
+    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE |  GLUT_DEPTH);  //
+    glutInitWindowSize(800, 600);
     glutInitWindowPosition(200, 200);
-    glutCreateWindow("test");
+    glutCreateWindow("Quadruped Locomotion");
     Initialize();
     dInitODE();
 
