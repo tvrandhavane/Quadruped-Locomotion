@@ -53,13 +53,12 @@ void Draw() {
     glNormal3f(0.5, 0.5, 0.1);
     glPushMatrix();
         glTranslatef (100.0, 200.0, 0.0);
-        /*glBegin(GL_QUADS);
-            glVertex4f(-10, 0, 10, 0);
-            glVertex4f(-10, 0, -10, 0);
-            glVertex4f(10, 0, -10, 0);
-            glVertex4f(10, 0, 10, 0);
+        glBegin(GL_QUADS);
+            glVertex3f(-1000, 10, 1000);
+            glVertex3f(-1000, 10, -1000);
+            glVertex3f(1000, 10, -1000);
+            glVertex3f(1000, 10, 1000);
         glEnd();
-        glutSolidSphere(10, 10, 10);*/
         const dReal *realP = dBodyGetPosition(ball_body);
         glTranslatef(realP[0], realP[1], realP[2]);
         glutSolidSphere(10, 10, 10);
