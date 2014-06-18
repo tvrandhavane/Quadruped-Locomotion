@@ -1,6 +1,8 @@
 #include <GL/glut.h>
 #include <ode/ode.h>
 #include <iostream>
+#include "helper.h"
+#include "imageLoader.h"
 
 dWorldID world;
 dBodyID ball_body;
@@ -9,7 +11,6 @@ dGeomID ball_geom;
 dGeomID plane_geom;
 dMass ball_mass;
 dJointGroupID cgroup;
-float angle=0.0;
 
 using namespace std;
 
@@ -38,6 +39,12 @@ static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
 }
 
 void Draw() {
+    //texture
+    imageLoader * image_tex= new imageLoader();
+    GLuint ground_texture;
+    ground_texture = image_tex->loadBMP_custom("./textures/002.bmp");
+    //
+
     dSpaceCollide(space,0,&nearCallback);
 
     dWorldQuickStep (world,0.1);
@@ -45,20 +52,26 @@ void Draw() {
     dJointGroupEmpty(cgroup);
     glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
    
-    if (angle>360.0) {
-        angle=0.0;
-
-    }
-    angle+=1;
+    
     glNormal3f(0.5, 0.5, 0.1);
     glPushMatrix();
         glTranslatef (100.0, 200.0, 0.0);
+
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, ground_texture);
+        //glColor3f(0.5, 0.1, 0.6);
+
         glBegin(GL_QUADS);
+            glTexCoord2f(0.0, 0.0);
             glVertex3f(-1000, 10, 1000);
+            glTexCoord2f(0.0, 1.0);
             glVertex3f(-1000, 10, -1000);
+            glTexCoord2f(1.0, 1.0);
             glVertex3f(1000, 10, -1000);
+            glTexCoord2f(1.0, 0.0);
             glVertex3f(1000, 10, 1000);
         glEnd();
+        glDisable(GL_TEXTURE_2D);
         const dReal *realP = dBodyGetPosition(ball_body);
         glTranslatef(realP[0], realP[1], realP[2]);
         glutSolidSphere(10, 10, 10);
@@ -102,7 +115,7 @@ void Initialize() {
     // Set material properties
     GLfloat qaBlack[] = {0.0, 0.0, 0.0, 0.8};
     GLfloat qaGreen[] = {0.0, 1.0, 0.0, 0.8};
-    GLfloat qaWhite[] = {0.9, 0.8, 0.2, 0.8};
+    GLfloat qaWhite[] = {1.0, 1.0, 1.0, 0.8};
     glMaterialfv(GL_FRONT, GL_AMBIENT, qaWhite);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, qaWhite);
     glMaterialfv(GL_FRONT, GL_SPECULAR, qaGreen);
@@ -119,14 +132,23 @@ void Timer(int iUnused)
 
 
 int main(int argc, char** argv) {
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_REPEAT);
+
+
+    
+
+    helper * global_helper = new helper();
+
     glutInit(&argc, argv);  //initialize glut library
-    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE |  GLUT_DEPTH);  //
+    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE |  GLUT_DEPTH);
     glutInitWindowSize(800, 600);
     glutInitWindowPosition(200, 200);
     glutCreateWindow("Quadruped Locomotion");
     Initialize();
     dInitODE();
 
+    global_helper->initWorld();
     world = dWorldCreate();
     dWorldSetGravity(world, 0.0, 10.0, 0.0);
     dWorldSetERP(world, 0.9);
@@ -153,7 +175,7 @@ int main(int argc, char** argv) {
 
     dGeomSetPosition(ball_geom, 0.0, -200.0, 0.0);
 
-    plane_geom =dCreatePlane(space, 0.0, -0.01, 0.0, 0.0);
+    plane_geom = dCreatePlane(space, 0.0, -0.01, 0.0, 0.0);
 
 
     glutDisplayFunc(Draw);
