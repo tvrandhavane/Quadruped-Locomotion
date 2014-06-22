@@ -16,6 +16,22 @@ void helper::initWorld(){
     dWorldSetContactSurfaceLayer (world,0.1);
 }
 
+void helper::initSpace(){
+	space = dSimpleSpaceCreate(0);
+}
+
+void helper::initCgroup(){
+	cgroup = dJointGroupCreate(0);
+}
+
 dWorldID helper::getWorld(){
 	return world;
+}
+
+dSpaceID helper::getSpace(){
+	return space;
+}
+
+dJointGroupID helper::getCgroup(){
+	return cgroup;
 }

@@ -5,11 +5,9 @@
 #include "imageLoader.h"
 
 dBodyID ball_body;
-dSpaceID space;
 dGeomID ball_geom;
 dGeomID plane_geom;
 dMass ball_mass;
-dJointGroupID cgroup;
 
 helper * global_helper;
 
@@ -33,7 +31,7 @@ static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
         int n =  dCollide(o1,o2,N,&contact[0].geom,sizeof(dContact));
         
         for (int i = 0; i < n; i++) {
-            dJointID c = dJointCreateContact(global_helper->getWorld(), cgroup,&contact[i]);
+            dJointID c = dJointCreateContact(global_helper->getWorld(), global_helper->getCgroup(), &contact[i]);
             dJointAttach (c,dGeomGetBody(o1),dGeomGetBody(o2));
         }
     }
@@ -46,11 +44,11 @@ void Draw() {
     ground_texture = image_tex->loadBMP_custom("./textures/002.bmp");
     //
 
-    dSpaceCollide(space, 0 ,&nearCallback);
+    dSpaceCollide(global_helper->getSpace(), 0 ,&nearCallback);
 
     dWorldQuickStep (global_helper->getWorld(), 0.1);
 
-    dJointGroupEmpty(cgroup);
+    dJointGroupEmpty(global_helper->getCgroup());
     glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
    
     
@@ -147,25 +145,22 @@ int main(int argc, char** argv) {
     dInitODE();
 
     global_helper->initWorld();
-
-
-
-    space = dSimpleSpaceCreate(0);
-    cgroup = dJointGroupCreate(0);
+    global_helper->initSpace();
+    global_helper->initCgroup();
 
     ball_body = dBodyCreate(global_helper->getWorld());
     dMassSetZero(&ball_mass);
     dMassSetSphereTotal(&ball_mass, 0.1, 0.2);
     dBodySetMass(ball_body, &ball_mass);
 
-    ball_geom = dCreateSphere(space, 0.2);
+    ball_geom = dCreateSphere(global_helper->getSpace(), 0.2);
     dGeomSetData(ball_geom, (void *)"ball");
     dGeomSetBody(ball_geom, ball_body);
 
 
     dGeomSetPosition(ball_geom, 0.0, -200.0, 0.0);
 
-    plane_geom = dCreatePlane(space, 0.0, -0.01, 0.0, 0.0);
+    plane_geom = dCreatePlane(global_helper->getSpace(), 0.0, -0.01, 0.0, 0.0);
 
 
     glutDisplayFunc(Draw);

@@ -19,7 +19,12 @@ private:
 public:
     helper();
     void initWorld();
+    void initSpace();
+    void initCgroup();
     dWorldID getWorld();
+    dSpaceID getSpace();
+    dJointGroupID getCgroup();
+
 };
 
 #endif // HELPER_H
