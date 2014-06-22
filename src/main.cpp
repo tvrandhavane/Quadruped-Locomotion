@@ -4,13 +4,14 @@
 #include "helper.h"
 #include "imageLoader.h"
 
-dWorldID world;
 dBodyID ball_body;
 dSpaceID space;
 dGeomID ball_geom;
 dGeomID plane_geom;
 dMass ball_mass;
 dJointGroupID cgroup;
+
+helper * global_helper;
 
 using namespace std;
 
@@ -32,7 +33,7 @@ static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
         int n =  dCollide(o1,o2,N,&contact[0].geom,sizeof(dContact));
         
         for (int i = 0; i < n; i++) {
-            dJointID c = dJointCreateContact(*((dWorldID*) data), cgroup,&contact[i]);
+            dJointID c = dJointCreateContact(global_helper->getWorld(), cgroup,&contact[i]);
             dJointAttach (c,dGeomGetBody(o1),dGeomGetBody(o2));
         }
     }
@@ -45,11 +46,9 @@ void Draw() {
     ground_texture = image_tex->loadBMP_custom("./textures/002.bmp");
     //
 
-    int test_int = 7;
+    dSpaceCollide(space, 0 ,&nearCallback);
 
-    dSpaceCollide(space, &world ,&nearCallback);
-
-    dWorldQuickStep (world,0.1);
+    dWorldQuickStep (global_helper->getWorld(), 0.1);
 
     dJointGroupEmpty(cgroup);
     glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
@@ -137,7 +136,7 @@ int main(int argc, char** argv) {
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_REPEAT);    
 
-    helper * global_helper = new helper();
+    global_helper = new helper();
 
     glutInit(&argc, argv);  //initialize glut library
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE |  GLUT_DEPTH);
@@ -148,21 +147,13 @@ int main(int argc, char** argv) {
     dInitODE();
 
     global_helper->initWorld();
-    world = dWorldCreate();
-    dWorldSetGravity(world, 0.0, 10.0, 0.0);
-    dWorldSetERP(world, 0.9);
-    dWorldSetCFM(world, 1e-4);
-    dWorldSetLinearDamping(world, 0.00001);
-    dWorldSetAngularDamping(world, 0.005);
-    dWorldSetMaxAngularSpeed(world, 200);
 
-    dWorldSetContactMaxCorrectingVel (world,0.1);
-    dWorldSetContactSurfaceLayer (world,0.1);
+
 
     space = dSimpleSpaceCreate(0);
     cgroup = dJointGroupCreate(0);
 
-    ball_body = dBodyCreate(world);
+    ball_body = dBodyCreate(global_helper->getWorld());
     dMassSetZero(&ball_mass);
     dMassSetSphereTotal(&ball_mass, 0.1, 0.2);
     dBodySetMass(ball_body, &ball_mass);
@@ -181,7 +172,7 @@ int main(int argc, char** argv) {
     Timer(0);
 
     glutMainLoop();
-    dWorldDestroy(world);
+    dWorldDestroy(global_helper->getWorld());
 
     dCloseODE();
     return 0;
