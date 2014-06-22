@@ -32,7 +32,7 @@ static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
         int n =  dCollide(o1,o2,N,&contact[0].geom,sizeof(dContact));
         
         for (int i = 0; i < n; i++) {
-            dJointID c = dJointCreateContact(world,cgroup,&contact[i]);
+            dJointID c = dJointCreateContact(*((dWorldID*) data), cgroup,&contact[i]);
             dJointAttach (c,dGeomGetBody(o1),dGeomGetBody(o2));
         }
     }
@@ -45,7 +45,9 @@ void Draw() {
     ground_texture = image_tex->loadBMP_custom("./textures/002.bmp");
     //
 
-    dSpaceCollide(space,0,&nearCallback);
+    int test_int = 7;
+
+    dSpaceCollide(space, &world ,&nearCallback);
 
     dWorldQuickStep (world,0.1);
 
@@ -133,10 +135,7 @@ void Timer(int iUnused)
 
 int main(int argc, char** argv) {
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_REPEAT);
-
-
-    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_REPEAT);    
 
     helper * global_helper = new helper();
 
