@@ -2,6 +2,7 @@
 #include <ode/ode.h>
 #include <iostream>
 #include "helper.h"
+#include "draw.h"
 #include "imageLoader.h"
 
 dBodyID ball_body;
@@ -10,7 +11,7 @@ dGeomID plane_geom;
 dMass ball_mass;
 
 helper * global_helper;
-
+float x;
 using namespace std;
 
 static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
@@ -28,7 +29,7 @@ static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
             contact[i].surface.bounce_vel = 0.0;
             contact[i].surface.soft_cfm = 0.01;
         }
-        int n =  dCollide(o1,o2,N,&contact[0].geom,sizeof(dContact));
+        int n =  dCollide(o1, o2, N, &contact[0].geom,sizeof(dContact));
         
         for (int i = 0; i < n; i++) {
             dJointID c = dJointCreateContact(global_helper->getWorld(), global_helper->getCgroup(), &contact[i]);
@@ -38,12 +39,16 @@ static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
 }
 
 void Draw() {
+    
+    
     //texture
     imageLoader * image_tex= new imageLoader();
-    GLuint ground_texture, sky_texture;
+    GLuint ground_texture;
     ground_texture = image_tex->loadBMP_custom("./textures/floor.bmp");
-    sky_texture = image_tex->loadBMP_custom("./textures/sky.bmp");
+    
     //
+
+    draw * draw_obj = new draw();
 
     dSpaceCollide(global_helper->getSpace(), 0 ,&nearCallback);
 
@@ -52,48 +57,25 @@ void Draw() {
     dJointGroupEmpty(global_helper->getCgroup());
     glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
    
-    //sky
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, sky_texture);
-    glBegin(GL_QUADS);
-        glTexCoord2f(0.0, 0.0);
-        glVertex3f(-1000, 375, -100);
-        glTexCoord2f(0.0, 0.25);
-        glVertex3f(-1000, -180, -100);
-        glTexCoord2f(0.25, 0.25);
-        glVertex3f(1000, -180, -100);
-        glTexCoord2f(0.25, 0.0);
-        glVertex3f(1000, 375, -100);
-    glEnd();
-    glDisable(GL_TEXTURE_2D);
-
+    draw_obj->draw_sky();
+    
     glNormal3f(0.5, 0.5, 0.1);
     glPushMatrix();
         glTranslatef (100.0, 200.0, 0.0);
 
-        //ground
-        glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, ground_texture);
-        glBegin(GL_QUADS);
-            glTexCoord2f(0.0, 0.0);
-            glVertex3f(-10000, -400, 10000);
-            glTexCoord2f(0.0, 1.0);
-            glVertex3f(-10000, -400, -10000);
-            glTexCoord2f(1.0, 1.0);
-            glVertex3f(10000, -400, -10000);
-            glTexCoord2f(1.0, 0.0);
-            glVertex3f(10000, -400, 10000);
-        glEnd();
-        glDisable(GL_TEXTURE_2D);
+        draw_obj->draw_ground();
 
         const dReal *realP = dBodyGetPosition(ball_body);
         glTranslatef(realP[0], realP[1], realP[2]);
         glutSolidSphere(10, 10, 10);
     glPopMatrix();
     glutSwapBuffers();
+
+
 }
 
 void Initialize() {
+
     glClearColor(0.8, 0.9, 0.8, 0.0);       //background colour
 
     glDepthFunc(GL_LESS);                   // The Type Of Depth Test To Do
@@ -135,7 +117,8 @@ void Initialize() {
     glMaterialfv(GL_FRONT, GL_SPECULAR, qaGreen);
     glMaterialf(GL_FRONT, GL_SHININESS, 120.0);
 
-    gluLookAt(0.0, 0.0, 800.0, 0.0, 0.0, 0.0, 0.0f, 1.0f, 0.0f);
+    gluLookAt(x, 0.0, 800.0, x, 0.0, 0.0, 0.0f, 1.0f, 0.0f);
+    
 }
 
 void Timer(int iUnused)
@@ -146,6 +129,7 @@ void Timer(int iUnused)
 
 
 int main(int argc, char** argv) {
+    x = 0;
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_REPEAT);    
 
