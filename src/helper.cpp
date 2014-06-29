@@ -5,7 +5,7 @@ helper::helper(){
 
 void helper::initWorld(){
 	world = dWorldCreate();
-    dWorldSetGravity(world, 0.0, 10.0, 0.0);
+    dWorldSetGravity(world, 0.0, -10.0, 0.0);
     dWorldSetERP(world, 0.9);
     dWorldSetCFM(world, 1e-4);
     dWorldSetLinearDamping(world, 0.00001);

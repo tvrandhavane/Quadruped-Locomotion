@@ -40,8 +40,9 @@ static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
 void Draw() {
     //texture
     imageLoader * image_tex= new imageLoader();
-    GLuint ground_texture;
-    ground_texture = image_tex->loadBMP_custom("./textures/002.bmp");
+    GLuint ground_texture, sky_texture;
+    ground_texture = image_tex->loadBMP_custom("./textures/floor.bmp");
+    sky_texture = image_tex->loadBMP_custom("./textures/sky.bmp");
     //
 
     dSpaceCollide(global_helper->getSpace(), 0 ,&nearCallback);
@@ -51,26 +52,40 @@ void Draw() {
     dJointGroupEmpty(global_helper->getCgroup());
     glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
    
-    
+    //sky
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, sky_texture);
+    glBegin(GL_QUADS);
+        glTexCoord2f(0.0, 0.0);
+        glVertex3f(-1000, 375, -100);
+        glTexCoord2f(0.0, 0.25);
+        glVertex3f(-1000, -180, -100);
+        glTexCoord2f(0.25, 0.25);
+        glVertex3f(1000, -180, -100);
+        glTexCoord2f(0.25, 0.0);
+        glVertex3f(1000, 375, -100);
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
+
     glNormal3f(0.5, 0.5, 0.1);
     glPushMatrix();
         glTranslatef (100.0, 200.0, 0.0);
 
+        //ground
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, ground_texture);
-        //glColor3f(0.5, 0.1, 0.6);
-
         glBegin(GL_QUADS);
             glTexCoord2f(0.0, 0.0);
-            glVertex3f(-1000, 10, 1000);
+            glVertex3f(-10000, -400, 10000);
             glTexCoord2f(0.0, 1.0);
-            glVertex3f(-1000, 10, -1000);
+            glVertex3f(-10000, -400, -10000);
             glTexCoord2f(1.0, 1.0);
-            glVertex3f(1000, 10, -1000);
+            glVertex3f(10000, -400, -10000);
             glTexCoord2f(1.0, 0.0);
-            glVertex3f(1000, 10, 1000);
+            glVertex3f(10000, -400, 10000);
         glEnd();
         glDisable(GL_TEXTURE_2D);
+
         const dReal *realP = dBodyGetPosition(ball_body);
         glTranslatef(realP[0], realP[1], realP[2]);
         glutSolidSphere(10, 10, 10);
@@ -120,7 +135,7 @@ void Initialize() {
     glMaterialfv(GL_FRONT, GL_SPECULAR, qaGreen);
     glMaterialf(GL_FRONT, GL_SHININESS, 120.0);
 
-    gluLookAt(0.0, 0.0, 400.0, 100.0, 100.0, 0.0, 0.0f, -1.0f, 0.0f);
+    gluLookAt(0.0, 0.0, 800.0, 0.0, 0.0, 0.0, 0.0f, 1.0f, 0.0f);
 }
 
 void Timer(int iUnused)
@@ -158,9 +173,9 @@ int main(int argc, char** argv) {
     dGeomSetBody(ball_geom, ball_body);
 
 
-    dGeomSetPosition(ball_geom, 0.0, -200.0, 0.0);
+    dGeomSetPosition(ball_geom, 0.0, 200.0, 0.0);
 
-    plane_geom = dCreatePlane(global_helper->getSpace(), 0.0, -0.01, 0.0, 0.0);
+    plane_geom = dCreatePlane(global_helper->getSpace(), 0.0, 1.0, 0.0, -390.0);
 
 
     glutDisplayFunc(Draw);
