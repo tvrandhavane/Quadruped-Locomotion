@@ -6,11 +6,39 @@ draw::draw(){
 
 void draw::draw_scene(float ball_location[]){
     draw_sky();
+    draw_paw();
     glPushMatrix();
         glTranslatef (100.0, 200.0, 0.0);
         draw_ground();
         glTranslatef(ball_location[0], ball_location[1], ball_location[2]);
         glutSolidSphere(10, 10, 10);
+    glPopMatrix();
+}
+
+void draw::draw_paw(){
+    glColor3f(1.0, 0.0, 0.0);
+    glPushMatrix();
+        glTranslatef (100.0, 100.0, 0.0);
+        glBegin(GL_TRIANGLES);
+            glVertex3f(10, 0, -10);
+            glVertex3f(-10, 0, -10);
+            glVertex3f(-20, 0, 0);
+        glEnd();
+        glBegin(GL_TRIANGLES);
+            glVertex3f(10, 0, -10);
+            glVertex3f(0, 10, 0);
+            glVertex3f(-20, 0, 0);
+        glEnd();
+        glBegin(GL_TRIANGLES);
+            glVertex3f(0, 10, 0);
+            glVertex3f(-10, 0, -10);
+            glVertex3f(-20, 0, 0);
+        glEnd();
+        glBegin(GL_TRIANGLES);
+            glVertex3f(10, 0, -10);
+            glVertex3f(-10, 0, -10);
+            glVertex3f(0, 10, 0);
+        glEnd();
     glPopMatrix();
 }
 
