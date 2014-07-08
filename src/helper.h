@@ -8,19 +8,24 @@
 class helper
 {
 private:
+	//Private Objects
 	dWorldID world;
-	dBodyID ball_body;
 	dSpaceID space;
-	dGeomID ball_geom;
-	dGeomID plane_geom;
-	dMass ball_mass;
 	dJointGroupID cgroup;
 
-public:
-    helper();
+	//Private Methods
     void initWorld();
     void initSpace();
     void initCgroup();
+
+public:
+	//Constructor
+    helper();
+
+    //Public Methods
+    void init();
+
+    //Getters
     dWorldID getWorld();
     dSpaceID getSpace();
     dJointGroupID getCgroup();

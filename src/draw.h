@@ -15,6 +15,7 @@ public:
     draw();
     void draw_sky();
     void draw_ground();
+    void draw_scene(float ball_location[]);
 
 };
 
