@@ -4,6 +4,7 @@
 #include <GL/glut.h>
 #include <ode/ode.h>
 #include <iostream>
+#include <cmath>
 #include "imageLoader.h"
 
 class draw
@@ -15,7 +16,12 @@ private:
 	//Private Methods
 	void draw_sky();
     void draw_ground();
-    void draw_paw();
+    void draw_leg();
+    void draw_tail();
+    void draw_neck_head();
+    void draw_back();
+    void draw_dog();
+    void draw_cube();
     
 public:
     //Constructor
