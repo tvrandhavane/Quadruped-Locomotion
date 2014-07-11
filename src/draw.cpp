@@ -178,7 +178,7 @@ void draw::draw_tail(){
         glPopMatrix();
         //Link 4
         glPushMatrix();
-            glTranslatef(l/2 + l*cos((30*3.14)/180), -(3*l)/2 - l*sin((60*3.14)/180), 0);
+            glTranslatef(l/2 + l*cos((30*3.14)/180), -(3*l)/2 - l *sin((60*3.14)/180), 0);
             glRotatef(-60, 0, 0, 1);
             glScalef(60, 5, 5);
             draw_cube();
@@ -187,11 +187,133 @@ void draw::draw_tail(){
 }
 
 void draw::draw_leg(){
+    float front_x = 230/(5 + 4*cos((45*3.14)/180) + 3*cos((30*3.14)/180));
+
+    //Front left leg
     glPushMatrix();
+        glTranslatef(30, 35, -60);
+        //thigh
+        glPushMatrix();
+            glRotatef(-90, 0, 0, 1);
+            glScalef(5*front_x, 5, 5);
+            draw_cube();
+        glPopMatrix();
+        //midleg
+        glPushMatrix();
+            glTranslatef(0, -5*front_x, 0);
+            glRotatef(-135, 0, 0, 1);
+            glScalef(4*front_x, 5, 5);
+            draw_cube();
+        glPopMatrix();
+        //Ankle
+        glPushMatrix();
+            glTranslatef(-4*front_x*sin((45*3.14)/180), -5*front_x - 4*front_x*cos((45*3.14)/180), 0);
+            glRotatef(-120, 0, 0, 1);
+            glScalef(3*front_x, 5, 5);
+            draw_cube();
+        glPopMatrix();
         //paw
         glPushMatrix();
-            glTranslatef (80.0, -100.0, 0.0);
-            glScalef(10, 5, 5);
+            glTranslatef (-4*front_x*sin((45*3.14)/180) - (3*front_x)/2, -5*front_x - 4*front_x*cos((45*3.14)/180) - 3*front_x*cos((30*3.14)/180), 0.0);
+            glRotatef(-180, 0, 0, 1);
+            glScalef(5, 5, 5);
+            draw_cube();
+        glPopMatrix();
+    glPopMatrix();
+
+    //Front right leg
+    glPushMatrix();
+        glTranslatef(30, 35, 60);
+        //thigh
+        glPushMatrix();
+            glRotatef(-90, 0, 0, 1);
+            glScalef(5*front_x, 5, 5);
+            draw_cube();
+        glPopMatrix();
+        //midleg
+        glPushMatrix();
+            glTranslatef(0, -5*front_x, 0);
+            glRotatef(-135, 0, 0, 1);
+            glScalef(4*front_x, 5, 5);
+            draw_cube();
+        glPopMatrix();
+        //Ankle
+        glPushMatrix();
+            glTranslatef(-4*front_x*sin((45*3.14)/180), -5*front_x - 4*front_x*cos((45*3.14)/180), 0);
+            glRotatef(-120, 0, 0, 1);
+            glScalef(3*front_x, 5, 5);
+            draw_cube();
+        glPopMatrix();
+        //paw
+        glPushMatrix();
+            glTranslatef (-4*front_x*sin((45*3.14)/180) - (3*front_x)/2, -5*front_x - 4*front_x*cos((45*3.14)/180) - 3*front_x*cos((30*3.14)/180), 0.0);
+            glRotatef(-180, 0, 0, 1);
+            glScalef(5, 5, 5);
+            draw_cube();
+        glPopMatrix();
+    glPopMatrix();
+
+    float back_x = 220/(5 + 4*cos((45*3.14)/180) + 3*cos((30*3.14)/180));
+    //Back left leg
+    glPushMatrix();
+        glTranslatef(270 + 60*cos((5*3.14)/180) + 60*cos(asin((60*sin((5*3.14)/180) + 10)/60)), 25, -60);
+        //thigh
+        glPushMatrix();
+            glRotatef(-90, 0, 0, 1);
+            glScalef(5*back_x, 5, 5);
+            draw_cube();
+        glPopMatrix();
+        //midleg
+        glPushMatrix();
+            glTranslatef(0, -5*back_x, 0);
+            glRotatef(-135, 0, 0, 1);
+            glScalef(4*back_x, 5, 5);
+            draw_cube();
+        glPopMatrix();
+        //Ankle
+        glPushMatrix();
+            glTranslatef(-4*back_x*sin((45*3.14)/180), -5*back_x - 4*back_x*cos((45*3.14)/180), 0);
+            glRotatef(-120, 0, 0, 1);
+            glScalef(3*back_x, 5, 5);
+            draw_cube();
+        glPopMatrix();
+        //paw
+        glPushMatrix();
+            glTranslatef (-4*back_x*sin((45*3.14)/180) - (3*back_x)/2, -5*back_x - 4*back_x*cos((45*3.14)/180) - 3*back_x*cos((30*3.14)/180), 0.0);
+            glRotatef(-180, 0, 0, 1);
+            glScalef(5, 5, 5);
+            draw_cube();
+        glPopMatrix();
+    glPopMatrix();
+
+    //Back right leg
+    glPushMatrix();
+        glTranslatef(270 + 60*cos((5*3.14)/180) + 60*cos(asin((60*sin((5*3.14)/180) + 10)/60)), 25, 60);
+        //thigh
+        glPushMatrix();
+            glRotatef(-90, 0, 0, 1);
+            glScalef(5*back_x, 5, 5);
+            draw_cube();
+        glPopMatrix();
+        //midleg
+        glPushMatrix();
+            glTranslatef(0, -5*back_x, 0);
+            glRotatef(-135, 0, 0, 1);
+            glScalef(4*back_x, 5, 5);
+            draw_cube();
+        glPopMatrix();
+        //Ankle
+        glPushMatrix();
+            glTranslatef(-4*back_x*sin((45*3.14)/180), -5*back_x - 4*back_x*cos((45*3.14)/180), 0);
+            glRotatef(-120, 0, 0, 1);
+            glScalef(3*back_x, 5, 5);
+            draw_cube();
+        glPopMatrix();
+        //paw
+        glPushMatrix();
+            glTranslatef (-4*back_x*sin((45*3.14)/180) - (3*back_x)/2, -5*back_x - 4*back_x*cos((45*3.14)/180) - 3*back_x*cos((30*3.14)/180), 0.0);
+            glRotatef(-180, 0, 0, 1);
+            glScalef(5, 5, 5);
             draw_cube();
         glPopMatrix();
     glPopMatrix();
