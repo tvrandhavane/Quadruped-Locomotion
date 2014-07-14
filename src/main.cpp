@@ -9,7 +9,6 @@
 using namespace std;
 
 //Declare global objects
-helper * global_helper;
 ODEBodies * body_bag;
 
 static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
@@ -40,7 +39,7 @@ static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
 
         //For each contact create a joint        
         for (int i = 0; i < n; i++) {
-            dJointID c = dJointCreateContact(global_helper->getWorld(), global_helper->getCgroup(), &contact[i]);
+            dJointID c = dJointCreateContact(body_bag->getGlobalHelper()->getWorld(), body_bag->getGlobalHelper()->getCgroup(), &contact[i]);
             dJointAttach (c, dGeomGetBody(o1), dGeomGetBody(o2));
         }
     }
@@ -48,31 +47,25 @@ static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
 
 void Draw() {
     //Initialize the draw object
-    draw * draw_obj = new draw();
+    draw * draw_obj = new draw(body_bag);
 
     //Collides all objects in space
-    dSpaceCollide(global_helper->getSpace(), 0 ,&nearCallback);
+    dSpaceCollide(body_bag->getGlobalHelper()->getSpace(), 0 ,&nearCallback);
 
     //Set stepsize and use quick step, computationally cheaper
-    dWorldQuickStep (global_helper->getWorld(), 0.1);
+    dWorldQuickStep (body_bag->getGlobalHelper()->getWorld(), 0.1);
 
-    dJointGroupEmpty(global_helper->getCgroup());
+    dJointGroupEmpty(body_bag->getGlobalHelper()->getCgroup());
 
     //Clear openGL buffers
     glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
 
-    //Get location of ball
-    const dReal *realP = dBodyGetPosition(body_bag->getBallBody());
-    float ball_location[3];
-    ball_location[0] = realP[0];
-    ball_location[1] = realP[1];
-    ball_location[2] = realP[2];
-
     //Draw scene  
-    draw_obj->draw_scene(ball_location);
+    draw_obj->draw_scene();
 
     //Glut swap buffers
     glutSwapBuffers();
+    free(draw_obj);
 }
 
 void Initialize() {
@@ -139,7 +132,7 @@ void Timer(int iUnused)
 
 int main(int argc, char** argv) {
     //Initialize helper
-    global_helper = new helper();
+    helper * global_helper = new helper();
     global_helper->init();  //initiaize world, space and contact group
 
     //Set up glut parameters
@@ -167,7 +160,7 @@ int main(int argc, char** argv) {
     glutMainLoop();
 
     //Destroy ODE World and close ODE
-    dWorldDestroy(global_helper->getWorld());
+    dWorldDestroy(body_bag->getGlobalHelper()->getWorld());
     dCloseODE();
 
     return 0;

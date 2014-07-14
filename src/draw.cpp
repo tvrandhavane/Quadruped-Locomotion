@@ -1,10 +1,12 @@
 #include "draw.h"
 
-draw::draw(){
+draw::draw(ODEBodies * body_bag){
     image_tex= new imageLoader();
+    this->body_bag = body_bag;
 }
 
-void draw::draw_scene(float ball_location[]){
+void draw::draw_scene(){
+    const dReal *ball_location = dBodyGetPosition(body_bag->getBallBody());
     draw_sky();
     draw_dog();
     glPushMatrix();
@@ -16,10 +18,13 @@ void draw::draw_scene(float ball_location[]){
 }
 
 void draw::draw_dog(){
-    draw_back();
-    draw_leg();
-    draw_tail();
-    draw_neck_head();
+    glPushMatrix();
+        glTranslatef(30, 35, 0);
+        draw_back();
+        draw_leg();
+        draw_tail();
+        draw_neck_head();
+    glPopMatrix();
 }
 
 void draw::draw_cube(){
@@ -71,10 +76,10 @@ void draw::draw_cube(){
 
 void draw::draw_back(){
     glPushMatrix();
-        glTranslatef(30, 35, 0);
         //Link 1
         glPushMatrix();
-            glTranslatef (0, 0, 0.0);
+            const dReal *back_link_1_location = dBodyGetPosition(body_bag->getBackLink1Body());
+            glTranslatef (back_link_1_location[0], back_link_1_location[1], back_link_1_location[2]);
             glScalef(60, 5, 5);
             draw_cube();
         glPopMatrix();
@@ -121,7 +126,6 @@ void draw::draw_back(){
 void draw::draw_neck_head(){
     int l = 40;
     glPushMatrix();
-        glTranslatef(30, 35, 0);
         //Link 1
         glPushMatrix();
             glRotatef(120, 0, 0, 1);
@@ -155,7 +159,7 @@ void draw::draw_neck_head(){
 void draw::draw_tail(){
     int l = 60;
     glPushMatrix();
-        glTranslatef (270 + 60*cos((5*3.14)/180) + 60*cos(asin((60*sin((5*3.14)/180) + 10)/60)), 25, 0.0);
+        glTranslatef (240 + 60*cos((5*3.14)/180) + 60*cos(asin((60*sin((5*3.14)/180) + 10)/60)), -10, 0.0);
         //Link 1
         glPushMatrix();
             glRotatef(-30, 0, 0, 1);
@@ -191,7 +195,7 @@ void draw::draw_leg(){
 
     //Front left leg
     glPushMatrix();
-        glTranslatef(30, 35, -60);
+        glTranslatef(0, 0, -60);
         //thigh
         glPushMatrix();
             glRotatef(-90, 0, 0, 1);
@@ -223,7 +227,7 @@ void draw::draw_leg(){
 
     //Front right leg
     glPushMatrix();
-        glTranslatef(30, 35, 60);
+        glTranslatef(0, 0, 60);
         //thigh
         glPushMatrix();
             glRotatef(-90, 0, 0, 1);
@@ -256,7 +260,7 @@ void draw::draw_leg(){
     float back_x = 220/(5 + 4*cos((45*3.14)/180) + 3*cos((30*3.14)/180));
     //Back left leg
     glPushMatrix();
-        glTranslatef(270 + 60*cos((5*3.14)/180) + 60*cos(asin((60*sin((5*3.14)/180) + 10)/60)), 25, -60);
+        glTranslatef(240 + 60*cos((5*3.14)/180) + 60*cos(asin((60*sin((5*3.14)/180) + 10)/60)), -10, -60);
         //thigh
         glPushMatrix();
             glRotatef(-90, 0, 0, 1);
@@ -288,7 +292,7 @@ void draw::draw_leg(){
 
     //Back right leg
     glPushMatrix();
-        glTranslatef(270 + 60*cos((5*3.14)/180) + 60*cos(asin((60*sin((5*3.14)/180) + 10)/60)), 25, 60);
+        glTranslatef(240 + 60*cos((5*3.14)/180) + 60*cos(asin((60*sin((5*3.14)/180) + 10)/60)), -10, 60);
         //thigh
         glPushMatrix();
             glRotatef(-90, 0, 0, 1);

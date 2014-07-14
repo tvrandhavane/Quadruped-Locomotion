@@ -6,12 +6,14 @@
 #include <iostream>
 #include <cmath>
 #include "imageLoader.h"
+#include "ODEBodies.h"
 
 class draw
 {
 private:
 	//Private Objects
-	imageLoader *image_tex;
+	imageLoader * image_tex;
+	ODEBodies * body_bag;
 
 	//Private Methods
 	void draw_sky();
@@ -25,10 +27,10 @@ private:
     
 public:
     //Constructor
-    draw();
+    draw(ODEBodies * body_bag);
     
     //Public Methods
-    void draw_scene(float ball_location[]);
+    void draw_scene();
 
 };
 
