@@ -5,11 +5,13 @@
 #include "draw.h"
 #include "imageLoader.h"
 #include "ODEBodies.h"
+#include "controller.h"
 
 using namespace std;
 
 //Declare global objects
 ODEBodies * body_bag;
+controller * gait_controller;
 
 static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
     //Set up maximum number of contact points and contact array
@@ -125,6 +127,9 @@ void Timer(int iUnused)
     //Call the display function (Draw() function)
     glutPostRedisplay();
 
+    //Controller step
+    gait_controller->takeStep();
+
     //Set up next timer
     glutTimerFunc(1, Timer, 0);
 }
@@ -133,7 +138,10 @@ void Timer(int iUnused)
 int main(int argc, char** argv) {
     //Initialize helper
     helper * global_helper = new helper();
-    global_helper->init();  //initiaize world, space and contact group
+    global_helper->init();  //initiaize world, space and contact grou
+
+    //Initialize controller
+    gait_controller = new controller();
 
     //Set up glut parameters
     glutInit(&argc, argv);
