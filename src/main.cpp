@@ -48,6 +48,9 @@ static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
 }
 
 void Draw() {
+    //Controller step
+    gait_controller->takeStep();
+
     //Initialize the draw object
     draw * draw_obj = new draw(body_bag);
 
@@ -119,16 +122,12 @@ void Initialize() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_REPEAT);   
 
     //Set up look at vector
-    gluLookAt(100.0, 0.0, 800.0, 100.0, 0.0, 0.0, 0.0f, 1.0f, 0.0f);    
+    gluLookAt(0.0, 0.0, 800.0, 0.0, 0.0, 0.0, 0.0f, 1.0f, 0.0f);    
 }
 
-void Timer(int iUnused)
-{
+void Timer(int iUnused){
     //Call the display function (Draw() function)
     glutPostRedisplay();
-
-    //Controller step
-    gait_controller->takeStep();
 
     //Set up next timer
     glutTimerFunc(1, Timer, 0);

@@ -10,8 +10,9 @@ void draw::draw_scene(){
     draw_sky();
     draw_dog();
     glPushMatrix();
-        glTranslatef (100.0, 200.0, 0.0);
         draw_ground();
+    glPopMatrix();
+    glPushMatrix();
         glTranslatef(ball_location[0], ball_location[1], ball_location[2]);
         glutSolidSphere(10, 10, 10);
     glPopMatrix();
@@ -19,7 +20,6 @@ void draw::draw_scene(){
 
 void draw::draw_dog(){
     glPushMatrix();
-        glTranslatef(30, 35, 0);
         draw_back();
         draw_leg();
         draw_tail();
@@ -86,14 +86,16 @@ void draw::draw_back(){
 
         //Link 2
         glPushMatrix();
-            glTranslatef (60.0, 0, 0.0);
+            const dReal *back_link_2_location = dBodyGetPosition(body_bag->getBackLink2Body());
+            glTranslatef (back_link_2_location[0], back_link_2_location[1], back_link_2_location[2]);
             glScalef(60, 5, 5);
             draw_cube();
         glPopMatrix();
 
         //Link 3
         glPushMatrix();
-            glTranslatef (120.0, 0, 0.0);
+            const dReal *back_link_3_location = dBodyGetPosition(body_bag->getBackLink3Body());
+            glTranslatef (back_link_3_location[0], back_link_3_location[1], back_link_3_location[2]);
             glScalef(60, 5, 5);
             draw_cube();
         glPopMatrix();
@@ -360,13 +362,13 @@ void draw::draw_ground(){
     //Draw ground quad
     glBegin(GL_QUADS);
         glTexCoord2f(0.0, 0.0);
-        glVertex3f(-10000, -400, 10000);
+        glVertex3f(-10000, -200, 10000);
         glTexCoord2f(0.0, 1.0);
-        glVertex3f(-10000, -400, -10000);
+        glVertex3f(-10000, -200, -10000);
         glTexCoord2f(1.0, 1.0);
-        glVertex3f(10000, -400, -10000);
+        glVertex3f(10000, -200, -10000);
         glTexCoord2f(1.0, 0.0);
-        glVertex3f(10000, -400, 10000);
+        glVertex3f(10000, -200, 10000);
     glEnd();
 
     //Disable texture
