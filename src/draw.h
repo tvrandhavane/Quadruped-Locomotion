@@ -8,6 +8,8 @@
 #include "imageLoader.h"
 #include "ODEBodies.h"
 
+using namespace std;
+
 class draw
 {
 private:

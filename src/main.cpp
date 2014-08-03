@@ -12,6 +12,7 @@ using namespace std;
 //Declare global objects
 ODEBodies * body_bag;
 controller * gait_controller;
+draw * draw_obj;
 
 static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
     //Set up maximum number of contact points and contact array
@@ -23,6 +24,8 @@ static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
 
     //If collision, do the following
     if (isGround)  {
+        cout << "Plane ID = " << body_bag->getPlaneGeom() << endl;
+        cout << "Body ID = " << o1 << ", " << o2 << endl;
         //Set up contact parameters
         for (int i=0;i<N;i++) {
             contact[i].surface.mode = dContactBounce | dContactSoftCFM;
@@ -38,9 +41,11 @@ static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
         //Maximum N number of contacts can be created
         //Give the start of contact geom, skip size of one contact to store the next contact location in array
         int n =  dCollide(o1, o2, N, &contact[0].geom, sizeof(dContact));
+        cout << "n = " << n << endl;
 
         //For each contact create a joint        
         for (int i = 0; i < n; i++) {
+            cout << "\t " << i + 1 << endl;
             dJointID c = dJointCreateContact(body_bag->getGlobalHelper()->getWorld(), body_bag->getGlobalHelper()->getCgroup(), &contact[i]);
             dJointAttach (c, dGeomGetBody(o1), dGeomGetBody(o2));
         }
@@ -49,10 +54,7 @@ static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
 
 void Draw() {
     //Controller step
-    gait_controller->takeStep();
-
-    //Initialize the draw object
-    draw * draw_obj = new draw(body_bag);
+    gait_controller->takeStep();    
 
     //Collides all objects in space
     dSpaceCollide(body_bag->getGlobalHelper()->getSpace(), 0 ,&nearCallback);
@@ -70,12 +72,11 @@ void Draw() {
 
     //Glut swap buffers
     glutSwapBuffers();
-    free(draw_obj);
 }
 
 void Initialize() {
     //Set up background color
-    glClearColor(0.8, 0.9, 0.8, 0.0);
+    glClearColor(0.2, 0.2, 0.7, 0.0);
 
     //Set up depth parameters
     glDepthFunc(GL_LESS);
@@ -122,7 +123,7 @@ void Initialize() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_REPEAT);   
 
     //Set up look at vector
-    gluLookAt(0.0, 0.0, 800.0, 0.0, 0.0, 0.0, 0.0f, 1.0f, 0.0f);    
+    gluLookAt(0.0, 0.0, 700.0, 0.0, 0.0, 0.0, 0.0f, 1.0f, 0.0f);    
 }
 
 void Timer(int iUnused){
@@ -158,6 +159,8 @@ int main(int argc, char** argv) {
     //Set up ODE bodies
     body_bag = new ODEBodies(global_helper);
     body_bag->init();
+
+    draw_obj = new draw(body_bag);
 
     //Set up display function which will be called in loop
     glutDisplayFunc(Draw);

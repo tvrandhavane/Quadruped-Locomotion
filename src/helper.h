@@ -5,6 +5,8 @@
 #include <ode/ode.h>
 #include <iostream>
 
+using namespace std;
+
 class helper
 {
 private:

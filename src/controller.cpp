@@ -28,11 +28,11 @@ controller::controller(){
 
 void controller::takeStep(){
 	time = (time + 1);
-	cout << "Time = " << time << endl;
-	cout << "Leg 1 = " << gait_graph->isInSwing(time%T, swingStart[0], swingEnd[0]) << endl;
-	cout << "Leg 2 = " << gait_graph->isInSwing(time%T, swingStart[1], swingEnd[1]) << endl;
-	cout << "Leg 3 = " << gait_graph->isInSwing(time%T, swingStart[2], swingEnd[2]) << endl;
-	cout << "Leg 4 = " << gait_graph->isInSwing(time%T, swingStart[3], swingEnd[3]) << endl;
+	//cout << "Time = " << time << endl;
+	//cout << "Leg 1 = " << gait_graph->isInSwing(time%T, swingStart[0], swingEnd[0]) << endl;
+	//cout << "Leg 2 = " << gait_graph->isInSwing(time%T, swingStart[1], swingEnd[1]) << endl;
+	//cout << "Leg 3 = " << gait_graph->isInSwing(time%T, swingStart[2], swingEnd[2]) << endl;
+	//cout << "Leg 4 = " << gait_graph->isInSwing(time%T, swingStart[3], swingEnd[3]) << endl;
 
 	if(swingStart[0] == time%T){		
 		foot_location->computePlacementLocation(shoulderHeight, current_velocity, desired_velocity);

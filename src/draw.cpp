@@ -8,26 +8,36 @@ draw::draw(ODEBodies * body_bag){
 void draw::draw_scene(){
     const dReal *ball_location = dBodyGetPosition(body_bag->getBallBody());
     draw_sky();
-    draw_dog();
     glPushMatrix();
         draw_ground();
     glPopMatrix();
     glPushMatrix();
         glTranslatef(ball_location[0], ball_location[1], ball_location[2]);
-        glutSolidSphere(10, 10, 10);
+        glutSolidSphere(5, 10, 10);
+    glPopMatrix();
+    glPushMatrix();
+        draw_dog();
     glPopMatrix();
 }
 
 void draw::draw_dog(){
     glPushMatrix();
         draw_back();
-        draw_leg();
-        draw_tail();
-        draw_neck_head();
+        //draw_leg();
+        //draw_tail();
+        //draw_neck_head();
     glPopMatrix();
 }
 
 void draw::draw_cube(){
+    //Load texture image
+    GLuint sky_texture;
+    sky_texture = image_tex->loadBMP_custom("./textures/object.bmp");
+
+    //Enable and bind texture
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, sky_texture);
+
     glPushMatrix();
         //Base
         glBegin(GL_QUADS);
@@ -72,15 +82,18 @@ void draw::draw_cube(){
             glVertex3f(1, 1, 0);
         glEnd();
     glPopMatrix();
+
+    //Disable texture
+    glDisable(GL_TEXTURE_2D);
 }
 
 void draw::draw_back(){
     glPushMatrix();
         //Link 1
-        glPushMatrix();
+        /*glPushMatrix();
             const dReal *back_link_1_location = dBodyGetPosition(body_bag->getBackLink1Body());
             glTranslatef (back_link_1_location[0], back_link_1_location[1], back_link_1_location[2]);
-            glScalef(60, 5, 5);
+            glScalef(80, 4, 4);
             draw_cube();
         glPopMatrix();
 
@@ -88,7 +101,7 @@ void draw::draw_back(){
         glPushMatrix();
             const dReal *back_link_2_location = dBodyGetPosition(body_bag->getBackLink2Body());
             glTranslatef (back_link_2_location[0], back_link_2_location[1], back_link_2_location[2]);
-            glScalef(60, 5, 5);
+            glScalef(80, 4, 4);
             draw_cube();
         glPopMatrix();
 
@@ -96,19 +109,43 @@ void draw::draw_back(){
         glPushMatrix();
             const dReal *back_link_3_location = dBodyGetPosition(body_bag->getBackLink3Body());
             glTranslatef (back_link_3_location[0], back_link_3_location[1], back_link_3_location[2]);
-            glScalef(60, 5, 5);
+            glScalef(80, 4, 4);
             draw_cube();
-        glPopMatrix();
+        glPopMatrix();*/
 
         //Link 4
         glPushMatrix();
-            glTranslatef (180.0, 0, 0.0);
-            glRotatef(5, 0, 0, 1);
-            glScalef(60, 5, 5);
+            const dReal *back_link_4_location = dBodyGetPosition(body_bag->getBackLink4Body());
+            glTranslatef (back_link_4_location[0], back_link_4_location[1], back_link_4_location[2]);
+            const dReal *rotationMatrix =  dBodyGetRotation(body_bag->getBackLink4Body());
+
+
+            float m[16];
+            m[0] = rotationMatrix[0];
+            m[1] = rotationMatrix[1];
+            m[2] = rotationMatrix[2];
+            m[3] = 0;
+
+            m[4] = rotationMatrix[3];
+            m[5] = rotationMatrix[4];
+            m[6] = rotationMatrix[5];
+            m[7] = 0;
+
+            m[8] = rotationMatrix[6];
+            m[9] = rotationMatrix[7];
+            m[10] = rotationMatrix[8];
+            m[11] = 0;
+
+            m[12] = rotationMatrix[9];
+            m[13] = rotationMatrix[10];
+            m[14] = rotationMatrix[11];
+            m[15] = 1;
+            glMultMatrixf(rotationMatrix);
+            glScalef(80, 4, 4);
             draw_cube();
         glPopMatrix();
 
-        //Link 5
+        /*//Link 5
         glPushMatrix();
             glTranslatef (180 + 60*cos((5*3.14)/180), 60*sin((5*3.14)/180), 0.0);
             glScalef(60, 5, 5);
@@ -121,7 +158,7 @@ void draw::draw_back(){
             glRotatef((-asin((60*sin((5*3.14)/180) + 10)/60)) * (180/3.14), 0, 0, 1);
             glScalef(60, 5, 5);
             draw_cube();
-        glPopMatrix();
+        glPopMatrix();*/
     glPopMatrix();
 }
 
@@ -334,17 +371,19 @@ void draw::draw_sky(){
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, sky_texture);
 
-    //Draw sky quad
-    glBegin(GL_QUADS);
-        glTexCoord2f(0.0, 0.0);
-        glVertex3f(-1000, 375, -100);
-        glTexCoord2f(0.0, 0.25);
-        glVertex3f(-1000, -180, -100);
-        glTexCoord2f(0.25, 0.25);
-        glVertex3f(1000, -180, -100);
-        glTexCoord2f(0.25, 0.0);
-        glVertex3f(1000, 375, -100);
-    glEnd();
+    glPushMatrix();
+        //Draw sky quad
+        glBegin(GL_QUADS);
+            glTexCoord2f(0, 0);
+            glVertex3f(-1000, 500, -100);
+            glTexCoord2f(0, 2);
+            glVertex3f(-1000, -500, -100);
+            glTexCoord2f(4, 2);
+            glVertex3f(1000, -500, -100);
+            glTexCoord2f(4, 0);
+            glVertex3f(1000, 500, -100);
+        glEnd();
+    glPopMatrix();
 
     //Disable texture
     glDisable(GL_TEXTURE_2D);
@@ -362,13 +401,13 @@ void draw::draw_ground(){
     //Draw ground quad
     glBegin(GL_QUADS);
         glTexCoord2f(0.0, 0.0);
-        glVertex3f(-10000, -200, 10000);
+        glVertex3f(-10000, -250, 10000);
         glTexCoord2f(0.0, 1.0);
-        glVertex3f(-10000, -200, -10000);
+        glVertex3f(-10000, -250, -10000);
         glTexCoord2f(1.0, 1.0);
-        glVertex3f(10000, -200, -10000);
+        glVertex3f(10000, -250, -10000);
         glTexCoord2f(1.0, 0.0);
-        glVertex3f(10000, -200, 10000);
+        glVertex3f(10000, -250, 10000);
     glEnd();
 
     //Disable texture

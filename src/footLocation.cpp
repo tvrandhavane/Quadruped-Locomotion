@@ -22,6 +22,6 @@ void footLocation::computePlacementLocation(int h, float current_velocity[3], fl
 	targetLocation[1] = df[1] + (current_velocity[1] - desired_velocity[1])*sqrt(h/g);
 	targetLocation[2] = df[2] + (current_velocity[2] - desired_velocity[2])*sqrt(h/g);
 
-	cout << "TargetLocation = " << targetLocation[0] << " " << targetLocation[1] << " " << 
-		targetLocation[2] << endl;
+	//cout << "TargetLocation = " << targetLocation[0] << " " << targetLocation[1] << " " << 
+	//	targetLocation[2] << endl;
 }

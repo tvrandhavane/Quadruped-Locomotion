@@ -15,17 +15,20 @@ private:
     dBodyID back_link_1_body;
     dBodyID back_link_2_body;
     dBodyID back_link_3_body;
+    dBodyID back_link_4_body;
 	dBodyID ball_body;
 
     dGeomID back_link_1_geom;
     dGeomID back_link_2_geom;
     dGeomID back_link_3_geom;
+    dGeomID back_link_4_geom;
 	dGeomID ball_geom;
 	dGeomID plane_geom;
 
     dMass back_link_1_mass;
     dMass back_link_2_mass;
     dMass back_link_3_mass;
+    dMass back_link_4_mass;
 	dMass ball_mass;
 
 	//Private Methods
@@ -45,6 +48,7 @@ public:
     dBodyID getBackLink1Body();
     dBodyID getBackLink2Body();
     dBodyID getBackLink3Body();
+    dBodyID getBackLink4Body();
     dGeomID getBallGeom();
     dMass getBallMass();
     dGeomID getPlaneGeom();
