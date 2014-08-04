@@ -123,7 +123,7 @@ void Initialize() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_REPEAT);   
 
     //Set up look at vector
-    gluLookAt(0.0, 0.0, 700.0, 0.0, 0.0, 0.0, 0.0f, 1.0f, 0.0f);    
+    gluLookAt(0.0, 0.0, 800.0, 0.0, 0.0, 0.0, 0.0f, 1.0f, 0.0f);    
 }
 
 void Timer(int iUnused){

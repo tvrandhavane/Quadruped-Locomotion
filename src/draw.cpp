@@ -90,7 +90,7 @@ void draw::draw_cube(){
 void draw::draw_back(){
     glPushMatrix();
         //Link 1
-        /*glPushMatrix();
+        glPushMatrix();
             const dReal *back_link_1_location = dBodyGetPosition(body_bag->getBackLink1Body());
             glTranslatef (back_link_1_location[0], back_link_1_location[1], back_link_1_location[2]);
             glScalef(80, 4, 4);
@@ -111,54 +111,54 @@ void draw::draw_back(){
             glTranslatef (back_link_3_location[0], back_link_3_location[1], back_link_3_location[2]);
             glScalef(80, 4, 4);
             draw_cube();
-        glPopMatrix();*/
+        glPopMatrix();
 
         //Link 4
         glPushMatrix();
             const dReal *back_link_4_location = dBodyGetPosition(body_bag->getBackLink4Body());
             glTranslatef (back_link_4_location[0], back_link_4_location[1], back_link_4_location[2]);
             const dReal *rotationMatrix =  dBodyGetRotation(body_bag->getBackLink4Body());
-
-
             float m[16];
             m[0] = rotationMatrix[0];
-            m[1] = rotationMatrix[1];
-            m[2] = rotationMatrix[2];
+            m[1] = rotationMatrix[4];
+            m[2] = rotationMatrix[8];
             m[3] = 0;
 
-            m[4] = rotationMatrix[3];
-            m[5] = rotationMatrix[4];
-            m[6] = rotationMatrix[5];
+            m[4] = rotationMatrix[1];
+            m[5] = rotationMatrix[5];
+            m[6] = rotationMatrix[9];
             m[7] = 0;
 
-            m[8] = rotationMatrix[6];
-            m[9] = rotationMatrix[7];
-            m[10] = rotationMatrix[8];
+            m[8] = rotationMatrix[2];
+            m[9] = rotationMatrix[6];
+            m[10] = rotationMatrix[10];
             m[11] = 0;
 
-            m[12] = rotationMatrix[9];
-            m[13] = rotationMatrix[10];
+            m[12] = rotationMatrix[3];
+            m[13] = rotationMatrix[7];
             m[14] = rotationMatrix[11];
             m[15] = 1;
-            glMultMatrixf(rotationMatrix);
+            //rotate the link
+            glMultMatrixf(m);
             glScalef(80, 4, 4);
             draw_cube();
         glPopMatrix();
 
-        /*//Link 5
+        //Link 5
         glPushMatrix();
-            glTranslatef (180 + 60*cos((5*3.14)/180), 60*sin((5*3.14)/180), 0.0);
-            glScalef(60, 5, 5);
+            const dReal *back_link_5_location = dBodyGetPosition(body_bag->getBackLink5Body());
+            glTranslatef (back_link_5_location[0], back_link_5_location[1], back_link_5_location[2]);
+            glScalef(80, 4, 4);
             draw_cube();
         glPopMatrix();
 
         //Link 6
         glPushMatrix();
-            glTranslatef (240 + 60*cos((5*3.14)/180), 60*sin((5*3.14)/180), 0.0);
-            glRotatef((-asin((60*sin((5*3.14)/180) + 10)/60)) * (180/3.14), 0, 0, 1);
-            glScalef(60, 5, 5);
+            const dReal *back_link_6_location = dBodyGetPosition(body_bag->getBackLink6Body());
+            glTranslatef (back_link_6_location[0], back_link_6_location[1], back_link_6_location[2]);
+            glScalef(80, 4, 4);
             draw_cube();
-        glPopMatrix();*/
+        glPopMatrix();
     glPopMatrix();
 }
 
