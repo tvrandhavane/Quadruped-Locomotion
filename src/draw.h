@@ -21,6 +21,8 @@ private:
 	void draw_sky();
     void draw_ground();
     void draw_leg();
+    void draw_front_legs();
+    void draw_back_legs();
     void draw_tail();
     void draw_nnh();
     void draw_back();

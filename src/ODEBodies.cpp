@@ -5,7 +5,7 @@ ODEBodies::ODEBodies(helper * global_helper){
 
     root_position[0] = -200.0;
     root_position[1] = 470.0 - 250.0;
-    root_position[2] = 0.0;
+    root_position[2] = 200.0;
 }
 
 void ODEBodies::init(){
@@ -13,6 +13,7 @@ void ODEBodies::init(){
     set_back();
     set_nnh();
     set_tail();
+    set_leg();
 	set_plane();
 }
 
@@ -313,6 +314,253 @@ void ODEBodies::set_tail(){
     dGeomSetRotation(tail_link_4_geom, tail_link_4_rotation_matrix);
 }
 
+void ODEBodies::set_leg(){
+    set_front_legs();
+    set_back_legs();
+}
+
+void ODEBodies::set_front_legs(){
+    float front_foot_link_1_theta = (90*M_PI)/180;
+    float front_foot_link_2_theta = (135*M_PI)/180;
+    float front_foot_link_3_theta = (120*M_PI)/180;
+    float front_foot_link_4_theta = (180*M_PI)/180;
+    float length_multiplier = 466/(5 + 4*sin(front_foot_link_2_theta) + 3*sin(front_foot_link_3_theta));    
+
+    //Left Leg
+    //Link 1
+    front_left_foot_link_1_body = dBodyCreate(global_helper->getWorld());
+    dReal * front_left_foot_link_1_rotation_matrix;
+    front_foot_link_1_length = 5*length_multiplier;
+    front_left_foot_link_1_rotation_matrix = new float(12);
+    setRotationMatrixZAxis(front_left_foot_link_1_rotation_matrix, front_foot_link_1_theta);
+    dMassSetZero(&front_left_foot_link_1_mass);
+    dMassSetCylinderTotal(&front_left_foot_link_1_mass, 10, 2, 2.0, front_foot_link_1_length);
+    dBodySetMass(front_left_foot_link_1_body, &front_left_foot_link_1_mass);
+    dBodySetLinearVel(front_left_foot_link_1_body, 0.0, 0.0, 0.0);
+    dBodySetRotation(front_left_foot_link_1_body, front_left_foot_link_1_rotation_matrix);
+
+    front_left_foot_link_1_geom = dCreateCylinder(global_helper->getSpace(), 2.0, front_foot_link_1_length);
+    dGeomSetData(front_left_foot_link_1_geom, (void *)"front_left_foot_link_1");
+    dGeomSetBody(front_left_foot_link_1_geom, front_left_foot_link_1_body);
+    dGeomSetPosition(front_left_foot_link_1_geom, root_position[0], root_position[1], root_position[2]+120);
+    dGeomSetRotation(front_left_foot_link_1_geom, front_left_foot_link_1_rotation_matrix);
+
+    //Link 2
+    front_left_foot_link_2_body = dBodyCreate(global_helper->getWorld());
+    dReal * front_left_foot_link_2_rotation_matrix;
+    front_foot_link_2_length = 4*length_multiplier;
+    front_left_foot_link_2_rotation_matrix = new float(12);
+    setRotationMatrixZAxis(front_left_foot_link_2_rotation_matrix, front_foot_link_2_theta);
+    dMassSetZero(&front_left_foot_link_2_mass);
+    dMassSetCylinderTotal(&front_left_foot_link_2_mass, 10, 2, 2.0, front_foot_link_2_length);
+    dBodySetMass(front_left_foot_link_2_body, &front_left_foot_link_2_mass);
+    dBodySetLinearVel(front_left_foot_link_2_body, 0.0, 0.0, 0.0);
+    dBodySetRotation(front_left_foot_link_2_body, front_left_foot_link_2_rotation_matrix);
+
+    front_left_foot_link_2_geom = dCreateCylinder(global_helper->getSpace(), 2.0, front_foot_link_2_length);
+    dGeomSetData(front_left_foot_link_2_geom, (void *)"front_left_foot_link_2");
+    dGeomSetBody(front_left_foot_link_2_geom, front_left_foot_link_2_body);
+    dGeomSetPosition(front_left_foot_link_2_geom, root_position[0], root_position[1] - front_foot_link_1_length, root_position[2]+120);
+    dGeomSetRotation(front_left_foot_link_2_geom, front_left_foot_link_2_rotation_matrix);
+
+    //Link 3
+    front_left_foot_link_3_body = dBodyCreate(global_helper->getWorld());
+    dReal * front_left_foot_link_3_rotation_matrix;
+    front_foot_link_3_length = 3*length_multiplier;
+    front_left_foot_link_3_rotation_matrix = new float(12);
+    setRotationMatrixZAxis(front_left_foot_link_3_rotation_matrix, front_foot_link_3_theta);
+    dMassSetZero(&front_left_foot_link_3_mass);
+    dMassSetCylinderTotal(&front_left_foot_link_3_mass, 10, 2, 2.0, front_foot_link_3_length);
+    dBodySetMass(front_left_foot_link_3_body, &front_left_foot_link_3_mass);
+    dBodySetLinearVel(front_left_foot_link_3_body, 0.0, 0.0, 0.0);
+    dBodySetRotation(front_left_foot_link_3_body, front_left_foot_link_3_rotation_matrix);
+
+    front_left_foot_link_3_geom = dCreateCylinder(global_helper->getSpace(), 2.0, front_foot_link_3_length);
+    dGeomSetData(front_left_foot_link_3_geom, (void *)"front_left_foot_link_3");
+    dGeomSetBody(front_left_foot_link_3_geom, front_left_foot_link_3_body);
+    dGeomSetPosition(front_left_foot_link_3_geom, root_position[0] + front_foot_link_2_length*cos(front_foot_link_2_theta), root_position[1] - front_foot_link_1_length - front_foot_link_2_length*sin(front_foot_link_2_theta), root_position[2] + 120);
+    dGeomSetRotation(front_left_foot_link_3_geom, front_left_foot_link_3_rotation_matrix);
+
+    //Right Leg
+    //Link 1
+    front_right_foot_link_1_body = dBodyCreate(global_helper->getWorld());
+    dReal * front_right_foot_link_1_rotation_matrix;
+    front_foot_link_1_length = 5*length_multiplier;
+    front_right_foot_link_1_rotation_matrix = new float(12);
+    setRotationMatrixZAxis(front_right_foot_link_1_rotation_matrix, front_foot_link_1_theta);
+    dMassSetZero(&front_right_foot_link_1_mass);
+    dMassSetCylinderTotal(&front_right_foot_link_1_mass, 10, 2, 2.0, front_foot_link_1_length);
+    dBodySetMass(front_right_foot_link_1_body, &front_right_foot_link_1_mass);
+    dBodySetLinearVel(front_right_foot_link_1_body, 0.0, 0.0, 0.0);
+    dBodySetRotation(front_right_foot_link_1_body, front_right_foot_link_1_rotation_matrix);
+
+    front_right_foot_link_1_geom = dCreateCylinder(global_helper->getSpace(), 2.0, front_foot_link_1_length);
+    dGeomSetData(front_right_foot_link_1_geom, (void *)"front_right_foot_link_1");
+    dGeomSetBody(front_right_foot_link_1_geom, front_right_foot_link_1_body);
+    dGeomSetPosition(front_right_foot_link_1_geom, root_position[0], root_position[1], root_position[2]-120);
+    dGeomSetRotation(front_right_foot_link_1_geom, front_right_foot_link_1_rotation_matrix);
+
+    //Link 2
+    front_right_foot_link_2_body = dBodyCreate(global_helper->getWorld());
+    dReal * front_right_foot_link_2_rotation_matrix;
+    front_foot_link_2_length = 4*length_multiplier;
+    front_right_foot_link_2_rotation_matrix = new float(12);
+    setRotationMatrixZAxis(front_right_foot_link_2_rotation_matrix, front_foot_link_2_theta);
+    dMassSetZero(&front_right_foot_link_2_mass);
+    dMassSetCylinderTotal(&front_right_foot_link_2_mass, 10, 2, 2.0, front_foot_link_2_length);
+    dBodySetMass(front_right_foot_link_2_body, &front_right_foot_link_2_mass);
+    dBodySetLinearVel(front_right_foot_link_2_body, 0.0, 0.0, 0.0);
+    dBodySetRotation(front_right_foot_link_2_body, front_right_foot_link_2_rotation_matrix);
+
+    front_right_foot_link_2_geom = dCreateCylinder(global_helper->getSpace(), 2.0, front_foot_link_2_length);
+    dGeomSetData(front_right_foot_link_2_geom, (void *)"front_right_foot_link_2");
+    dGeomSetBody(front_right_foot_link_2_geom, front_right_foot_link_2_body);
+    dGeomSetPosition(front_right_foot_link_2_geom, root_position[0], root_position[1] - front_foot_link_1_length, root_position[2]-120);
+    dGeomSetRotation(front_right_foot_link_2_geom, front_right_foot_link_2_rotation_matrix);
+
+    //Link 3
+    front_right_foot_link_3_body = dBodyCreate(global_helper->getWorld());
+    dReal * front_right_foot_link_3_rotation_matrix;
+    front_foot_link_3_length = 3*length_multiplier;
+    front_right_foot_link_3_rotation_matrix = new float(12);
+    setRotationMatrixZAxis(front_right_foot_link_3_rotation_matrix, front_foot_link_3_theta);
+    dMassSetZero(&front_right_foot_link_3_mass);
+    dMassSetCylinderTotal(&front_right_foot_link_3_mass, 10, 2, 2.0, front_foot_link_3_length);
+    dBodySetMass(front_right_foot_link_3_body, &front_right_foot_link_3_mass);
+    dBodySetLinearVel(front_right_foot_link_3_body, 0.0, 0.0, 0.0);
+    dBodySetRotation(front_right_foot_link_3_body, front_right_foot_link_3_rotation_matrix);
+
+    front_right_foot_link_3_geom = dCreateCylinder(global_helper->getSpace(), 2.0, front_foot_link_3_length);
+    dGeomSetData(front_right_foot_link_3_geom, (void *)"front_right_foot_link_3");
+    dGeomSetBody(front_right_foot_link_3_geom, front_right_foot_link_3_body);
+    dGeomSetPosition(front_right_foot_link_3_geom, root_position[0] + front_foot_link_2_length*cos(front_foot_link_2_theta), root_position[1] - front_foot_link_1_length - front_foot_link_2_length*sin(front_foot_link_2_theta), root_position[2] - 120);
+    dGeomSetRotation(front_right_foot_link_3_geom, front_right_foot_link_3_rotation_matrix);
+}
+
+void ODEBodies::set_back_legs(){
+    float start_location[3];
+
+    start_location[0] = root_position[0] + 320.0 + 80*cos(back_link_4_theta) + 80*cos(back_link_6_theta);
+    start_location[1] = root_position[1] - 80*sin(back_link_4_theta) - 80*sin(back_link_6_theta);
+    start_location[2] = root_position[2];
+
+    float back_foot_link_1_theta = (90*M_PI)/180;
+    float back_foot_link_2_theta = (135*M_PI)/180;
+    float back_foot_link_3_theta = (120*M_PI)/180;
+    float back_foot_link_4_theta = (180*M_PI)/180;
+    float length_multiplier = 446/(5 + 4*sin(back_foot_link_2_theta) + 3*sin(back_foot_link_3_theta));    
+
+    //Left Leg
+    //Link 1
+    back_left_foot_link_1_body = dBodyCreate(global_helper->getWorld());
+    dReal * back_left_foot_link_1_rotation_matrix;
+    back_foot_link_1_length = 5*length_multiplier;
+    back_left_foot_link_1_rotation_matrix = new float(12);
+    setRotationMatrixZAxis(back_left_foot_link_1_rotation_matrix, back_foot_link_1_theta);
+    dMassSetZero(&back_left_foot_link_1_mass);
+    dMassSetCylinderTotal(&back_left_foot_link_1_mass, 10, 2, 2.0, back_foot_link_1_length);
+    dBodySetMass(back_left_foot_link_1_body, &back_left_foot_link_1_mass);
+    dBodySetLinearVel(back_left_foot_link_1_body, 0.0, 0.0, 0.0);
+    dBodySetRotation(back_left_foot_link_1_body, back_left_foot_link_1_rotation_matrix);
+
+    back_left_foot_link_1_geom = dCreateCylinder(global_helper->getSpace(), 2.0, back_foot_link_1_length);
+    dGeomSetData(back_left_foot_link_1_geom, (void *)"back_left_foot_link_1");
+    dGeomSetBody(back_left_foot_link_1_geom, back_left_foot_link_1_body);
+    dGeomSetPosition(back_left_foot_link_1_geom, start_location[0], start_location[1], start_location[2]+120);
+    dGeomSetRotation(back_left_foot_link_1_geom, back_left_foot_link_1_rotation_matrix);
+
+    //Link 2
+    back_left_foot_link_2_body = dBodyCreate(global_helper->getWorld());
+    dReal * back_left_foot_link_2_rotation_matrix;
+    back_foot_link_2_length = 4*length_multiplier;
+    back_left_foot_link_2_rotation_matrix = new float(12);
+    setRotationMatrixZAxis(back_left_foot_link_2_rotation_matrix, back_foot_link_2_theta);
+    dMassSetZero(&back_left_foot_link_2_mass);
+    dMassSetCylinderTotal(&back_left_foot_link_2_mass, 10, 2, 2.0, back_foot_link_2_length);
+    dBodySetMass(back_left_foot_link_2_body, &back_left_foot_link_2_mass);
+    dBodySetLinearVel(back_left_foot_link_2_body, 0.0, 0.0, 0.0);
+    dBodySetRotation(back_left_foot_link_2_body, back_left_foot_link_2_rotation_matrix);
+
+    back_left_foot_link_2_geom = dCreateCylinder(global_helper->getSpace(), 2.0, back_foot_link_2_length);
+    dGeomSetData(back_left_foot_link_2_geom, (void *)"back_left_foot_link_2");
+    dGeomSetBody(back_left_foot_link_2_geom, back_left_foot_link_2_body);
+    dGeomSetPosition(back_left_foot_link_2_geom, start_location[0], start_location[1] - back_foot_link_1_length, start_location[2]+120);
+    dGeomSetRotation(back_left_foot_link_2_geom, back_left_foot_link_2_rotation_matrix);
+
+    //Link 3
+    back_left_foot_link_3_body = dBodyCreate(global_helper->getWorld());
+    dReal * back_left_foot_link_3_rotation_matrix;
+    back_foot_link_3_length = 3*length_multiplier;
+    back_left_foot_link_3_rotation_matrix = new float(12);
+    setRotationMatrixZAxis(back_left_foot_link_3_rotation_matrix, back_foot_link_3_theta);
+    dMassSetZero(&back_left_foot_link_3_mass);
+    dMassSetCylinderTotal(&back_left_foot_link_3_mass, 10, 2, 2.0, back_foot_link_3_length);
+    dBodySetMass(back_left_foot_link_3_body, &back_left_foot_link_3_mass);
+    dBodySetLinearVel(back_left_foot_link_3_body, 0.0, 0.0, 0.0);
+    dBodySetRotation(back_left_foot_link_3_body, back_left_foot_link_3_rotation_matrix);
+
+    back_left_foot_link_3_geom = dCreateCylinder(global_helper->getSpace(), 2.0, back_foot_link_3_length);
+    dGeomSetData(back_left_foot_link_3_geom, (void *)"back_left_foot_link_3");
+    dGeomSetBody(back_left_foot_link_3_geom, back_left_foot_link_3_body);
+    dGeomSetPosition(back_left_foot_link_3_geom, start_location[0] + back_foot_link_2_length*cos(back_foot_link_2_theta), start_location[1] - back_foot_link_1_length - back_foot_link_2_length*sin(back_foot_link_2_theta), start_location[2] + 120);
+    dGeomSetRotation(back_left_foot_link_3_geom, back_left_foot_link_3_rotation_matrix);
+
+    //Right Leg
+    //Link 1
+    back_right_foot_link_1_body = dBodyCreate(global_helper->getWorld());
+    dReal * back_right_foot_link_1_rotation_matrix;
+    back_foot_link_1_length = 5*length_multiplier;
+    back_right_foot_link_1_rotation_matrix = new float(12);
+    setRotationMatrixZAxis(back_right_foot_link_1_rotation_matrix, back_foot_link_1_theta);
+    dMassSetZero(&back_right_foot_link_1_mass);
+    dMassSetCylinderTotal(&back_right_foot_link_1_mass, 10, 2, 2.0, back_foot_link_1_length);
+    dBodySetMass(back_right_foot_link_1_body, &back_right_foot_link_1_mass);
+    dBodySetLinearVel(back_right_foot_link_1_body, 0.0, 0.0, 0.0);
+    dBodySetRotation(back_right_foot_link_1_body, back_right_foot_link_1_rotation_matrix);
+
+    back_right_foot_link_1_geom = dCreateCylinder(global_helper->getSpace(), 2.0, back_foot_link_1_length);
+    dGeomSetData(back_right_foot_link_1_geom, (void *)"back_right_foot_link_1");
+    dGeomSetBody(back_right_foot_link_1_geom, back_right_foot_link_1_body);
+    dGeomSetPosition(back_right_foot_link_1_geom, start_location[0], start_location[1], start_location[2]-120);
+    dGeomSetRotation(back_right_foot_link_1_geom, back_right_foot_link_1_rotation_matrix);
+
+    //Link 2
+    back_right_foot_link_2_body = dBodyCreate(global_helper->getWorld());
+    dReal * back_right_foot_link_2_rotation_matrix;
+    back_foot_link_2_length = 4*length_multiplier;
+    back_right_foot_link_2_rotation_matrix = new float(12);
+    setRotationMatrixZAxis(back_right_foot_link_2_rotation_matrix, back_foot_link_2_theta);
+    dMassSetZero(&back_right_foot_link_2_mass);
+    dMassSetCylinderTotal(&back_right_foot_link_2_mass, 10, 2, 2.0, back_foot_link_2_length);
+    dBodySetMass(back_right_foot_link_2_body, &back_right_foot_link_2_mass);
+    dBodySetLinearVel(back_right_foot_link_2_body, 0.0, 0.0, 0.0);
+    dBodySetRotation(back_right_foot_link_2_body, back_right_foot_link_2_rotation_matrix);
+
+    back_right_foot_link_2_geom = dCreateCylinder(global_helper->getSpace(), 2.0, back_foot_link_2_length);
+    dGeomSetData(back_right_foot_link_2_geom, (void *)"back_right_foot_link_2");
+    dGeomSetBody(back_right_foot_link_2_geom, back_right_foot_link_2_body);
+    dGeomSetPosition(back_right_foot_link_2_geom, start_location[0], start_location[1] - back_foot_link_1_length, start_location[2]-120);
+    dGeomSetRotation(back_right_foot_link_2_geom, back_right_foot_link_2_rotation_matrix);
+
+    //Link 3
+    back_right_foot_link_3_body = dBodyCreate(global_helper->getWorld());
+    dReal * back_right_foot_link_3_rotation_matrix;
+    back_foot_link_3_length = 3*length_multiplier;
+    back_right_foot_link_3_rotation_matrix = new float(12);
+    setRotationMatrixZAxis(back_right_foot_link_3_rotation_matrix, back_foot_link_3_theta);
+    dMassSetZero(&back_right_foot_link_3_mass);
+    dMassSetCylinderTotal(&back_right_foot_link_3_mass, 10, 2, 2.0, back_foot_link_3_length);
+    dBodySetMass(back_right_foot_link_3_body, &back_right_foot_link_3_mass);
+    dBodySetLinearVel(back_right_foot_link_3_body, 0.0, 0.0, 0.0);
+    dBodySetRotation(back_right_foot_link_3_body, back_right_foot_link_3_rotation_matrix);
+
+    back_right_foot_link_3_geom = dCreateCylinder(global_helper->getSpace(), 2.0, back_foot_link_3_length);
+    dGeomSetData(back_right_foot_link_3_geom, (void *)"back_right_foot_link_3");
+    dGeomSetBody(back_right_foot_link_3_geom, back_right_foot_link_3_body);
+    dGeomSetPosition(back_right_foot_link_3_geom, start_location[0] + back_foot_link_2_length*cos(back_foot_link_2_theta), start_location[1] - back_foot_link_1_length - back_foot_link_2_length*sin(back_foot_link_2_theta), start_location[2] - 120);
+    dGeomSetRotation(back_right_foot_link_3_geom, back_right_foot_link_3_rotation_matrix);
+}
+
 void ODEBodies::set_plane(){
 	plane_geom = dCreatePlane(global_helper->getSpace(), 0.0, 1.0, 0.0, -250.0);	
 }
@@ -379,6 +627,78 @@ dBodyID ODEBodies::getTailLink3Body(){
 
 dBodyID ODEBodies::getTailLink4Body(){
     return tail_link_4_body;
+}
+
+dBodyID ODEBodies::getFrontLeftFootLink1Body(){
+    return front_left_foot_link_1_body;
+}
+
+dBodyID ODEBodies::getFrontLeftFootLink2Body(){
+    return front_left_foot_link_2_body;
+}
+
+dBodyID ODEBodies::getFrontLeftFootLink3Body(){
+    return front_left_foot_link_3_body;
+}
+
+dBodyID ODEBodies::getFrontRightFootLink1Body(){
+    return front_right_foot_link_1_body;
+}
+
+dBodyID ODEBodies::getFrontRightFootLink2Body(){
+    return front_right_foot_link_2_body;
+}
+
+dBodyID ODEBodies::getFrontRightFootLink3Body(){
+    return front_right_foot_link_3_body;
+}
+
+float ODEBodies::getFrontFootLink1Length(){
+    return front_foot_link_1_length;
+}
+
+float ODEBodies::getFrontFootLink2Length(){
+    return front_foot_link_2_length;
+}
+
+float ODEBodies::getFrontFootLink3Length(){
+    return front_foot_link_3_length;
+}
+
+dBodyID ODEBodies::getBackLeftFootLink1Body(){
+    return back_left_foot_link_1_body;
+}
+
+dBodyID ODEBodies::getBackLeftFootLink2Body(){
+    return back_left_foot_link_2_body;
+}
+
+dBodyID ODEBodies::getBackLeftFootLink3Body(){
+    return back_left_foot_link_3_body;
+}
+
+dBodyID ODEBodies::getBackRightFootLink1Body(){
+    return back_right_foot_link_1_body;
+}
+
+dBodyID ODEBodies::getBackRightFootLink2Body(){
+    return back_right_foot_link_2_body;
+}
+
+dBodyID ODEBodies::getBackRightFootLink3Body(){
+    return back_right_foot_link_3_body;
+}
+
+float ODEBodies::getBackFootLink1Length(){
+    return back_foot_link_1_length;
+}
+
+float ODEBodies::getBackFootLink2Length(){
+    return back_foot_link_2_length;
+}
+
+float ODEBodies::getBackFootLink3Length(){
+    return back_foot_link_3_length;
 }
 
 dGeomID ODEBodies::getPlaneGeom(){

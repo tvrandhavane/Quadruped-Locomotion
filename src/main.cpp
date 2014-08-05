@@ -107,7 +107,7 @@ void Initialize() {
     gluPerspective(45.0,                    //The camera angle
                    1000.0 / 600.0,           //The width-to-height ratio
                    1.0,                     //The near z clipping coordinate
-                   1000.0);                 //The far z clipping coordinate    
+                   2000.0);                 //The far z clipping coordinate    
 
     // Set material properties
     GLfloat qaBlack[] = {0.0, 0.0, 0.0, 0.8};
@@ -123,7 +123,7 @@ void Initialize() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_REPEAT);   
 
     //Set up look at vector
-    gluLookAt(0.0, 0.0, 800.0, 0.0, 0.0, 0.0, 0.0f, 1.0f, 0.0f);    
+    gluLookAt(0.0, 0.0, 1500.0, 0.0, 0.0, 0.0, 0.0f, 1.0f, 0.0f);    
 }
 
 void Timer(int iUnused){
@@ -151,6 +151,7 @@ int main(int argc, char** argv) {
     glutCreateWindow("Quadruped Locomotion");
 
     //Initialize the scene
+    
     Initialize();
 
     //Initialize ODE
