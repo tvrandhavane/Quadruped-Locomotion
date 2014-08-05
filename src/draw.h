@@ -22,7 +22,7 @@ private:
     void draw_ground();
     void draw_leg();
     void draw_tail();
-    void draw_neck_head();
+    void draw_nnh();
     void draw_back();
     void draw_dog();
     void draw_cube();

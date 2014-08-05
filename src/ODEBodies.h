@@ -13,12 +13,22 @@ private:
 	//Private Objects
 	helper * global_helper;
 
+    float root_position[3];
+
     dBodyID back_link_1_body;
     dBodyID back_link_2_body;
     dBodyID back_link_3_body;
     dBodyID back_link_4_body;
     dBodyID back_link_5_body;
     dBodyID back_link_6_body;
+    dBodyID nnh_link_1_body;
+    dBodyID nnh_link_2_body;
+    dBodyID nnh_link_3_body;
+    dBodyID nnh_link_4_body;
+    dBodyID tail_link_1_body;
+    dBodyID tail_link_2_body;
+    dBodyID tail_link_3_body;
+    dBodyID tail_link_4_body;
 	dBodyID ball_body;
 
     dGeomID back_link_1_geom;
@@ -27,6 +37,14 @@ private:
     dGeomID back_link_4_geom;
     dGeomID back_link_5_geom;
     dGeomID back_link_6_geom;
+    dGeomID nnh_link_1_geom;
+    dGeomID nnh_link_2_geom;
+    dGeomID nnh_link_3_geom;
+    dGeomID nnh_link_4_geom;
+    dGeomID tail_link_1_geom;
+    dGeomID tail_link_2_geom;
+    dGeomID tail_link_3_geom;
+    dGeomID tail_link_4_geom;
 	dGeomID ball_geom;
 	dGeomID plane_geom;
 
@@ -36,11 +54,24 @@ private:
     dMass back_link_4_mass;
     dMass back_link_5_mass;
     dMass back_link_6_mass;
+    dMass nnh_link_1_mass;
+    dMass nnh_link_2_mass;
+    dMass nnh_link_3_mass;
+    dMass nnh_link_4_mass;
+    dMass tail_link_1_mass;
+    dMass tail_link_2_mass;
+    dMass tail_link_3_mass;
+    dMass tail_link_4_mass;
 	dMass ball_mass;
+
+    float back_link_4_theta;
+    float back_link_6_theta;
 
 	//Private Methods
     void set_ball();
     void set_back();
+    void set_nnh();
+    void set_tail();
     void set_plane();
     void setRotationMatrixZAxis(dReal * R, float theta);
 
@@ -53,14 +84,24 @@ public:
 
     //Getters
     dBodyID getBallBody();
+    //Back
     dBodyID getBackLink1Body();
     dBodyID getBackLink2Body();
     dBodyID getBackLink3Body();
     dBodyID getBackLink4Body();
     dBodyID getBackLink5Body();
     dBodyID getBackLink6Body();
-    dGeomID getBallGeom();
-    dMass getBallMass();
+    //Neck and head
+    dBodyID getNnhLink1Body();
+    dBodyID getNnhLink2Body();
+    dBodyID getNnhLink3Body();
+    dBodyID getNnhLink4Body();
+    //Tail
+    dBodyID getTailLink1Body();
+    dBodyID getTailLink2Body();
+    dBodyID getTailLink3Body();
+    dBodyID getTailLink4Body();
+
     dGeomID getPlaneGeom();
     helper * getGlobalHelper();
 };
