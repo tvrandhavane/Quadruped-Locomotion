@@ -26,6 +26,8 @@ private:
     void draw_back();
     void draw_dog();
     void draw_cube();
+
+    void getOpenGLRotationMatrix(float * opengl, const float * ode);
     
 public:
     //Constructor

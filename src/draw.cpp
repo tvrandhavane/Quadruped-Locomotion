@@ -117,29 +117,11 @@ void draw::draw_back(){
         glPushMatrix();
             const dReal *back_link_4_location = dBodyGetPosition(body_bag->getBackLink4Body());
             glTranslatef (back_link_4_location[0], back_link_4_location[1], back_link_4_location[2]);
-            const dReal *rotationMatrix =  dBodyGetRotation(body_bag->getBackLink4Body());
-            float m[16];
-            m[0] = rotationMatrix[0];
-            m[1] = rotationMatrix[4];
-            m[2] = rotationMatrix[8];
-            m[3] = 0;
-
-            m[4] = rotationMatrix[1];
-            m[5] = rotationMatrix[5];
-            m[6] = rotationMatrix[9];
-            m[7] = 0;
-
-            m[8] = rotationMatrix[2];
-            m[9] = rotationMatrix[6];
-            m[10] = rotationMatrix[10];
-            m[11] = 0;
-
-            m[12] = rotationMatrix[3];
-            m[13] = rotationMatrix[7];
-            m[14] = rotationMatrix[11];
-            m[15] = 1;
+            const dReal *back_link_4_rotation_matrix_ode =  dBodyGetRotation(body_bag->getBackLink4Body());
+            float back_link_4_rotation_matrix_openGL[16];
+            getOpenGLRotationMatrix(back_link_4_rotation_matrix_openGL, back_link_4_rotation_matrix_ode);
             //rotate the link
-            glMultMatrixf(m);
+            glMultMatrixf(back_link_4_rotation_matrix_openGL);
             glScalef(80, 4, 4);
             draw_cube();
         glPopMatrix();
@@ -156,6 +138,12 @@ void draw::draw_back(){
         glPushMatrix();
             const dReal *back_link_6_location = dBodyGetPosition(body_bag->getBackLink6Body());
             glTranslatef (back_link_6_location[0], back_link_6_location[1], back_link_6_location[2]);
+
+            const dReal *back_link_6_rotation_matrix_ode =  dBodyGetRotation(body_bag->getBackLink6Body());
+            float back_link_6_rotation_matrix_openGL[16];
+            getOpenGLRotationMatrix(back_link_6_rotation_matrix_openGL, back_link_6_rotation_matrix_ode);
+            //rotate the link
+            glMultMatrixf(back_link_6_rotation_matrix_openGL);
             glScalef(80, 4, 4);
             draw_cube();
         glPopMatrix();
@@ -412,4 +400,26 @@ void draw::draw_ground(){
 
     //Disable texture
     glDisable(GL_TEXTURE_2D);
+}
+
+void draw::getOpenGLRotationMatrix(float * opengl, const float * ode){
+    opengl[0] = ode[0];
+    opengl[1] = ode[4];
+    opengl[2] = ode[8];
+    opengl[3] = 0;
+
+    opengl[4] = ode[1];
+    opengl[5] = ode[5];
+    opengl[6] = ode[9];
+    opengl[7] = 0;
+
+    opengl[8] = ode[2];
+    opengl[9] = ode[6];
+    opengl[10] = ode[10];
+    opengl[11] = 0;
+
+    opengl[12] = ode[3];
+    opengl[13] = ode[7];
+    opengl[14] = ode[11];
+    opengl[15] = 1;
 }
