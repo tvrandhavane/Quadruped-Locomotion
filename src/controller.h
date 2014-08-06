@@ -3,7 +3,6 @@
 
 #include <iostream>
 #include <cmath>
-#include "gaitGraph.h"
 #include "footLocation.h"
 
 using namespace std;
@@ -23,11 +22,11 @@ private:
     float current_velocity[3];
     float desired_velocity[3];
 
-    gaitGraph * gait_graph;
     footLocation * foot_location;
 
 	//Private Methods
-    
+    bool isInSwing(int leg_id);
+
 public:
     //Constructor
     controller();

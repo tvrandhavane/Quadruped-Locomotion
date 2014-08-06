@@ -6,12 +6,14 @@
 #include <iostream>
 #include <cmath>
 #include "helper.h"
+#include "controller.h"
 
 class ODEBodies
 {
 private:
 	//Private Objects
 	helper * global_helper;
+    controller * gait_controller;
 
     float root_position[3];
 
@@ -124,7 +126,7 @@ private:
 
 public:
 	//Constructor
-    ODEBodies(helper * global_helper);
+    ODEBodies(helper * global_helper, controller * gait_controller);
 
     //Public Methods
     void init();
@@ -175,6 +177,7 @@ public:
 
     dGeomID getPlaneGeom();
     helper * getGlobalHelper();
+    controller * getGaitController();
 };
 
 #endif // ODEBODIES_H

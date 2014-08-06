@@ -1,7 +1,6 @@
 #include "controller.h"
 
 controller::controller(){
-	gait_graph = new gaitGraph();
 	foot_location = new footLocation();
 
 	time = 0;
@@ -15,13 +14,13 @@ controller::controller(){
 	swingStart[3] = 50;
 	swingEnd[3] = 100;
 
-	shoulderHeight = 47;		//in cm
-    hipHeight = 45;
+	shoulderHeight = 470;		//in 0.1cm
+    hipHeight = 450;
 
-    current_velocity[0] = 200;		//in cm/s
+    current_velocity[0] = 2000;		//in 0.1cm/s
     current_velocity[1] = 0;
     current_velocity[2] = 0;
-    desired_velocity[0] = 400;
+    desired_velocity[0] = 4000;
     desired_velocity[1] = 0;
     desired_velocity[2] = 0;
 }
@@ -46,4 +45,25 @@ void controller::takeStep(){
 	if(swingStart[3] == time%T){		
 		foot_location->computePlacementLocation(hipHeight, current_velocity, desired_velocity);
 	}
+}
+
+bool controller::isInSwing(int leg_id){
+	int phase = time%T;
+	if(swingStart[leg_id] < swingEnd[leg_id]){
+		if(phase >= swingStart[leg_id] && phase < swingEnd[leg_id]){
+			return true;
+		}
+	}
+	else if(swingStart[leg_id] == swingEnd[leg_id]){
+		return true;
+	}
+	else{
+		if(phase >= swingStart[leg_id]){
+			return true;
+		}
+		else if(phase < swingEnd[leg_id]){
+			return true;
+		}
+	}
+	return false;
 }

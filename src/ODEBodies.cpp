@@ -1,7 +1,8 @@
 #include "ODEBodies.h"
 
-ODEBodies::ODEBodies(helper * global_helper){
+ODEBodies::ODEBodies(helper * global_helper, controller * gait_controller){
 	this->global_helper = global_helper;
+    this->gait_controller = gait_controller;
 
     root_position[0] = -200.0;
     root_position[1] = 470.0 - 250.0;
@@ -232,6 +233,18 @@ void ODEBodies::set_nnh(){
     dJointID ball_joint_spine_1= dJointCreateBall(global_helper->getWorld(), 0);
     dJointAttach(ball_joint_spine_1, back_link_1_body, nnh_link_1_body);
     dJointSetBallAnchor (ball_joint_spine_1, root_position[0], root_position[1], root_position[2]);
+
+    dJointID ball_joint_1_2= dJointCreateBall(global_helper->getWorld(), 0);
+    dJointAttach(ball_joint_1_2, nnh_link_1_body, nnh_link_2_body);
+    dJointSetBallAnchor (ball_joint_1_2, root_position[0] - 30.0, root_position[1] + 60*sin((60*3.14)/180), root_position[2]);
+
+    dJointID ball_joint_2_3= dJointCreateBall(global_helper->getWorld(), 0);
+    dJointAttach(ball_joint_2_3, nnh_link_2_body, nnh_link_3_body);
+    dJointSetBallAnchor (ball_joint_2_3, root_position[0] - 30.0, root_position[1] + 60 + 60*sin((60*3.14)/180), root_position[2]);
+
+    dJointID ball_joint_3_4= dJointCreateBall(global_helper->getWorld(), 0);
+    dJointAttach(ball_joint_3_4, nnh_link_3_body, nnh_link_4_body);
+    dJointSetBallAnchor (ball_joint_3_4, root_position[0] - 60.0, root_position[1] + 60 + 2*60*sin((60*3.14)/180), root_position[2]);
 }
 
 void ODEBodies::set_tail(){
@@ -312,6 +325,23 @@ void ODEBodies::set_tail(){
     dGeomSetBody(tail_link_4_geom, tail_link_4_body);
     dGeomSetPosition(tail_link_4_geom, start_location[0] + 80*cos(tail_link_1_theta) + 80*cos(tail_link_2_theta), start_location[1] - 80*sin(tail_link_1_theta) - 80*sin(tail_link_2_theta) - 80, start_location[2]);
     dGeomSetRotation(tail_link_4_geom, tail_link_4_rotation_matrix);
+
+    //Joints
+    dJointID ball_joint_pelvis_1 = dJointCreateBall(global_helper->getWorld(), 0);
+    dJointAttach(ball_joint_pelvis_1, back_link_6_body, tail_link_1_body);
+    dJointSetBallAnchor (ball_joint_pelvis_1, start_location[0], start_location[1], start_location[2]);
+
+    dJointID ball_joint_1_2 = dJointCreateBall(global_helper->getWorld(), 0);
+    dJointAttach(ball_joint_1_2, tail_link_1_body, tail_link_2_body);
+    dJointSetBallAnchor (ball_joint_1_2, start_location[0] + 80*cos(tail_link_1_theta), start_location[1] - 80*sin(tail_link_1_theta), start_location[2]);
+
+    dJointID ball_joint_2_3 = dJointCreateBall(global_helper->getWorld(), 0);
+    dJointAttach(ball_joint_2_3, tail_link_2_body, tail_link_3_body);
+    dJointSetBallAnchor (ball_joint_2_3, start_location[0] + 80*cos(tail_link_1_theta) + 80*cos(tail_link_2_theta), start_location[1] - 80*sin(tail_link_1_theta) - 80*sin(tail_link_2_theta), start_location[2]);
+
+    dJointID ball_joint_3_4 = dJointCreateBall(global_helper->getWorld(), 0);
+    dJointAttach(ball_joint_3_4, tail_link_3_body, tail_link_4_body);
+    dJointSetBallAnchor (ball_joint_3_4, start_location[0] + 80*cos(tail_link_1_theta) + 80*cos(tail_link_2_theta), start_location[1] - 80*sin(tail_link_1_theta) - 80*sin(tail_link_2_theta) - 80, start_location[2]);
 }
 
 void ODEBodies::set_leg(){
@@ -435,6 +465,31 @@ void ODEBodies::set_front_legs(){
     dGeomSetBody(front_right_foot_link_3_geom, front_right_foot_link_3_body);
     dGeomSetPosition(front_right_foot_link_3_geom, root_position[0] + front_foot_link_2_length*cos(front_foot_link_2_theta), root_position[1] - front_foot_link_1_length - front_foot_link_2_length*sin(front_foot_link_2_theta), root_position[2] - 120);
     dGeomSetRotation(front_right_foot_link_3_geom, front_right_foot_link_3_rotation_matrix);
+
+    //Joints
+    dJointID ball_joint_shoulder_left_1 = dJointCreateBall(global_helper->getWorld(), 0);
+    dJointAttach(ball_joint_shoulder_left_1, back_link_1_body, front_left_foot_link_1_body);
+    dJointSetBallAnchor (ball_joint_shoulder_left_1, root_position[0], root_position[1], root_position[2] + 60.0);
+
+    dJointID ball_joint_left_1_left_2 = dJointCreateBall(global_helper->getWorld(), 0);
+    dJointAttach(ball_joint_left_1_left_2, front_left_foot_link_1_body, front_left_foot_link_2_body);
+    dJointSetBallAnchor (ball_joint_left_1_left_2, root_position[0], root_position[1] - front_foot_link_1_length, root_position[2]+120);
+
+    dJointID ball_joint_left_2_left_3 = dJointCreateBall(global_helper->getWorld(), 0);
+    dJointAttach(ball_joint_left_2_left_3, front_left_foot_link_1_body, front_left_foot_link_2_body);
+    dJointSetBallAnchor (ball_joint_left_2_left_3, root_position[0] + front_foot_link_2_length*cos(front_foot_link_2_theta), root_position[1] - front_foot_link_1_length - front_foot_link_2_length*sin(front_foot_link_2_theta), root_position[2] - 120);
+
+    dJointID ball_joint_shoulder_right_1 = dJointCreateBall(global_helper->getWorld(), 0);
+    dJointAttach(ball_joint_shoulder_right_1, back_link_1_body, front_right_foot_link_1_body);
+    dJointSetBallAnchor (ball_joint_shoulder_right_1, root_position[0], root_position[1], root_position[2] - 60.0);
+
+    dJointID ball_joint_right_1_right_2 = dJointCreateBall(global_helper->getWorld(), 0);
+    dJointAttach(ball_joint_right_1_right_2, front_right_foot_link_1_body, front_right_foot_link_2_body);
+    dJointSetBallAnchor (ball_joint_right_1_right_2, root_position[0], root_position[1] - front_foot_link_1_length, root_position[2]-120);
+
+    dJointID ball_joint_right_2_right_3 = dJointCreateBall(global_helper->getWorld(), 0);
+    dJointAttach(ball_joint_right_2_right_3, front_right_foot_link_1_body, front_right_foot_link_2_body);
+    dJointSetBallAnchor (ball_joint_right_2_right_3, root_position[0] + front_foot_link_2_length*cos(front_foot_link_2_theta), root_position[1] - front_foot_link_1_length - front_foot_link_2_length*sin(front_foot_link_2_theta), root_position[2] - 120);
 }
 
 void ODEBodies::set_back_legs(){
@@ -559,6 +614,31 @@ void ODEBodies::set_back_legs(){
     dGeomSetBody(back_right_foot_link_3_geom, back_right_foot_link_3_body);
     dGeomSetPosition(back_right_foot_link_3_geom, start_location[0] + back_foot_link_2_length*cos(back_foot_link_2_theta), start_location[1] - back_foot_link_1_length - back_foot_link_2_length*sin(back_foot_link_2_theta), start_location[2] - 120);
     dGeomSetRotation(back_right_foot_link_3_geom, back_right_foot_link_3_rotation_matrix);
+
+    //Joints
+    dJointID ball_joint_pelvis_left_1 = dJointCreateBall(global_helper->getWorld(), 0);
+    dJointAttach(ball_joint_pelvis_left_1, back_link_1_body, back_left_foot_link_1_body);
+    dJointSetBallAnchor (ball_joint_pelvis_left_1, start_location[0], start_location[1], start_location[2] + 60.0);
+
+    dJointID ball_joint_left_1_left_2 = dJointCreateBall(global_helper->getWorld(), 0);
+    dJointAttach(ball_joint_left_1_left_2, back_left_foot_link_1_body, back_left_foot_link_2_body);
+    dJointSetBallAnchor (ball_joint_left_1_left_2, start_location[0], start_location[1] - back_foot_link_1_length, start_location[2]+120);
+
+    dJointID ball_joint_left_2_left_3 = dJointCreateBall(global_helper->getWorld(), 0);
+    dJointAttach(ball_joint_left_2_left_3, back_left_foot_link_1_body, back_left_foot_link_2_body);
+    dJointSetBallAnchor (ball_joint_left_2_left_3, start_location[0] + back_foot_link_2_length*cos(back_foot_link_2_theta), start_location[1] - back_foot_link_1_length - back_foot_link_2_length*sin(back_foot_link_2_theta), start_location[2] - 120);
+
+    dJointID ball_joint_pelvis_right_1 = dJointCreateBall(global_helper->getWorld(), 0);
+    dJointAttach(ball_joint_pelvis_right_1, back_link_1_body, back_right_foot_link_1_body);
+    dJointSetBallAnchor (ball_joint_pelvis_right_1, start_location[0], start_location[1], start_location[2] - 60.0);
+
+    dJointID ball_joint_right_1_right_2 = dJointCreateBall(global_helper->getWorld(), 0);
+    dJointAttach(ball_joint_right_1_right_2, back_right_foot_link_1_body, back_right_foot_link_2_body);
+    dJointSetBallAnchor (ball_joint_right_1_right_2, start_location[0], start_location[1] - back_foot_link_1_length, start_location[2]-120);
+
+    dJointID ball_joint_right_2_right_3 = dJointCreateBall(global_helper->getWorld(), 0);
+    dJointAttach(ball_joint_right_2_right_3, back_right_foot_link_1_body, back_right_foot_link_2_body);
+    dJointSetBallAnchor (ball_joint_right_2_right_3, start_location[0] + back_foot_link_2_length*cos(back_foot_link_2_theta), start_location[1] - back_foot_link_1_length - back_foot_link_2_length*sin(back_foot_link_2_theta), start_location[2] - 120);
 }
 
 void ODEBodies::set_plane(){
@@ -567,6 +647,10 @@ void ODEBodies::set_plane(){
 
 helper * ODEBodies::getGlobalHelper(){
     return global_helper;
+}
+
+controller * ODEBodies::getGaitController(){
+    return gait_controller;
 }
 
 dBodyID ODEBodies::getBallBody(){

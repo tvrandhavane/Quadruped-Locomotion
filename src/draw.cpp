@@ -212,6 +212,7 @@ void draw::draw_tail(){
             const dReal *tail_link_1_rotation_matrix_ode =  dBodyGetRotation(body_bag->getTailLink1Body());
             float tail_link_1_rotation_matrix_openGL[16];
             getOpenGLRotationMatrix(tail_link_1_rotation_matrix_openGL, tail_link_1_rotation_matrix_ode);
+            cout << "Tail link 1 = " << tail_link_1_location[0] << " " << tail_link_1_location[1] << " " << tail_link_1_location[2] << endl;
             //rotate the link
             glMultMatrixf(tail_link_1_rotation_matrix_openGL);
             glScalef(80, 4, 4);

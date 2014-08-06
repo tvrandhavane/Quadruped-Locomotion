@@ -11,7 +11,6 @@ using namespace std;
 
 //Declare global objects
 ODEBodies * body_bag;
-controller * gait_controller;
 draw * draw_obj;
 
 static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
@@ -54,7 +53,7 @@ static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
 
 void Draw() {
     //Controller step
-    gait_controller->takeStep();    
+    body_bag->getGaitController()->takeStep();    
 
     //Collides all objects in space
     dSpaceCollide(body_bag->getGlobalHelper()->getSpace(), 0 ,&nearCallback);
@@ -141,7 +140,7 @@ int main(int argc, char** argv) {
     global_helper->init();  //initiaize world, space and contact grou
 
     //Initialize controller
-    gait_controller = new controller();
+    controller * gait_controller = new controller();
 
     //Set up glut parameters
     glutInit(&argc, argv);
@@ -158,7 +157,7 @@ int main(int argc, char** argv) {
     dInitODE();    
 
     //Set up ODE bodies
-    body_bag = new ODEBodies(global_helper);
+    body_bag = new ODEBodies(global_helper, gait_controller);
     body_bag->init();
 
     draw_obj = new draw(body_bag);
