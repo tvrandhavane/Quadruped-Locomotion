@@ -15,7 +15,7 @@ private:
 	helper * global_helper;
     controller * gait_controller;
 
-    float root_position[3];
+    float * root_position;
 
     dBodyID back_link_1_body;
     dBodyID back_link_2_body;

@@ -31,12 +31,12 @@ void draw::draw_dog(){
 
 void draw::draw_cube(){
     //Load texture image
-    GLuint sky_texture;
-    sky_texture = image_tex->loadBMP_custom("./textures/object.bmp");
+    GLuint cube_texture;
+    cube_texture = image_tex->loadBMP_custom("./textures/object.bmp");
 
     //Enable and bind texture
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, sky_texture);
+    glBindTexture(GL_TEXTURE_2D, cube_texture);
 
     glPushMatrix();
         //Base
@@ -212,7 +212,6 @@ void draw::draw_tail(){
             const dReal *tail_link_1_rotation_matrix_ode =  dBodyGetRotation(body_bag->getTailLink1Body());
             float tail_link_1_rotation_matrix_openGL[16];
             getOpenGLRotationMatrix(tail_link_1_rotation_matrix_openGL, tail_link_1_rotation_matrix_ode);
-            cout << "Tail link 1 = " << tail_link_1_location[0] << " " << tail_link_1_location[1] << " " << tail_link_1_location[2] << endl;
             //rotate the link
             glMultMatrixf(tail_link_1_rotation_matrix_openGL);
             glScalef(80, 4, 4);

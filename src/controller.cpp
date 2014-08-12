@@ -1,8 +1,6 @@
 #include "controller.h"
 
 controller::controller(){
-	foot_location = new footLocation();
-
 	time = 0;
 	T = 100;
 	swingStart[0] = 0;
@@ -14,6 +12,10 @@ controller::controller(){
 	swingStart[3] = 50;
 	swingEnd[3] = 100;
 
+	root_position[0] = -200.0;
+    root_position[1] = 470.0 - 250.0;
+    root_position[2] = 200.0;
+
 	shoulderHeight = 470;		//in 0.1cm
     hipHeight = 450;
 
@@ -23,28 +25,50 @@ controller::controller(){
     desired_velocity[0] = 4000;
     desired_velocity[1] = 0;
     desired_velocity[2] = 0;
+
+    lfHeight[0] = shoulderHeight;
+    lfHeight[1] = shoulderHeight;
+    lfHeight[2] = hipHeight;
+    lfHeight[3] = hipHeight;
+
+
+    for(int i = 0; i< 4; i++){
+    	prev_stepping_location[i][0] = 0.0;
+    	prev_stepping_location[i][1] = 0.0;
+    	prev_stepping_location[i][2] = 0.0;
+    	next_stepping_location[i][0] = 0.0;
+    	next_stepping_location[i][1] = 0.0;
+    	next_stepping_location[i][2] = 0.0;
+    	current_foot_location[i][0] = 0.0;
+    	current_foot_location[i][1] = 0.0;
+    	current_foot_location[i][2] = 0.0;
+    }
 }
 
 void controller::takeStep(){
 	time = (time + 1);
-	//cout << "Time = " << time << endl;
-	//cout << "Leg 1 = " << gait_graph->isInSwing(time%T, swingStart[0], swingEnd[0]) << endl;
-	//cout << "Leg 2 = " << gait_graph->isInSwing(time%T, swingStart[1], swingEnd[1]) << endl;
-	//cout << "Leg 3 = " << gait_graph->isInSwing(time%T, swingStart[2], swingEnd[2]) << endl;
-	//cout << "Leg 4 = " << gait_graph->isInSwing(time%T, swingStart[3], swingEnd[3]) << endl;
+	int phase = time%T;
 
-	if(swingStart[0] == time%T){		
-		foot_location->computePlacementLocation(shoulderHeight, current_velocity, desired_velocity);
+	//for each leg
+	for(int i = 0; i < 4; i++){
+		if(swingStart[i] == phase){		
+			computePlacementLocation(i, lfHeight[0]);
+		}
+		else if(isInSwing(i)){
+			setFootLocation(i, phase);
+		}
+		else{
+			stanceLegTreatment(i);
+		}
 	}
-	if(swingStart[1] == time%T){		
-		foot_location->computePlacementLocation(shoulderHeight, current_velocity, desired_velocity);
-	}
-	if(swingStart[2] == time%T){		
-		foot_location->computePlacementLocation(hipHeight, current_velocity, desired_velocity);
-	}
-	if(swingStart[3] == time%T){		
-		foot_location->computePlacementLocation(hipHeight, current_velocity, desired_velocity);
-	}
+}
+
+void controller::setFootLocation(int leg_id, int phase){
+	cout << "set foot location " << endl;
+}
+
+void controller::stanceLegTreatment(int leg_id){
+	cout << "stance leg treatment" << endl;
 }
 
 bool controller::isInSwing(int leg_id){
@@ -66,4 +90,31 @@ bool controller::isInSwing(int leg_id){
 		}
 	}
 	return false;
+}
+
+void controller::computePlacementLocation(int leg_id, float h){
+	cout << "compute placement location " << endl;
+	float df[3];
+
+	float velocitySqr = desired_velocity[0]*desired_velocity[0];
+	velocitySqr += desired_velocity[1]*desired_velocity[1];
+	velocitySqr += desired_velocity[2]*desired_velocity[2];
+
+	float dfFactor = sqrt((h/g) + (velocitySqr/(4*g*g)));
+
+	df[0] = desired_velocity[0] * dfFactor;
+	df[1] = desired_velocity[1] * dfFactor;
+	df[2] = desired_velocity[2] * dfFactor;
+
+	prev_stepping_location[leg_id][0] = next_stepping_location[leg_id][0];
+	prev_stepping_location[leg_id][1] = next_stepping_location[leg_id][1];
+	prev_stepping_location[leg_id][2] = next_stepping_location[leg_id][2];
+
+	next_stepping_location[leg_id][0] = df[0] + (current_velocity[0] - desired_velocity[0])*sqrt(h/g);
+	next_stepping_location[leg_id][1] = df[1] + (current_velocity[1] - desired_velocity[1])*sqrt(h/g);
+	next_stepping_location[leg_id][2] = df[2] + (current_velocity[2] - desired_velocity[2])*sqrt(h/g);
+}
+
+float * controller::getRootPosition(){
+	return root_position;
 }

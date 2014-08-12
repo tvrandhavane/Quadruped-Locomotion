@@ -23,8 +23,6 @@ static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
 
     //If collision, do the following
     if (isGround)  {
-        cout << "Plane ID = " << body_bag->getPlaneGeom() << endl;
-        cout << "Body ID = " << o1 << ", " << o2 << endl;
         //Set up contact parameters
         for (int i=0;i<N;i++) {
             contact[i].surface.mode = dContactBounce | dContactSoftCFM;
@@ -40,11 +38,9 @@ static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
         //Maximum N number of contacts can be created
         //Give the start of contact geom, skip size of one contact to store the next contact location in array
         int n =  dCollide(o1, o2, N, &contact[0].geom, sizeof(dContact));
-        cout << "n = " << n << endl;
-
+        
         //For each contact create a joint        
         for (int i = 0; i < n; i++) {
-            cout << "\t " << i + 1 << endl;
             dJointID c = dJointCreateContact(body_bag->getGlobalHelper()->getWorld(), body_bag->getGlobalHelper()->getCgroup(), &contact[i]);
             dJointAttach (c, dGeomGetBody(o1), dGeomGetBody(o2));
         }

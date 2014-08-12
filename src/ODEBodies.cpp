@@ -4,9 +4,7 @@ ODEBodies::ODEBodies(helper * global_helper, controller * gait_controller){
 	this->global_helper = global_helper;
     this->gait_controller = gait_controller;
 
-    root_position[0] = -200.0;
-    root_position[1] = 470.0 - 250.0;
-    root_position[2] = 200.0;
+    root_position = gait_controller->getRootPosition();
 }
 
 void ODEBodies::init(){
