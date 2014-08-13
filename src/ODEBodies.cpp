@@ -10,10 +10,10 @@ ODEBodies::ODEBodies(helper * global_helper, controller * gait_controller){
 void ODEBodies::init(){
 	set_ball();
     set_back();
-    set_nnh();
-    set_tail();
-    set_leg();
-	set_plane();
+    //set_nnh();
+    //set_tail();
+    //set_leg();
+	//set_plane();
 }
 
 void ODEBodies::setRotationMatrixZAxis(dReal * R,float theta){
@@ -344,7 +344,7 @@ void ODEBodies::set_tail(){
 
 void ODEBodies::set_leg(){
     set_front_legs();
-    set_back_legs();
+    //set_back_legs();
 }
 
 void ODEBodies::set_front_legs(){
@@ -396,18 +396,18 @@ void ODEBodies::set_front_legs(){
     dReal * front_left_foot_link_3_rotation_matrix;
     front_foot_link_3_length = 3*length_multiplier;
     front_left_foot_link_3_rotation_matrix = new float(12);
-    setRotationMatrixZAxis(front_left_foot_link_3_rotation_matrix, front_foot_link_3_theta);
+    //setRotationMatrixZAxis(front_left_foot_link_3_rotation_matrix, front_foot_link_3_theta);
     dMassSetZero(&front_left_foot_link_3_mass);
     dMassSetCylinderTotal(&front_left_foot_link_3_mass, 10, 2, 2.0, front_foot_link_3_length);
     dBodySetMass(front_left_foot_link_3_body, &front_left_foot_link_3_mass);
     dBodySetLinearVel(front_left_foot_link_3_body, 0.0, 0.0, 0.0);
-    dBodySetRotation(front_left_foot_link_3_body, front_left_foot_link_3_rotation_matrix);
+    //dBodySetRotation(front_left_foot_link_3_body, front_left_foot_link_3_rotation_matrix);
 
     front_left_foot_link_3_geom = dCreateCylinder(global_helper->getSpace(), 2.0, front_foot_link_3_length);
     dGeomSetData(front_left_foot_link_3_geom, (void *)"front_left_foot_link_3");
     dGeomSetBody(front_left_foot_link_3_geom, front_left_foot_link_3_body);
     dGeomSetPosition(front_left_foot_link_3_geom, root_position[0] + front_foot_link_2_length*cos(front_foot_link_2_theta), root_position[1] - front_foot_link_1_length - front_foot_link_2_length*sin(front_foot_link_2_theta), root_position[2] + 120);
-    dGeomSetRotation(front_left_foot_link_3_geom, front_left_foot_link_3_rotation_matrix);
+    //dGeomSetRotation(front_left_foot_link_3_geom, front_left_foot_link_3_rotation_matrix);
 
     //Right Leg
     //Link 1
@@ -465,10 +465,11 @@ void ODEBodies::set_front_legs(){
     dGeomSetRotation(front_right_foot_link_3_geom, front_right_foot_link_3_rotation_matrix);
 
     //Joints
-    dJointID ball_joint_shoulder_left_1 = dJointCreateBall(global_helper->getWorld(), 0);
+    /*dJointID ball_joint_shoulder_left_1 = dJointCreateBall(global_helper->getWorld(), 0);
     dJointAttach(ball_joint_shoulder_left_1, back_link_1_body, front_left_foot_link_1_body);
     dJointSetBallAnchor (ball_joint_shoulder_left_1, root_position[0], root_position[1], root_position[2] + 60.0);
 
+    */
     dJointID ball_joint_left_1_left_2 = dJointCreateBall(global_helper->getWorld(), 0);
     dJointAttach(ball_joint_left_1_left_2, front_left_foot_link_1_body, front_left_foot_link_2_body);
     dJointSetBallAnchor (ball_joint_left_1_left_2, root_position[0], root_position[1] - front_foot_link_1_length, root_position[2]+120);
@@ -477,10 +478,11 @@ void ODEBodies::set_front_legs(){
     dJointAttach(ball_joint_left_2_left_3, front_left_foot_link_1_body, front_left_foot_link_2_body);
     dJointSetBallAnchor (ball_joint_left_2_left_3, root_position[0] + front_foot_link_2_length*cos(front_foot_link_2_theta), root_position[1] - front_foot_link_1_length - front_foot_link_2_length*sin(front_foot_link_2_theta), root_position[2] - 120);
 
+    /*
     dJointID ball_joint_shoulder_right_1 = dJointCreateBall(global_helper->getWorld(), 0);
     dJointAttach(ball_joint_shoulder_right_1, back_link_1_body, front_right_foot_link_1_body);
     dJointSetBallAnchor (ball_joint_shoulder_right_1, root_position[0], root_position[1], root_position[2] - 60.0);
-
+    */
     dJointID ball_joint_right_1_right_2 = dJointCreateBall(global_helper->getWorld(), 0);
     dJointAttach(ball_joint_right_1_right_2, front_right_foot_link_1_body, front_right_foot_link_2_body);
     dJointSetBallAnchor (ball_joint_right_1_right_2, root_position[0], root_position[1] - front_foot_link_1_length, root_position[2]-120);

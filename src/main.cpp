@@ -49,7 +49,7 @@ static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
 
 void Draw() {
     //Controller step
-    body_bag->getGaitController()->takeStep();    
+    //body_bag->getGaitController()->takeStep();    
 
     //Collides all objects in space
     dSpaceCollide(body_bag->getGlobalHelper()->getSpace(), 0 ,&nearCallback);

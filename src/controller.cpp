@@ -3,14 +3,14 @@
 controller::controller(){
 	time = 0;
 	T = 100;
-	swingStart[0] = 0;
+	swingStart[0] = 1;
 	swingEnd[0] = 50;
-	swingStart[1] = 0;
+	swingStart[1] = 1;
 	swingEnd[1] = 50;
-	swingStart[2] = 50;
-	swingEnd[2] = 100;
-	swingStart[3] = 50;
-	swingEnd[3] = 100;
+	swingStart[2] = 0;
+	swingEnd[2] = 0;
+	swingStart[3] = 0;
+	swingEnd[3] = 0;
 
 	root_position[0] = -200.0;
     root_position[1] = 470.0 - 250.0;
@@ -49,10 +49,13 @@ void controller::takeStep(){
 	time = (time + 1);
 	int phase = time%T;
 
+	cout << "Time = " << time << endl;
+
 	//for each leg
 	for(int i = 0; i < 4; i++){
 		if(swingStart[i] == phase){		
 			computePlacementLocation(i, lfHeight[0]);
+			setFootLocation(i, phase);
 		}
 		else if(isInSwing(i)){
 			setFootLocation(i, phase);
@@ -63,8 +66,35 @@ void controller::takeStep(){
 	}
 }
 
+float controller::computeSwingPhase(int leg_id, int phase){
+	float swingPhaseLength, phaseLength;
+	if(swingStart[leg_id] < swingEnd[leg_id]){
+		swingPhaseLength = swingEnd[leg_id] - swingStart[leg_id];
+		if(phase < swingEnd[leg_id]){
+			if(phase > swingStart[leg_id]){
+				phaseLength = phase - swingStart[leg_id];
+			}
+		}
+	}
+	else{
+		swingPhaseLength = T - swingStart[leg_id] + swingEnd[leg_id];
+		if(phase < swingEnd[leg_id]){
+			phaseLength = T - swingStart[leg_id] + phase;
+		}
+		else if(phase > swingStart[leg_id]){
+			phaseLength = phase - swingStart[leg_id];
+		}
+	}
+
+	return phaseLength/swingPhaseLength;
+}
+
 void controller::setFootLocation(int leg_id, int phase){
-	cout << "set foot location " << endl;
+	float swing_phase = computeSwingPhase(leg_id, phase);
+
+	current_foot_location[leg_id][0] = (1 - swing_phase)*prev_stepping_location[leg_id][0] + swing_phase*next_stepping_location[leg_id][0];
+	current_foot_location[leg_id][1] = (1 - swing_phase)*prev_stepping_location[leg_id][1] + swing_phase*next_stepping_location[leg_id][1];
+	current_foot_location[leg_id][2] = (1 - swing_phase)*prev_stepping_location[leg_id][2] + swing_phase*next_stepping_location[leg_id][2];
 }
 
 void controller::stanceLegTreatment(int leg_id){
@@ -79,7 +109,7 @@ bool controller::isInSwing(int leg_id){
 		}
 	}
 	else if(swingStart[leg_id] == swingEnd[leg_id]){
-		return true;
+		return false;
 	}
 	else{
 		if(phase >= swingStart[leg_id]){

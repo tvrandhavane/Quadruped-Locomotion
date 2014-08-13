@@ -23,9 +23,9 @@ void draw::draw_scene(){
 void draw::draw_dog(){
     glPushMatrix();
         draw_back();
-        draw_leg();
-        draw_tail();
-        draw_nnh();
+        //draw_leg();
+        //draw_tail();
+        //draw_nnh();
     glPopMatrix();
 }
 
@@ -258,7 +258,7 @@ void draw::draw_tail(){
 
 void draw::draw_leg(){
     draw_front_legs();
-    draw_back_legs();
+    //draw_back_legs();
 }
 
 void draw::draw_back_legs(){
@@ -379,7 +379,8 @@ void draw::draw_front_legs(){
         //Link 3
         glPushMatrix();
             const dReal *front_left_foot_link_3_location = dBodyGetPosition(body_bag->getFrontLeftFootLink3Body());
-            glTranslatef (front_left_foot_link_3_location[0], front_left_foot_link_3_location[1], front_left_foot_link_3_location[2]);
+            glTranslatef (front_left_foot_link_3_location[0], front_left_foot_link_3_location[1], front_left_foot_link_3_location[2]);            
+            cout << "link 3 location = " << front_left_foot_link_3_location[0] << ", " << front_left_foot_link_3_location[1] << ", " << front_left_foot_link_3_location[2] << endl;
             const dReal *front_left_foot_link_3_rotation_matrix_ode =  dBodyGetRotation(body_bag->getFrontLeftFootLink3Body());
             float front_left_foot_link_3_rotation_matrix_openGL[16];
             getOpenGLRotationMatrix(front_left_foot_link_3_rotation_matrix_openGL, front_left_foot_link_3_rotation_matrix_ode);

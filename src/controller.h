@@ -36,6 +36,7 @@ private:
     void computePlacementLocation(int leg_id, float h);
     void setFootLocation(int leg_id, int phase);
     void stanceLegTreatment(int leg_id);
+    float computeSwingPhase(int leg_id, int phase);
 
 public:
     //Constructor
