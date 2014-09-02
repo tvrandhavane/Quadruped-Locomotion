@@ -6,15 +6,15 @@ draw::draw(ODEBodies * body_bag){
 }
 
 void draw::draw_scene(){
-    const dReal *ball_location = dBodyGetPosition(body_bag->getBallBody());
+    //const dReal *ball_location = dBodyGetPosition(body_bag->getBallBody());
     //draw_sky();
     glPushMatrix();
         draw_ground();
     glPopMatrix();
-    glPushMatrix();
+    /*glPushMatrix();
         glTranslatef(ball_location[0], ball_location[1], ball_location[2]);
         glutSolidSphere(5, 10, 10);
-    glPopMatrix();
+    glPopMatrix();*/
     glPushMatrix();
         draw_dog();
     glPopMatrix();
@@ -22,8 +22,8 @@ void draw::draw_scene(){
 
 void draw::draw_dog(){
     glPushMatrix();
-        draw_back();
-        //draw_leg();
+        //draw_back();
+        draw_leg();
         //draw_tail();
         //draw_nnh();
     glPopMatrix();
@@ -41,45 +41,45 @@ void draw::draw_cube(){
     glPushMatrix();
         //Base
         glBegin(GL_QUADS);
-            glVertex3f(0, 0, 0);
-            glVertex3f(1, 0, 0);
-            glVertex3f(1, 0, 1);
-            glVertex3f(0, 0, 1);
+            glVertex3f(-0.5, -0.5, -0.5);
+            glVertex3f(0.5, -0.5, -0.5);
+            glVertex3f(0.5, -0.5, 0.5);
+            glVertex3f(-0.5, -0.5, 0.5);
         glEnd();
         //Top
         glBegin(GL_QUADS);
-            glVertex3f(0, 1, 0);
-            glVertex3f(1, 1, 0);
-            glVertex3f(1, 1, 1);
-            glVertex3f(0, 1, 1);
+            glVertex3f(-0.5, 0.5, -0.5);
+            glVertex3f(0.5, 0.5, -0.5);
+            glVertex3f(0.5, 0.5, 0.5);
+            glVertex3f(-0.5, 0.5, 0.5);
         glEnd();
         //Front
         glBegin(GL_QUADS);
-            glVertex3f(0, 0, 0);
-            glVertex3f(1, 0, 0);
-            glVertex3f(1, 1, 0);
-            glVertex3f(0, 1, 0);
+            glVertex3f(-0.5, -0.5, -0.5);
+            glVertex3f(0.5, -0.5, -0.5);
+            glVertex3f(0.5, 0.5, -0.5);
+            glVertex3f(-0.5, 0.5, -0.5);
         glEnd();
         //Back
         glBegin(GL_QUADS);
-            glVertex3f(0, 0, 1);
-            glVertex3f(1, 0, 1);
-            glVertex3f(1, 1, 1);
-            glVertex3f(0, 1, 1);
+            glVertex3f(-0.5, -0.5, 0.5);
+            glVertex3f(0.5, -0.5, 0.5);
+            glVertex3f(0.5, 0.5, 0.5);
+            glVertex3f(-0.5, 0.5, 0.5);
         glEnd();
         //Left
         glBegin(GL_QUADS);
-            glVertex3f(0, 0, 0);
-            glVertex3f(0, 0, 1);
-            glVertex3f(0, 1, 1);
-            glVertex3f(0, 1, 0);
+            glVertex3f(-0.5, -0.5, -0.5);
+            glVertex3f(-0.5, -0.5, 0.5);
+            glVertex3f(-0.5, 0.5, 0.5);
+            glVertex3f(-0.5, 0.5, -0.5);
         glEnd();
         //Right
         glBegin(GL_QUADS);
-            glVertex3f(1, 0, 0);
-            glVertex3f(1, 0, 1);
-            glVertex3f(1, 1, 1);
-            glVertex3f(1, 1, 0);
+            glVertex3f(0.5, -0.5, -0.5);
+            glVertex3f(0.5, -0.5, 0.5);
+            glVertex3f(0.5, 0.5, 0.5);
+            glVertex3f(0.5, 0.5, -0.5);
         glEnd();
     glPopMatrix();
 
@@ -354,19 +354,23 @@ void draw::draw_front_legs(){
         glPushMatrix();
             const dReal *front_left_foot_link_1_location = dBodyGetPosition(body_bag->getFrontLeftFootLink1Body());
             glTranslatef (front_left_foot_link_1_location[0], front_left_foot_link_1_location[1], front_left_foot_link_1_location[2]);
-            const dReal *front_left_foot_link_1_rotation_matrix_ode =  dBodyGetRotation(body_bag->getFrontLeftFootLink1Body());
+            cout << "link 1 location = " << front_left_foot_link_1_location[0] << ", " << front_left_foot_link_1_location[1] << ", " << front_left_foot_link_1_location[2] << endl;
+            const dReal *front_left_foot_link_1_rotation_matrix_ode = dBodyGetRotation(body_bag->getFrontLeftFootLink1Body());
             float front_left_foot_link_1_rotation_matrix_openGL[16];
             getOpenGLRotationMatrix(front_left_foot_link_1_rotation_matrix_openGL, front_left_foot_link_1_rotation_matrix_ode);
             //rotate the link
             glMultMatrixf(front_left_foot_link_1_rotation_matrix_openGL);
-            glScalef(body_bag->getFrontFootLink1Length(), 4, 4);
+            glScalef(4, 4, body_bag->getFrontFootLink1Length());
+            cout << "getFrontFootLink1Length = " << body_bag->getFrontFootLink1Length() << endl;
             draw_cube();
         glPopMatrix();
 
+        /*
         //Link 2
         glPushMatrix();
             const dReal *front_left_foot_link_2_location = dBodyGetPosition(body_bag->getFrontLeftFootLink2Body());
             glTranslatef (front_left_foot_link_2_location[0], front_left_foot_link_2_location[1], front_left_foot_link_2_location[2]);
+            cout << "link 2 location = " << front_left_foot_link_2_location[0] << ", " << front_left_foot_link_2_location[1] << ", " << front_left_foot_link_2_location[2] << endl;
             const dReal *front_left_foot_link_2_rotation_matrix_ode =  dBodyGetRotation(body_bag->getFrontLeftFootLink2Body());
             float front_left_foot_link_2_rotation_matrix_openGL[16];
             getOpenGLRotationMatrix(front_left_foot_link_2_rotation_matrix_openGL, front_left_foot_link_2_rotation_matrix_ode);
@@ -380,7 +384,6 @@ void draw::draw_front_legs(){
         glPushMatrix();
             const dReal *front_left_foot_link_3_location = dBodyGetPosition(body_bag->getFrontLeftFootLink3Body());
             glTranslatef (front_left_foot_link_3_location[0], front_left_foot_link_3_location[1], front_left_foot_link_3_location[2]);            
-            cout << "link 3 location = " << front_left_foot_link_3_location[0] << ", " << front_left_foot_link_3_location[1] << ", " << front_left_foot_link_3_location[2] << endl;
             const dReal *front_left_foot_link_3_rotation_matrix_ode =  dBodyGetRotation(body_bag->getFrontLeftFootLink3Body());
             float front_left_foot_link_3_rotation_matrix_openGL[16];
             getOpenGLRotationMatrix(front_left_foot_link_3_rotation_matrix_openGL, front_left_foot_link_3_rotation_matrix_ode);

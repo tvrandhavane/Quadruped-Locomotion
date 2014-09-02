@@ -122,8 +122,11 @@ private:
     void set_back_legs();
     void set_leg();
     void set_plane();
+    void extendMatrixTo4x3(dReal * inp_R, dReal * outp_R);
+    void multiplyMatrices(float* matC, float* matA, float* matB, int rC, int cC, int rA, int cA, int rB, int cB);
     void setRotationMatrixZAxis(dReal * R, float theta);
-
+    void setRotationMatrixXAxis(dReal * R, float theta);
+    void setLink(dBodyID link_body, dMass *link_mass, dReal link_length, float z_rotation_angle, dGeomID link_geom, float * position);
 public:
 	//Constructor
     ODEBodies(helper * global_helper, controller * gait_controller);

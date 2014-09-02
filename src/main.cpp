@@ -23,6 +23,7 @@ static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
 
     //If collision, do the following
     if (isGround)  {
+        cout << "o1 = " << o1 << "o2 = " << o2 << endl;
         //Set up contact parameters
         for (int i=0;i<N;i++) {
             contact[i].surface.mode = dContactBounce | dContactSoftCFM;
@@ -55,7 +56,7 @@ void Draw() {
     dSpaceCollide(body_bag->getGlobalHelper()->getSpace(), 0 ,&nearCallback);
 
     //Set stepsize and use quick step, computationally cheaper
-    dWorldQuickStep (body_bag->getGlobalHelper()->getWorld(), 0.1);
+    dWorldStep(body_bag->getGlobalHelper()->getWorld(), 0.1);
 
     dJointGroupEmpty(body_bag->getGlobalHelper()->getCgroup());
 
