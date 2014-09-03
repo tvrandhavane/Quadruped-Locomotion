@@ -354,32 +354,29 @@ void draw::draw_front_legs(){
         glPushMatrix();
             const dReal *front_left_foot_link_1_location = dBodyGetPosition(body_bag->getFrontLeftFootLink1Body());
             glTranslatef (front_left_foot_link_1_location[0], front_left_foot_link_1_location[1], front_left_foot_link_1_location[2]);
-            cout << "link 1 location = " << front_left_foot_link_1_location[0] << ", " << front_left_foot_link_1_location[1] << ", " << front_left_foot_link_1_location[2] << endl;
             const dReal *front_left_foot_link_1_rotation_matrix_ode = dBodyGetRotation(body_bag->getFrontLeftFootLink1Body());
             float front_left_foot_link_1_rotation_matrix_openGL[16];
             getOpenGLRotationMatrix(front_left_foot_link_1_rotation_matrix_openGL, front_left_foot_link_1_rotation_matrix_ode);
             //rotate the link
             glMultMatrixf(front_left_foot_link_1_rotation_matrix_openGL);
             glScalef(4, 4, body_bag->getFrontFootLink1Length());
-            cout << "getFrontFootLink1Length = " << body_bag->getFrontFootLink1Length() << endl;
             draw_cube();
         glPopMatrix();
 
-        /*
+        
         //Link 2
         glPushMatrix();
             const dReal *front_left_foot_link_2_location = dBodyGetPosition(body_bag->getFrontLeftFootLink2Body());
             glTranslatef (front_left_foot_link_2_location[0], front_left_foot_link_2_location[1], front_left_foot_link_2_location[2]);
-            cout << "link 2 location = " << front_left_foot_link_2_location[0] << ", " << front_left_foot_link_2_location[1] << ", " << front_left_foot_link_2_location[2] << endl;
             const dReal *front_left_foot_link_2_rotation_matrix_ode =  dBodyGetRotation(body_bag->getFrontLeftFootLink2Body());
             float front_left_foot_link_2_rotation_matrix_openGL[16];
             getOpenGLRotationMatrix(front_left_foot_link_2_rotation_matrix_openGL, front_left_foot_link_2_rotation_matrix_ode);
             //rotate the link
             glMultMatrixf(front_left_foot_link_2_rotation_matrix_openGL);
-            glScalef(body_bag->getFrontFootLink2Length(), 4, 4);
+            glScalef(4, 4, body_bag->getFrontFootLink2Length());
             draw_cube();
         glPopMatrix();
-
+        
         //Link 3
         glPushMatrix();
             const dReal *front_left_foot_link_3_location = dBodyGetPosition(body_bag->getFrontLeftFootLink3Body());
@@ -389,11 +386,24 @@ void draw::draw_front_legs(){
             getOpenGLRotationMatrix(front_left_foot_link_3_rotation_matrix_openGL, front_left_foot_link_3_rotation_matrix_ode);
             //rotate the link
             glMultMatrixf(front_left_foot_link_3_rotation_matrix_openGL);
-            glScalef(body_bag->getFrontFootLink3Length(), 4, 4);
+            glScalef(4, 4, body_bag->getFrontFootLink3Length());
+            draw_cube();
+        glPopMatrix();
+
+        //Link 4
+        glPushMatrix();
+            const dReal *front_left_foot_link_4_location = dBodyGetPosition(body_bag->getFrontLeftFootLink4Body());
+            glTranslatef (front_left_foot_link_4_location[0], front_left_foot_link_4_location[1], front_left_foot_link_4_location[2]);            
+            const dReal *front_left_foot_link_4_rotation_matrix_ode =  dBodyGetRotation(body_bag->getFrontLeftFootLink4Body());
+            float front_left_foot_link_4_rotation_matrix_openGL[16];
+            getOpenGLRotationMatrix(front_left_foot_link_4_rotation_matrix_openGL, front_left_foot_link_4_rotation_matrix_ode);
+            //rotate the link
+            glMultMatrixf(front_left_foot_link_4_rotation_matrix_openGL);
+            glScalef(4, 4, body_bag->getFrontFootLink4Length());
             draw_cube();
         glPopMatrix();
     glPopMatrix();
-
+    /*
     //Front right leg
     glPushMatrix();
         //Link 1

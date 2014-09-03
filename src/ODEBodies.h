@@ -34,6 +34,7 @@ private:
     dBodyID front_left_foot_link_1_body;
     dBodyID front_left_foot_link_2_body;
     dBodyID front_left_foot_link_3_body;
+    dBodyID front_left_foot_link_4_body;
     dBodyID front_right_foot_link_1_body;
     dBodyID front_right_foot_link_2_body;
     dBodyID front_right_foot_link_3_body;
@@ -62,6 +63,7 @@ private:
     dGeomID front_left_foot_link_1_geom;
     dGeomID front_left_foot_link_2_geom;
     dGeomID front_left_foot_link_3_geom;
+    dGeomID front_left_foot_link_4_geom;
     dGeomID front_right_foot_link_1_geom;
     dGeomID front_right_foot_link_2_geom;
     dGeomID front_right_foot_link_3_geom;
@@ -91,6 +93,7 @@ private:
     dMass front_left_foot_link_1_mass;
     dMass front_left_foot_link_2_mass;
     dMass front_left_foot_link_3_mass;
+    dMass front_left_foot_link_4_mass;
     dMass front_right_foot_link_1_mass;
     dMass front_right_foot_link_2_mass;
     dMass front_right_foot_link_3_mass;
@@ -108,6 +111,7 @@ private:
     dReal front_foot_link_1_length;
     dReal front_foot_link_2_length;
     dReal front_foot_link_3_length;
+    dReal front_foot_link_4_length;
 
     dReal back_foot_link_1_length;
     dReal back_foot_link_2_length;
@@ -126,7 +130,7 @@ private:
     void multiplyMatrices(float* matC, float* matA, float* matB, int rC, int cC, int rA, int cA, int rB, int cB);
     void setRotationMatrixZAxis(dReal * R, float theta);
     void setRotationMatrixXAxis(dReal * R, float theta);
-    void setLink(dBodyID link_body, dMass *link_mass, dReal link_length, float z_rotation_angle, dGeomID link_geom, float * position);
+    void setLink(dBodyID * link_body, dMass *link_mass, dReal link_length, float z_rotation_angle, dGeomID *link_geom, float * position);
 public:
 	//Constructor
     ODEBodies(helper * global_helper, controller * gait_controller);
@@ -157,6 +161,7 @@ public:
     dBodyID getFrontLeftFootLink1Body();
     dBodyID getFrontLeftFootLink2Body();
     dBodyID getFrontLeftFootLink3Body();
+    dBodyID getFrontLeftFootLink4Body();
     //Front right foot    
     dBodyID getFrontRightFootLink1Body();
     dBodyID getFrontRightFootLink2Body();
@@ -173,6 +178,7 @@ public:
     float getFrontFootLink1Length();
     float getFrontFootLink2Length();
     float getFrontFootLink3Length();
+    float getFrontFootLink4Length();
 
     float getBackFootLink1Length();
     float getBackFootLink2Length();
