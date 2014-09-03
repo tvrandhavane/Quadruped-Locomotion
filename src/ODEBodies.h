@@ -42,9 +42,11 @@ private:
     dBodyID back_left_foot_link_1_body;
     dBodyID back_left_foot_link_2_body;
     dBodyID back_left_foot_link_3_body;
+    dBodyID back_left_foot_link_4_body;
     dBodyID back_right_foot_link_1_body;
     dBodyID back_right_foot_link_2_body;
     dBodyID back_right_foot_link_3_body;
+    dBodyID back_right_foot_link_4_body;
 	dBodyID ball_body;
 
     dGeomID back_link_1_geom;
@@ -72,9 +74,11 @@ private:
     dGeomID back_left_foot_link_1_geom;
     dGeomID back_left_foot_link_2_geom;
     dGeomID back_left_foot_link_3_geom;
+    dGeomID back_left_foot_link_4_geom;
     dGeomID back_right_foot_link_1_geom;
     dGeomID back_right_foot_link_2_geom;
     dGeomID back_right_foot_link_3_geom;
+    dGeomID back_right_foot_link_4_geom;
 	dGeomID ball_geom;
 	dGeomID plane_geom;
 
@@ -103,22 +107,34 @@ private:
     dMass back_left_foot_link_1_mass;
     dMass back_left_foot_link_2_mass;
     dMass back_left_foot_link_3_mass;
+    dMass back_left_foot_link_4_mass;
     dMass back_right_foot_link_1_mass;
     dMass back_right_foot_link_2_mass;
     dMass back_right_foot_link_3_mass;
+    dMass back_right_foot_link_4_mass;
 	dMass ball_mass;
 
-    float back_link_4_theta;
-    float back_link_6_theta;
-
+    dReal back_link_1_length;
+    dReal back_link_2_length;
+    dReal back_link_3_length;
+    dReal back_link_4_length;
+    dReal back_link_5_length;
+    dReal back_link_6_length;
     dReal front_foot_link_1_length;
     dReal front_foot_link_2_length;
     dReal front_foot_link_3_length;
     dReal front_foot_link_4_length;
-
     dReal back_foot_link_1_length;
     dReal back_foot_link_2_length;
     dReal back_foot_link_3_length;
+    dReal back_foot_link_4_length;
+
+    float back_link_1_theta;
+    float back_link_2_theta;
+    float back_link_3_theta;
+    float back_link_4_theta;
+    float back_link_5_theta;
+    float back_link_6_theta;
 
 	//Private Methods
     void set_ball();
@@ -174,10 +190,19 @@ public:
     dBodyID getBackLeftFootLink1Body();
     dBodyID getBackLeftFootLink2Body();
     dBodyID getBackLeftFootLink3Body();
+    dBodyID getBackLeftFootLink4Body();
     //Back right foot    
     dBodyID getBackRightFootLink1Body();
     dBodyID getBackRightFootLink2Body();
     dBodyID getBackRightFootLink3Body();
+    dBodyID getBackRightFootLink4Body();
+
+    float getBackLink1Length();
+    float getBackLink2Length();
+    float getBackLink3Length();
+    float getBackLink4Length();
+    float getBackLink5Length();
+    float getBackLink6Length();
 
     float getFrontFootLink1Length();
     float getFrontFootLink2Length();
@@ -187,6 +212,7 @@ public:
     float getBackFootLink1Length();
     float getBackFootLink2Length();
     float getBackFootLink3Length();
+    float getBackFootLink4Length();
 
     dGeomID getPlaneGeom();
     helper * getGlobalHelper();
