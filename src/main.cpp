@@ -17,6 +17,7 @@ static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
     //Set up maximum number of contact points and contact array
     const int N = 12;
     dContact contact[N];
+    
 
     //Check if collision is between ball and plane
     bool isGround = ((body_bag->getPlaneGeom() == o1) || (body_bag->getPlaneGeom() == o2));

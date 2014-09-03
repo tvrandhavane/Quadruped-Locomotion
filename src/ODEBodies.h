@@ -38,6 +38,7 @@ private:
     dBodyID front_right_foot_link_1_body;
     dBodyID front_right_foot_link_2_body;
     dBodyID front_right_foot_link_3_body;
+    dBodyID front_right_foot_link_4_body;
     dBodyID back_left_foot_link_1_body;
     dBodyID back_left_foot_link_2_body;
     dBodyID back_left_foot_link_3_body;
@@ -67,6 +68,7 @@ private:
     dGeomID front_right_foot_link_1_geom;
     dGeomID front_right_foot_link_2_geom;
     dGeomID front_right_foot_link_3_geom;
+    dGeomID front_right_foot_link_4_geom;
     dGeomID back_left_foot_link_1_geom;
     dGeomID back_left_foot_link_2_geom;
     dGeomID back_left_foot_link_3_geom;
@@ -97,6 +99,7 @@ private:
     dMass front_right_foot_link_1_mass;
     dMass front_right_foot_link_2_mass;
     dMass front_right_foot_link_3_mass;
+    dMass front_right_foot_link_4_mass;
     dMass back_left_foot_link_1_mass;
     dMass back_left_foot_link_2_mass;
     dMass back_left_foot_link_3_mass;
@@ -166,6 +169,7 @@ public:
     dBodyID getFrontRightFootLink1Body();
     dBodyID getFrontRightFootLink2Body();
     dBodyID getFrontRightFootLink3Body();
+    dBodyID getFrontRightFootLink4Body();
     //Back left foot
     dBodyID getBackLeftFootLink1Body();
     dBodyID getBackLeftFootLink2Body();
