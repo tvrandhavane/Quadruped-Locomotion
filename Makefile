@@ -15,7 +15,7 @@ OBJDIR = $(PROJECT_ROOT)/obj
 BINDIR = $(PROJECT_ROOT)/bin
 
 
-LIBS = -lGL -lGLU -lglut -lode -lpthread -g
+LIBS = -lGL -lGLU -lglut -lode -lpthread -g -pg
 TARGET = QuadSimulator
 
 

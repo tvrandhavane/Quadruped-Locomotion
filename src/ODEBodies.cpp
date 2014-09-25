@@ -10,9 +10,9 @@ ODEBodies::ODEBodies(helper * global_helper, controller * gait_controller){
 void ODEBodies::init(){
 	//set_ball();
     set_back();
-    //set_nnh();
-    //set_tail();
-    //set_leg();
+    set_nnh();
+    set_tail();
+    set_leg();
 	set_plane();
 }
 
@@ -124,7 +124,6 @@ void ODEBodies::set_back(){
     back_link_5_theta = (90*M_PI)/180;
     back_link_6_theta = asin((back_link_4_length*cos(back_link_4_theta) + 20)/back_link_6_length) + (90*M_PI)/180;
 
-    /***** Left Leg ******/
     //Link 1    
     dReal back_link_1_position[3];
     back_link_1_position[0] = root_position[0] + back_link_1_length/2;
@@ -205,27 +204,27 @@ void ODEBodies::set_back(){
     back_joint_3_4_position[2] = root_position[2];
 
     dJointID back_joint_3_4 = dJointCreateBall(global_helper->getWorld(), 0);
-    dJointAttach(back_joint_3_4, back_link_2_body, back_link_3_body);
+    dJointAttach(back_joint_3_4, back_link_3_body, back_link_4_body);
     dJointSetBallAnchor (back_joint_3_4, back_joint_3_4_position[0], back_joint_3_4_position[1], back_joint_3_4_position[2]);
 
     //Link 4 and link 5
     dReal back_joint_4_5_position[3];
     back_joint_4_5_position[0] = root_position[0] + back_link_1_length + back_link_2_length + back_link_3_length + back_link_4_length*sin(back_link_4_theta);
-    back_joint_4_5_position[1] = root_position[1] + back_link_5_length*sin(back_link_5_theta);
+    back_joint_4_5_position[1] = root_position[1] + back_link_4_length*cos(back_link_4_theta);
     back_joint_4_5_position[2] = root_position[2];
 
     dJointID back_joint_4_5 = dJointCreateBall(global_helper->getWorld(), 0);
-    dJointAttach(back_joint_4_5, back_link_2_body, back_link_3_body);
+    dJointAttach(back_joint_4_5, back_link_4_body, back_link_5_body);
     dJointSetBallAnchor (back_joint_4_5, back_joint_4_5_position[0], back_joint_4_5_position[1], back_joint_4_5_position[2]);
 
     //Link 5 and link 6
     dReal back_joint_5_6_position[3];
-    back_joint_5_6_position[0] = root_position[0] + back_link_1_length + back_link_2_length + back_link_3_length + back_link_4_length*sin(back_link_4_theta);
-    back_joint_5_6_position[1] = root_position[1] + back_link_5_length*sin(back_link_5_theta);
+    back_joint_5_6_position[0] = root_position[0] + back_link_1_length + back_link_2_length + back_link_3_length + back_link_4_length*sin(back_link_4_theta) + back_link_5_length*sin(back_link_5_theta) ;
+    back_joint_5_6_position[1] = root_position[1] + back_link_4_length*cos(back_link_4_theta);
     back_joint_5_6_position[2] = root_position[2];
 
     dJointID back_joint_5_6 = dJointCreateBall(global_helper->getWorld(), 0);
-    dJointAttach(back_joint_5_6, back_link_2_body, back_link_3_body);
+    dJointAttach(back_joint_5_6, back_link_5_body, back_link_6_body);
     dJointSetBallAnchor (back_joint_5_6, back_joint_5_6_position[0], back_joint_5_6_position[1], back_joint_5_6_position[2]);
 }
 
@@ -562,7 +561,7 @@ void ODEBodies::set_front_legs(){
 
     //Joints
     //back and Link 1
-    /*dReal front_left_foot_joint_back_1_left_1_position[3];
+    dReal front_left_foot_joint_back_1_left_1_position[3];
     front_left_foot_joint_back_1_left_1_position[0] = start_location[0];
     front_left_foot_joint_back_1_left_1_position[1] = start_location[1] + front_foot_link_1_length/2;
     front_left_foot_joint_back_1_left_1_position[2] = start_location[2] + 120;

@@ -15,6 +15,8 @@ void helper::initWorld(){
 
 	//Set world parameters
     dWorldSetGravity(world, 0.0, -9.81, 0.0);
+    dWorldSetERP(world, 0.2);
+	dWorldSetCFM(world, 1e-4);
     dWorldSetLinearDamping(world, 0.00001);
     dWorldSetAngularDamping(world, 0.005);
     dWorldSetMaxAngularSpeed(world, 200);
