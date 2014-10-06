@@ -571,14 +571,6 @@ void ODEBodies::set_front_legs(){
     dJointSetUniversalAxis1(front_left_foot_joint_back_1_left_1, 1, 0, 0);
     dJointSetUniversalAxis2(front_left_foot_joint_back_1_left_1, 0, 1, 0);
     dJointSetUniversalAnchor(front_left_foot_joint_back_1_left_1, front_left_foot_joint_back_1_left_1_position[0], front_left_foot_joint_back_1_left_1_position[1], front_left_foot_joint_back_1_left_1_position[2]);
-    dReal result1[3];
-    dJointGetUniversalAxis1(front_left_foot_joint_back_1_left_1, result1);
-    cout << "axis 1  = " << result1[0] << " " << result1[1] << " " << result1[2] << endl;
-    dReal result2[3];
-    dJointGetUniversalAxis2(front_left_foot_joint_back_1_left_1, result2);
-    cout << "axis 2  = " << result2[0] << " " << result2[1] << " " << result2[2] << endl;
-    /*dJointSetUniversalAxis1(front_left_foot_joint_back_1_left_1, 1, 0, 0);
-    dJointSetUniversalAxis2(front_left_foot_joint_back_1_left_1, 0, 1, 0);*/
 
     //Link 1 and link 2
     dReal front_left_foot_joint_left_1_left_2_position[3];
@@ -647,6 +639,18 @@ void ODEBodies::set_front_legs(){
     setLink(&front_right_foot_link_4_body, &front_right_foot_link_4_mass, front_foot_link_4_length, front_foot_link_4_theta, &front_right_foot_link_4_geom, front_right_foot_link_4_position);
 
     //Joints
+    //back and Link 1
+    dReal front_right_foot_joint_back_1_right_1_position[3];
+    front_right_foot_joint_back_1_right_1_position[0] = start_location[0];
+    front_right_foot_joint_back_1_right_1_position[1] = start_location[1] + front_foot_link_1_length/2;
+    front_right_foot_joint_back_1_right_1_position[2] = start_location[2] - 120;
+
+    dJointID front_right_foot_joint_back_1_right_1 = dJointCreateUniversal(global_helper->getWorld(), 0);
+    dJointAttach(front_right_foot_joint_back_1_right_1, back_link_1_body, front_right_foot_link_1_body);
+    dJointSetUniversalAxis1(front_right_foot_joint_back_1_right_1, 1, 0, 0);
+    dJointSetUniversalAxis2(front_right_foot_joint_back_1_right_1, 0, 1, 0);
+    dJointSetUniversalAnchor(front_right_foot_joint_back_1_right_1, front_right_foot_joint_back_1_right_1_position[0], front_right_foot_joint_back_1_right_1_position[1], front_right_foot_joint_back_1_right_1_position[2]);
+
     //Link 1 and link 2
     dReal front_right_foot_joint_right_1_right_2_position[3];
     front_right_foot_joint_right_1_right_2_position[0] = start_location[0];
@@ -733,6 +737,18 @@ void ODEBodies::set_back_legs(){
     setLink(&back_left_foot_link_4_body, &back_left_foot_link_4_mass, back_foot_link_4_length, back_foot_link_4_theta, &back_left_foot_link_4_geom, back_left_foot_link_4_position);
 
     //Joints
+    //back and Link 1
+    dReal back_left_foot_joint_back_6_left_1_position[3];
+    back_left_foot_joint_back_6_left_1_position[0] = start_location[0];
+    back_left_foot_joint_back_6_left_1_position[1] = start_location[1] + back_foot_link_1_length/2;
+    back_left_foot_joint_back_6_left_1_position[2] = start_location[2] + 120;
+
+    dJointID back_left_foot_joint_back_6_left_1 = dJointCreateUniversal(global_helper->getWorld(), 0);
+    dJointAttach(back_left_foot_joint_back_6_left_1, back_link_6_body, back_left_foot_link_1_body);
+    dJointSetUniversalAxis1(back_left_foot_joint_back_6_left_1, 1, 0, 0);
+    dJointSetUniversalAxis2(back_left_foot_joint_back_6_left_1, 0, 1, 0);
+    dJointSetUniversalAnchor(back_left_foot_joint_back_6_left_1, back_left_foot_joint_back_6_left_1_position[0], back_left_foot_joint_back_6_left_1_position[1], back_left_foot_joint_back_6_left_1_position[2]);
+
     //Link 1 and link 2
     dReal back_left_foot_joint_left_1_left_2_position[3];
     back_left_foot_joint_left_1_left_2_position[0] = start_location[0];
@@ -801,6 +817,18 @@ void ODEBodies::set_back_legs(){
     setLink(&back_right_foot_link_4_body, &back_right_foot_link_4_mass, back_foot_link_4_length, back_foot_link_4_theta, &back_right_foot_link_4_geom, back_right_foot_link_4_position);
 
     //Joints
+    //back and Link 1
+    dReal back_right_foot_joint_back_6_right_1_position[3];
+    back_right_foot_joint_back_6_right_1_position[0] = start_location[0];
+    back_right_foot_joint_back_6_right_1_position[1] = start_location[1] + back_foot_link_1_length/2;
+    back_right_foot_joint_back_6_right_1_position[2] = start_location[2] + 120;
+
+    dJointID back_right_foot_joint_back_6_right_1 = dJointCreateUniversal(global_helper->getWorld(), 0);
+    dJointAttach(back_right_foot_joint_back_6_right_1, back_link_6_body, back_right_foot_link_1_body);
+    dJointSetUniversalAxis1(back_right_foot_joint_back_6_right_1, 1, 0, 0);
+    dJointSetUniversalAxis2(back_right_foot_joint_back_6_right_1, 0, 1, 0);
+    dJointSetUniversalAnchor(back_right_foot_joint_back_6_right_1, back_right_foot_joint_back_6_right_1_position[0], back_right_foot_joint_back_6_right_1_position[1], back_right_foot_joint_back_6_right_1_position[2]);
+
     //Link 1 and link 2
     dReal back_right_foot_joint_right_1_right_2_position[3];
     back_right_foot_joint_right_1_right_2_position[0] = start_location[0];

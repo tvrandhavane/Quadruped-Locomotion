@@ -24,21 +24,25 @@ void draw::draw_dog(){
     glPushMatrix();
         draw_back();
         draw_leg();
-        draw_tail();
-        draw_nnh();
+        //draw_tail();
+        //draw_nnh();
     glPopMatrix();
 }
 
 void draw::draw_cube(){
-    //Load texture image
+    /*//Load texture image
     GLuint cube_texture;
     cube_texture = image_tex->loadBMP_custom("./textures/object.bmp");
 
     //Enable and bind texture
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, cube_texture);
+    glBindTexture(GL_TEXTURE_2D, cube_texture);*/
+
+    glDisable(GL_LIGHTING);
+    glDisable(GL_TEXTURE_2D);
 
     glPushMatrix();
+        glColor3f(1.0f, 0.0f, 0.0f);
         //Base
         glBegin(GL_QUADS);
             glVertex3f(-0.5, -0.5, -0.5);
@@ -83,8 +87,10 @@ void draw::draw_cube(){
         glEnd();
     glPopMatrix();
 
+    glEnable(GL_LIGHTING);
+    glEnable(GL_TEXTURE_2D);
     //Disable texture
-    glDisable(GL_TEXTURE_2D);
+    //glDisable(GL_TEXTURE_2D);
 }
 
 void draw::draw_back(){
@@ -580,16 +586,19 @@ void draw::draw_sky(){
 }
 
 void draw::draw_ground(){
-    //Load texture image
+    /*//Load texture image
     GLuint ground_texture;
     ground_texture = image_tex->loadBMP_custom("./textures/floor.bmp");
 
     //Enable and bind texture
     glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, ground_texture);
+    glBindTexture(GL_TEXTURE_2D, ground_texture);*/
 
+    glDisable(GL_LIGHTING);
+    glDisable(GL_TEXTURE_2D);
     //Draw ground quad
     glBegin(GL_QUADS);
+        glColor3f(0.5f, 0.5f, 0.5f);
         glTexCoord2f(0.0, 0.0);
         glVertex3f(-10000, -250, 10000);
         glTexCoord2f(0.0, 1.0);
@@ -600,8 +609,10 @@ void draw::draw_ground(){
         glVertex3f(10000, -250, 10000);
     glEnd();
 
+    glEnable(GL_LIGHTING);
+    glEnable(GL_TEXTURE_2D);
     //Disable texture
-    glDisable(GL_TEXTURE_2D);
+    //glDisable(GL_TEXTURE_2D);
 }
 
 void draw::getOpenGLRotationMatrix(float * opengl, const float * ode){
