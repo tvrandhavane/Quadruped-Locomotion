@@ -24,8 +24,8 @@ void draw::draw_dog(){
     glPushMatrix();
         draw_back();
         draw_leg();
-        //draw_tail();
-        //draw_nnh();
+        draw_tail();
+        draw_nnh();
     glPopMatrix();
 }
 
