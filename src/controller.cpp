@@ -43,6 +43,8 @@ controller::controller(){
     	current_foot_location[i][1] = 0.0;
     	current_foot_location[i][2] = 0.0;
     }
+
+    //IKSolver = new inverseKinematics();
 }
 
 void controller::takeStep(){

@@ -23,7 +23,6 @@ static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
 
     //If collision, do the following
     if (isGround)  {
-        cout << "o1 = " << o1 << "o2 = " << o2 << endl;
         //Set up contact parameters
         for (int i=0;i<N;i++) {
             contact[i].surface.mode = dContactBounce | dContactSoftCFM;
@@ -50,7 +49,7 @@ static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
 
 void Draw() {
     //Controller step
-    //body_bag->getGaitController()->takeStep();    
+    body_bag->getGaitController()->takeStep();   
 
     //Collides all objects in space
     dSpaceCollide(body_bag->getGlobalHelper()->getSpace(), 0 ,&nearCallback);
@@ -62,6 +61,9 @@ void Draw() {
 
     //Clear openGL buffers
     glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
+
+    //ODE functions to be called in each iteration
+    body_bag->step();
 
     //Draw scene  
     draw_obj->draw_scene();

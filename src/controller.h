@@ -3,10 +3,11 @@
 
 #include <iostream>
 #include <cmath>
-
-using namespace std;
+#include "inverseKinematics.h"
 
 #define g 9800
+
+using namespace std;
 
 class controller
 {
@@ -38,6 +39,7 @@ private:
     void stanceLegTreatment(int leg_id);
     float computeSwingPhase(int leg_id, int phase);
 
+    
 public:
     //Constructor
     controller();

@@ -7,6 +7,11 @@ ODEBodies::ODEBodies(helper * global_helper, controller * gait_controller){
     root_position = gait_controller->getRootPosition();
 }
 
+void ODEBodies::step(){
+    //Apply forces
+    //dBodyAddForce(back_link_2_body, 0.0, 98.1, 0.0);
+}
+
 void ODEBodies::init(){
 	//set_ball();
     set_back();
@@ -49,8 +54,8 @@ void ODEBodies::setLink(dBodyID * link_body, dMass * link_mass, dReal link_lengt
     dMassSetZero(link_mass);
     dMassSetCylinderTotal(link_mass, 10, 2, 2.0, link_length);
     dBodySetMass(*link_body, link_mass);
-    dBodySetLinearVel(*link_body, 0.0, 0.0, 0.0);
-
+    //dBodySetLinearVel(*link_body, 0.0, 0.0, 0.0);
+    
     dReal rotation_matrix_x[9];
     dReal rotation_matrix_z[9];
     dReal rotation_matrix_final_3x3[9];
@@ -401,101 +406,6 @@ void ODEBodies::set_tail(){
     dJointID tail_joint_3_4 = dJointCreateBall(global_helper->getWorld(), 0);
     dJointAttach(tail_joint_3_4, tail_link_3_body, tail_link_4_body);
     dJointSetBallAnchor (tail_joint_3_4, tail_joint_3_4_position[0], tail_joint_3_4_position[1], tail_joint_3_4_position[2]);
-
-    /*dReal start_location[3];
-
-    start_location[0] = root_position[0] + 320.0 + 80*cos(back_link_4_theta) + 80*cos(back_link_6_theta);
-    start_location[1] = root_position[1] - 80*sin(back_link_4_theta) - 80*sin(back_link_6_theta);
-    start_location[2] = root_position[2];
-    
-    //Link 1
-    tail_link_1_body = dBodyCreate(global_helper->getWorld());
-    dReal * tail_link_1_rotation_matrix;
-    dReal tail_link_1_theta = (30*M_PI)/180;
-    tail_link_1_rotation_matrix = new dReal(12);
-    setRotationMatrixZAxis(tail_link_1_rotation_matrix, tail_link_1_theta);
-    dMassSetZero(&tail_link_1_mass);
-    dMassSetCylinderTotal(&tail_link_1_mass, 10, 2, 2.0, 60);
-    dBodySetMass(tail_link_1_body, &tail_link_1_mass);
-    dBodySetLinearVel(tail_link_1_body, 0.0, 0.0, 0.0);
-    dBodySetRotation(tail_link_1_body, tail_link_1_rotation_matrix);
-
-    tail_link_1_geom = dCreateCylinder(global_helper->getSpace(), 2.0, 60.0);
-    dGeomSetData(tail_link_1_geom, (void *)"tail_link_1");
-    dGeomSetBody(tail_link_1_geom, tail_link_1_body);
-    dGeomSetPosition(tail_link_1_geom, start_location[0], start_location[1], start_location[2]);
-    dGeomSetRotation(tail_link_1_geom, tail_link_1_rotation_matrix);
-
-    //Link 2
-    tail_link_2_body = dBodyCreate(global_helper->getWorld());
-    dReal * tail_link_2_rotation_matrix;
-    dReal tail_link_2_theta = (60*M_PI)/180;
-    tail_link_2_rotation_matrix = new dReal(12);
-    setRotationMatrixZAxis(tail_link_2_rotation_matrix, tail_link_2_theta);
-    dMassSetZero(&tail_link_2_mass);
-    dMassSetCylinderTotal(&tail_link_2_mass, 10, 2, 2.0, 60);
-    dBodySetMass(tail_link_2_body, &tail_link_2_mass);
-    dBodySetLinearVel(tail_link_2_body, 0.0, 0.0, 0.0);
-    dBodySetRotation(tail_link_2_body, tail_link_2_rotation_matrix);
-
-    tail_link_2_geom = dCreateCylinder(global_helper->getSpace(), 2.0, 60.0);
-    dGeomSetData(tail_link_2_geom, (void *)"tail_link_2");
-    dGeomSetBody(tail_link_2_geom, tail_link_2_body);
-    dGeomSetPosition(tail_link_2_geom, start_location[0] + 80*cos(tail_link_1_theta), start_location[1] - 80*sin(tail_link_1_theta), start_location[2]);
-    dGeomSetRotation(tail_link_2_geom, tail_link_2_rotation_matrix);
-
-    //Link 3
-    tail_link_3_body = dBodyCreate(global_helper->getWorld());
-    dReal * tail_link_3_rotation_matrix;
-    dReal tail_link_3_theta = (90*M_PI)/180;
-    tail_link_3_rotation_matrix = new dReal(12);
-    setRotationMatrixZAxis(tail_link_3_rotation_matrix, tail_link_3_theta);
-    dMassSetZero(&tail_link_3_mass);
-    dMassSetCylinderTotal(&tail_link_3_mass, 10, 2, 2.0, 60);
-    dBodySetMass(tail_link_3_body, &tail_link_3_mass);
-    dBodySetLinearVel(tail_link_3_body, 0.0, 0.0, 0.0);
-    dBodySetRotation(tail_link_3_body, tail_link_3_rotation_matrix);
-
-    tail_link_3_geom = dCreateCylinder(global_helper->getSpace(), 2.0, 60.0);
-    dGeomSetData(tail_link_3_geom, (void *)"tail_link_3");
-    dGeomSetBody(tail_link_3_geom, tail_link_3_body);
-    dGeomSetPosition(tail_link_3_geom, start_location[0] + 80*cos(tail_link_1_theta) + 80*cos(tail_link_2_theta), start_location[1] - 80*sin(tail_link_1_theta) - 80*sin(tail_link_2_theta), start_location[2]);
-    dGeomSetRotation(tail_link_3_geom, tail_link_3_rotation_matrix);
-
-    //Link 4
-    tail_link_4_body = dBodyCreate(global_helper->getWorld());
-    dReal * tail_link_4_rotation_matrix;
-    dReal tail_link_4_theta = (60*M_PI)/180;
-    tail_link_4_rotation_matrix = new dReal(12);
-    setRotationMatrixZAxis(tail_link_4_rotation_matrix, tail_link_4_theta);
-    dMassSetZero(&tail_link_4_mass);
-    dMassSetCylinderTotal(&tail_link_4_mass, 10, 2, 2.0, 60);
-    dBodySetMass(tail_link_4_body, &tail_link_4_mass);
-    dBodySetLinearVel(tail_link_4_body, 0.0, 0.0, 0.0);
-    dBodySetRotation(tail_link_4_body, tail_link_4_rotation_matrix);
-
-    tail_link_4_geom = dCreateCylinder(global_helper->getSpace(), 2.0, 60.0);
-    dGeomSetData(tail_link_4_geom, (void *)"tail_link_4");
-    dGeomSetBody(tail_link_4_geom, tail_link_4_body);
-    dGeomSetPosition(tail_link_4_geom, start_location[0] + 80*cos(tail_link_1_theta) + 80*cos(tail_link_2_theta), start_location[1] - 80*sin(tail_link_1_theta) - 80*sin(tail_link_2_theta) - 80, start_location[2]);
-    dGeomSetRotation(tail_link_4_geom, tail_link_4_rotation_matrix);
-
-    //Joints
-    dJointID ball_joint_pelvis_1 = dJointCreateBall(global_helper->getWorld(), 0);
-    dJointAttach(ball_joint_pelvis_1, back_link_6_body, tail_link_1_body);
-    dJointSetBallAnchor (ball_joint_pelvis_1, start_location[0], start_location[1], start_location[2]);
-
-    dJointID ball_joint_1_2 = dJointCreateBall(global_helper->getWorld(), 0);
-    dJointAttach(ball_joint_1_2, tail_link_1_body, tail_link_2_body);
-    dJointSetBallAnchor (ball_joint_1_2, start_location[0] + 80*cos(tail_link_1_theta), start_location[1] - 80*sin(tail_link_1_theta), start_location[2]);
-
-    dJointID ball_joint_2_3 = dJointCreateBall(global_helper->getWorld(), 0);
-    dJointAttach(ball_joint_2_3, tail_link_2_body, tail_link_3_body);
-    dJointSetBallAnchor (ball_joint_2_3, start_location[0] + 80*cos(tail_link_1_theta) + 80*cos(tail_link_2_theta), start_location[1] - 80*sin(tail_link_1_theta) - 80*sin(tail_link_2_theta), start_location[2]);
-
-    dJointID ball_joint_3_4 = dJointCreateBall(global_helper->getWorld(), 0);
-    dJointAttach(ball_joint_3_4, tail_link_3_body, tail_link_4_body);
-    dJointSetBallAnchor (ball_joint_3_4, start_location[0] + 80*cos(tail_link_1_theta) + 80*cos(tail_link_2_theta), start_location[1] - 80*sin(tail_link_1_theta) - 80*sin(tail_link_2_theta) - 80, start_location[2]);*/
 }
 
 void ODEBodies::set_leg(){

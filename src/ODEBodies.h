@@ -156,6 +156,7 @@ public:
 
     //Public Methods
     void init();
+    void step();
 
     //Getters
     dBodyID getBallBody();
