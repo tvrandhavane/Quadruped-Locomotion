@@ -13,7 +13,6 @@ class ODEBodies
 private:
 	//Private Objects
 	helper * global_helper;
-    controller * gait_controller;
 
     float * root_position;
 
@@ -135,6 +134,14 @@ private:
     float back_link_4_theta;
     float back_link_5_theta;
     float back_link_6_theta;
+    float front_foot_link_1_theta;
+    float front_foot_link_2_theta;
+    float front_foot_link_3_theta;
+    float front_foot_link_4_theta;
+    float back_foot_link_1_theta;
+    float back_foot_link_2_theta;
+    float back_foot_link_3_theta;
+    float back_foot_link_4_theta;
 
 	//Private Methods
     void set_ball();
@@ -152,7 +159,7 @@ private:
     void setLink(dBodyID * link_body, dMass *link_mass, dReal link_length, float z_rotation_angle, dGeomID *link_geom, float * position);
 public:
 	//Constructor
-    ODEBodies(helper * global_helper, controller * gait_controller);
+    ODEBodies(helper * global_helper, float * root_position);
 
     //Public Methods
     void init();
@@ -217,7 +224,9 @@ public:
 
     dGeomID getPlaneGeom();
     helper * getGlobalHelper();
-    controller * getGaitController();
+
+    vector<float> getLengths(int leg_id);
+    vector<float> getAngles(int leg_id);
 };
 
 #endif // ODEBODIES_H

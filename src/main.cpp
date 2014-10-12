@@ -6,11 +6,12 @@
 #include "imageLoader.h"
 #include "ODEBodies.h"
 #include "controller.h"
+#include "quadrupedFramework.h"
 
 using namespace std;
 
 //Declare global objects
-ODEBodies * body_bag;
+quadrupedFramework * quadFramework;
 draw * draw_obj;
 
 static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
@@ -19,7 +20,7 @@ static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
     dContact contact[N];
 
     //Check if collision is between ball and plane
-    bool isGround = ((body_bag->getPlaneGeom() == o1) || (body_bag->getPlaneGeom() == o2));
+    bool isGround = ((quadFramework->getBodyBag()->getPlaneGeom() == o1) || (quadFramework->getBodyBag()->getPlaneGeom() == o2));
 
     //If collision, do the following
     if (isGround)  {
@@ -41,29 +42,30 @@ static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
         
         //For each contact create a joint        
         for (int i = 0; i < n; i++) {
-            dJointID c = dJointCreateContact(body_bag->getGlobalHelper()->getWorld(), body_bag->getGlobalHelper()->getCgroup(), &contact[i]);
+            dJointID c = dJointCreateContact(quadFramework->getBodyBag()->getGlobalHelper()->getWorld(), quadFramework->getBodyBag()->getGlobalHelper()->getCgroup(), &contact[i]);
             dJointAttach (c, dGeomGetBody(o1), dGeomGetBody(o2));
         }
     }
 }
 
 void Draw() {
+    quadFramework->takeStep();
     //Controller step
-    body_bag->getGaitController()->takeStep();   
-
-    //Collides all objects in space
-    dSpaceCollide(body_bag->getGlobalHelper()->getSpace(), 0 ,&nearCallback);
-
-    //Set stepsize and use quick step, computationally cheaper
-    dWorldStep(body_bag->getGlobalHelper()->getWorld(), 0.1);
-
-    dJointGroupEmpty(body_bag->getGlobalHelper()->getCgroup());
-
-    //Clear openGL buffers
-    glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
+    quadFramework->getGaitController()->takeStep();   
 
     //ODE functions to be called in each iteration
-    body_bag->step();
+    quadFramework->getBodyBag()->step();
+
+    //Collides all objects in space
+    dSpaceCollide(quadFramework->getBodyBag()->getGlobalHelper()->getSpace(), 0 ,&nearCallback);
+
+    //Set stepsize and use quick step, computationally cheaper
+    dWorldStep(quadFramework->getBodyBag()->getGlobalHelper()->getWorld(), 0.1);
+
+    dJointGroupEmpty(quadFramework->getBodyBag()->getGlobalHelper()->getCgroup());
+
+    //Clear openGL buffers
+    glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);    
 
     //Draw scene  
     draw_obj->draw_scene();
@@ -134,13 +136,6 @@ void Timer(int iUnused){
 
 
 int main(int argc, char** argv) {
-    //Initialize helper
-    helper * global_helper = new helper();
-    global_helper->init();  //initiaize world, space and contact grou
-
-    //Initialize controller
-    controller * gait_controller = new controller();
-
     //Set up glut parameters
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE |  GLUT_DEPTH);
@@ -155,11 +150,11 @@ int main(int argc, char** argv) {
     //Initialize ODE
     dInitODE();    
 
-    //Set up ODE bodies
-    body_bag = new ODEBodies(global_helper, gait_controller);
-    body_bag->init();
+    //Set up quadruped framework
+    quadFramework = new quadrupedFramework();
+    
 
-    draw_obj = new draw(body_bag);
+    draw_obj = new draw(quadFramework->getBodyBag());
 
     //Set up display function which will be called in loop
     glutDisplayFunc(Draw);
@@ -169,7 +164,7 @@ int main(int argc, char** argv) {
     glutMainLoop();
 
     //Destroy ODE World and close ODE
-    dWorldDestroy(body_bag->getGlobalHelper()->getWorld());
+    dWorldDestroy(quadFramework->getBodyBag()->getGlobalHelper()->getWorld());
     dCloseODE();
 
     return 0;

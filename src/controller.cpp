@@ -12,10 +12,6 @@ controller::controller(){
 	swingStart[3] = 0;
 	swingEnd[3] = 0;
 
-	root_position[0] = -200.0;
-    root_position[1] = 470.0 - 250.0;
-    root_position[2] = 200.0;
-
 	shoulderHeight = 470;		//in 0.1cm
     hipHeight = 450;
 
@@ -43,8 +39,10 @@ controller::controller(){
     	current_foot_location[i][1] = 0.0;
     	current_foot_location[i][2] = 0.0;
     }
+}
 
-    //IKSolver = new inverseKinematics();
+void controller::applyIK(vector<float> lengths, vector<float> angles, vector<float> endEffector){
+	inverseKinematics * IKSolver = new inverseKinematics(lengths, angles, endEffector);
 }
 
 void controller::takeStep(){
@@ -145,8 +143,4 @@ void controller::computePlacementLocation(int leg_id, float h){
 	next_stepping_location[leg_id][0] = df[0] + (current_velocity[0] - desired_velocity[0])*sqrt(h/g);
 	next_stepping_location[leg_id][1] = df[1] + (current_velocity[1] - desired_velocity[1])*sqrt(h/g);
 	next_stepping_location[leg_id][2] = df[2] + (current_velocity[2] - desired_velocity[2])*sqrt(h/g);
-}
-
-float * controller::getRootPosition(){
-	return root_position;
 }

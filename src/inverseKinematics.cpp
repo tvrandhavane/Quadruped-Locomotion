@@ -11,6 +11,13 @@ inverseKinematics::inverseKinematics(vector<float> lengths, vector<float> angles
 	Pn(1, 0) = endEffector[1];
 	Pn(2, 0) = endEffector[2];
 	createJacobian(Pn);
+
+	for (int i=0; i<jacobian.get_rows(); i++) {
+	    for (int j=0; j<jacobian.get_cols(); j++) {
+	      	std::cout << jacobian(i,j) << ", ";
+	    }
+	    std::cout << std::endl;
+	}
 }
 
 QSMatrix<float> inverseKinematics::getTransformationMatrix(float l, float theta){

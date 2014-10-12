@@ -18,8 +18,6 @@ private:
     int swingStart[4];
     int swingEnd[4];
 
-    float root_position[3];
-
     int shoulderHeight;
     int hipHeight;
 
@@ -39,15 +37,13 @@ private:
     void stanceLegTreatment(int leg_id);
     float computeSwingPhase(int leg_id, int phase);
 
-    
 public:
     //Constructor
     controller();
     
     //Public Methods
     void takeStep();
-    float * getRootPosition();
-
+    void applyIK(vector<float> lengths, vector<float> angles, vector<float> endEffector);
 };
 
 #endif // CONTROLLER_H

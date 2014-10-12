@@ -1,15 +1,51 @@
 #include "ODEBodies.h"
 
-ODEBodies::ODEBodies(helper * global_helper, controller * gait_controller){
+ODEBodies::ODEBodies(helper * global_helper, float * root_position){
 	this->global_helper = global_helper;
-    this->gait_controller = gait_controller;
-
-    root_position = gait_controller->getRootPosition();
+    this->root_position = root_position;
 }
 
 void ODEBodies::step(){
     //Apply forces
     //dBodyAddForce(back_link_2_body, 0.0, 98.1, 0.0);
+}
+
+vector<float> ODEBodies::getLengths(int leg_id){
+    vector<float> ret(4);
+    //front
+    if(leg_id == 0){
+        ret[0] = front_foot_link_1_length;
+        ret[1] = front_foot_link_2_length;
+        ret[2] = front_foot_link_3_length;
+        ret[3] = front_foot_link_4_length;
+    }
+    //back
+    else{
+        ret[0] = back_foot_link_1_length;
+        ret[1] = back_foot_link_2_length;
+        ret[2] = back_foot_link_3_length;
+        ret[3] = back_foot_link_4_length;
+    }
+    return ret;
+}
+
+vector<float> ODEBodies::getAngles(int leg_id){
+    vector<float> ret(4);
+    //front
+    if(leg_id == 0){
+        ret[0] = front_foot_link_1_theta;
+        ret[1] = front_foot_link_2_theta;
+        ret[2] = front_foot_link_3_theta;
+        ret[3] = front_foot_link_4_theta;
+    }
+    //back
+    else{
+        ret[0] = back_foot_link_1_theta;
+        ret[1] = back_foot_link_2_theta;
+        ret[2] = back_foot_link_3_theta;
+        ret[3] = back_foot_link_4_theta;
+    }
+    return ret;
 }
 
 void ODEBodies::init(){
@@ -414,10 +450,10 @@ void ODEBodies::set_leg(){
 }
 
 void ODEBodies::set_front_legs(){
-    dReal front_foot_link_1_theta = (0*M_PI)/180;
-    dReal front_foot_link_2_theta = (45*M_PI)/180;
-    dReal front_foot_link_3_theta = (30*M_PI)/180;
-    dReal front_foot_link_4_theta = (90*M_PI)/180;
+    front_foot_link_1_theta = (0*M_PI)/180;
+    front_foot_link_2_theta = (45*M_PI)/180;
+    front_foot_link_3_theta = (30*M_PI)/180;
+    front_foot_link_4_theta = (90*M_PI)/180;
     dReal length_multiplier = 462/(5 + 4*abs(cos(front_foot_link_2_theta)) + 3*abs(cos(front_foot_link_3_theta)));    
     front_foot_link_1_length = 5*length_multiplier;
     front_foot_link_2_length = 4*length_multiplier;
@@ -589,10 +625,10 @@ void ODEBodies::set_front_legs(){
 }
 
 void ODEBodies::set_back_legs(){
-    dReal back_foot_link_1_theta = (0*M_PI)/180;
-    dReal back_foot_link_2_theta = (45*M_PI)/180;
-    dReal back_foot_link_3_theta = (30*M_PI)/180;
-    dReal back_foot_link_4_theta = (90*M_PI)/180;
+    back_foot_link_1_theta = (0*M_PI)/180;
+    back_foot_link_2_theta = (45*M_PI)/180;
+    back_foot_link_3_theta = (30*M_PI)/180;
+    back_foot_link_4_theta = (90*M_PI)/180;
     dReal length_multiplier = 446/(5 + 4*abs(sin(back_foot_link_2_theta)) + 3*abs(sin(back_foot_link_3_theta)));   
   
     back_foot_link_1_length = 5*length_multiplier;
@@ -772,10 +808,6 @@ void ODEBodies::set_plane(){
 
 helper * ODEBodies::getGlobalHelper(){
     return global_helper;
-}
-
-controller * ODEBodies::getGaitController(){
-    return gait_controller;
 }
 
 dBodyID ODEBodies::getBallBody(){
