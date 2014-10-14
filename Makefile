@@ -14,7 +14,7 @@ SRCDIR = $(PROJECT_ROOT)/src
 OBJDIR = $(PROJECT_ROOT)/obj
 BINDIR = $(PROJECT_ROOT)/bin
 
-
+INCLUDE = -I $(PROJECT_ROOT)/src/eigen
 LIBS = -lGL -lGLU -lglut -lode -lpthread -g -pg
 TARGET = QuadSimulator
 
@@ -35,14 +35,14 @@ setup:
 	@$(ECHO) "Compiling...."
 
 $(BINDIR)/$(TARGET): $(OBJS)
-	@$(CC) -o $@  $(OBJS) $(LIBS)
+	@$(CC) -o $@  $(OBJS) $(LIBS) $(INCLUDE)
 	@$(ECHO) "Building executable..."
 
 -include $(OBJS:.o=.d)
 
 $(OBJS): $(OBJDIR)/%.o : $(SRCDIR)/%.cpp
 	@$(PRINT) "$(notdir $<)\n"
-	@$(CC) $(LIBS) -c $< -o $@
+	@$(CC) $(LIBS) $(INCLUDE) -c $< -o $@
 
 clean:
 	@$(ECHO) -n "Cleaning up..."
