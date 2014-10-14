@@ -1,23 +1,17 @@
 #include "inverseKinematics.h"
-// #include "QSMatrix.h"
 
 inverseKinematics::inverseKinematics(vector<float> lengths, vector<float> angles, vector<float> endEffector){
 	this->angles = angles;
 	this->lengths = lengths;
 	numLinks = lengths.size();
 	jacobian = QSMatrix<float> (6, numLinks-1, 0.0);
+
 	QSMatrix<float> Pn(4, 1, 1.0);
 	Pn(0, 0) = endEffector[0];
 	Pn(1, 0) = endEffector[1];
 	Pn(2, 0) = endEffector[2];
 	createJacobian(Pn);
-
-	for (int i=0; i<jacobian.get_rows(); i++) {
-	    for (int j=0; j<jacobian.get_cols(); j++) {
-	      	std::cout << jacobian(i,j) << ", ";
-	    }
-	    std::cout << std::endl;
-	}
+	invertJacobian();
 }
 
 QSMatrix<float> inverseKinematics::getTransformationMatrix(float l, float theta){
@@ -75,5 +69,57 @@ void inverseKinematics::createJacobian(QSMatrix<float> Pn){
 }
 
 void inverseKinematics::invertJacobian(){
+	Eigen::MatrixXf m = Eigen::MatrixXf::Random(jacobian.get_rows(),jacobian.get_cols());
 
+	for (int i=0; i<jacobian.get_rows(); i++) {
+	    for (int j=0; j<jacobian.get_cols(); j++) {
+	      	m(i, j) = jacobian(i,j);
+	    }
+	}
+ 
+	QSMatrix<float> U(jacobian.get_rows(), jacobian.get_rows(), 0.0);
+	QSMatrix<float> V(jacobian.get_cols(), jacobian.get_cols(), 0.0);
+	QSMatrix<float> S(jacobian.get_rows(), jacobian.get_cols(), 0.0);
+
+	Eigen::JacobiSVD<Eigen::MatrixXf> svd(m, Eigen::ComputeFullU | Eigen::ComputeThinV);
+
+	for (int i=0; i<U.get_rows(); i++) {
+	    for (int j=0; j<U.get_cols(); j++) {
+	      	U(i,j) = svd.matrixU()(i, j);
+	    }
+	}
+
+	for (int i=0; i<V.get_rows(); i++) {
+	    for (int j=0; j<V.get_cols(); j++) {
+	      	V(i,j) = svd.matrixV()(i, j);
+	    }
+	}
+
+	for (int i=0; i< svd.singularValues().size(); i++) {
+	    S(i, i) = svd.singularValues()(i);
+	}	
+
+	inverseJacobian = QSMatrix<float> (numLinks-1, 6, 0.0);
+	QSMatrix<float> Sdagger = QSMatrix<float>(S.get_cols(), S.get_rows(), 0.0);
+	for (int i=0; i< svd.singularValues().size(); i++) {
+	    Sdagger(i, i) = S(i, i);
+	}
+
+	for (int i=0; i<Sdagger.get_rows(); i++) {
+	    for (int j=0; j<Sdagger.get_cols(); j++) {
+	      	if(Sdagger(i,j) != 0){
+	      		Sdagger(i, j) = 1/Sdagger(i, j);
+	      	}
+	    }
+	}
+
+	QSMatrix<float> Utranspose(U.get_cols(), U.get_rows(), 0.0);
+	for (int i=0; i<Utranspose.get_rows(); i++) {
+	    for (int j=0; j<Utranspose.get_cols(); j++) {
+	      	Utranspose(i, j) = U(j, i);
+	    }
+	}
+
+	QSMatrix<float> temp = Sdagger*Utranspose;
+	inverseJacobian = V*temp;
 }

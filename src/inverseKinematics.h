@@ -5,6 +5,8 @@
 #include <cmath>
 #include <vector>
 #include "QSMatrix.h"
+#include <iostream>
+#include <Eigen/Dense>
 
 using namespace std;
 
@@ -14,6 +16,7 @@ private:
 	vector<float> lengths;
 	vector<float> angles;
 	QSMatrix<float> jacobian;
+	QSMatrix<float> inverseJacobian;
 
 	QSMatrix<float> getTransformationMatrix(float l, float theta);
 	QSMatrix<float> crossProduct(QSMatrix<float> m1, QSMatrix<float> m2);
