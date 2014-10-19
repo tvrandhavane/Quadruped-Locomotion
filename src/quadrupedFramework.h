@@ -3,6 +3,7 @@
 
 #include "ODEBodies.h"
 #include "controller.h"
+#include "QSMatrix.h"
 
 class quadrupedFramework
 {

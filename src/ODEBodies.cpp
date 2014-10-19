@@ -760,7 +760,7 @@ void ODEBodies::set_back_legs(){
     dReal back_right_foot_joint_back_6_right_1_position[3];
     back_right_foot_joint_back_6_right_1_position[0] = start_location[0];
     back_right_foot_joint_back_6_right_1_position[1] = start_location[1] + back_foot_link_1_length/2;
-    back_right_foot_joint_back_6_right_1_position[2] = start_location[2] + 120;
+    back_right_foot_joint_back_6_right_1_position[2] = start_location[2] - 120;
 
     dJointID back_right_foot_joint_back_6_right_1 = dJointCreateUniversal(global_helper->getWorld(), 0);
     dJointAttach(back_right_foot_joint_back_6_right_1, back_link_6_body, back_right_foot_link_1_body);

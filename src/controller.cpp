@@ -1,6 +1,6 @@
 #include "controller.h"
 
-controller::controller(){
+controller::controller(ODEBodies * body_bag){
 	time = 0;
 	T = 100;
 	swingStart[0] = 1;
@@ -27,6 +27,7 @@ controller::controller(){
     lfHeight[2] = hipHeight;
     lfHeight[3] = hipHeight;
 
+    this->body_bag = body_bag;
 
     for(int i = 0; i< 4; i++){
     	prev_stepping_location[i][0] = 0.0;
@@ -41,8 +42,47 @@ controller::controller(){
     }
 }
 
-void controller::applyIK(vector<float> lengths, vector<float> angles, vector<float> endEffector){
-	inverseKinematics * IKSolver = new inverseKinematics(lengths, angles, endEffector);
+void controller::applyIK(vector<float> lengths, vector<float> angles, vector<float> endEffector, QSMatrix<float> transformationMatrix, QSMatrix<float> axis){
+	inverseKinematics * IKSolver = new inverseKinematics(lengths, angles, endEffector, transformationMatrix, axis);
+}
+
+void controller::gravityCompensation(){
+	dBodyAddForce(body_bag->getBackLink1Body(), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getBackLink2Body(), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getBackLink3Body(), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getBackLink4Body(), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getBackLink5Body(), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getBackLink6Body(), 0.0, 98.1, 0.0);
+    //Neck and head
+    dBodyAddForce(body_bag->getNnhLink1Body(), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getNnhLink2Body(), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getNnhLink3Body(), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getNnhLink4Body(), 0.0, 98.1, 0.0);
+    //Tail
+    dBodyAddForce(body_bag->getTailLink1Body(), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getTailLink2Body(), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getTailLink3Body(), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getTailLink4Body(), 0.0, 98.1, 0.0);
+    //Front left foot
+    dBodyAddForce(body_bag->getFrontLeftFootLink1Body(), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getFrontLeftFootLink2Body(), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getFrontLeftFootLink3Body(), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getFrontLeftFootLink4Body(), 0.0, 98.1, 0.0);
+    //Front right foot    
+    dBodyAddForce(body_bag->getFrontRightFootLink1Body(), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getFrontRightFootLink2Body(), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getFrontRightFootLink3Body(), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getFrontRightFootLink4Body(), 0.0, 98.1, 0.0);
+    //Back left foot
+    dBodyAddForce(body_bag->getBackLeftFootLink1Body(), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getBackLeftFootLink2Body(), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getBackLeftFootLink3Body(), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getBackLeftFootLink4Body(), 0.0, 98.1, 0.0);
+    //Back right foot    
+    dBodyAddForce(body_bag->getBackRightFootLink1Body(), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getBackRightFootLink2Body(), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getBackRightFootLink3Body(), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getBackRightFootLink4Body(), 0.0, 98.1, 0.0);
 }
 
 void controller::takeStep(){

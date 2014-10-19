@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cmath>
 #include "inverseKinematics.h"
+#include "ODEBodies.h"
 
 #define g 9800
 
@@ -30,6 +31,8 @@ private:
     float next_stepping_location[4][3];
     float current_foot_location[4][3];
 
+    ODEBodies * body_bag;
+
 	//Private Methods
     bool isInSwing(int leg_id);
     void computePlacementLocation(int leg_id, float h);
@@ -39,11 +42,12 @@ private:
 
 public:
     //Constructor
-    controller();
+    controller(ODEBodies * body_bag);
     
     //Public Methods
     void takeStep();
-    void applyIK(vector<float> lengths, vector<float> angles, vector<float> endEffector);
+    void applyIK(vector<float> lengths, vector<float> angles, vector<float> endEffector, QSMatrix<float> transformationMatrix, QSMatrix<float> axis);
+    void gravityCompensation();
 };
 
 #endif // CONTROLLER_H

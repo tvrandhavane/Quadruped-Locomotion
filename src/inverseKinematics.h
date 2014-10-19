@@ -17,13 +17,16 @@ private:
 	vector<float> angles;
 	QSMatrix<float> jacobian;
 	QSMatrix<float> inverseJacobian;
+	QSMatrix<float> jointAngleChange;
+	QSMatrix<float> endEffector;
 
 	QSMatrix<float> getTransformationMatrix(float l, float theta);
 	QSMatrix<float> crossProduct(QSMatrix<float> m1, QSMatrix<float> m2);
 
 public:
-	inverseKinematics(vector<float> lengths, vector<float> angles, vector<float> endEffector);
-	void createJacobian(QSMatrix<float> Pn);
+	inverseKinematics(vector<float> lengths, vector<float> angles, vector<float> targetPosition, QSMatrix<float> transformationMatrix, QSMatrix<float> axis);
+	void createJacobian(QSMatrix<float> Pn, QSMatrix<float> T0, QSMatrix<float> Z0);
 	void invertJacobian();
+	void computeJointAngleChange(QSMatrix<float> target_pos);
 };
 #endif // INVERSE_KINEMATICS_H

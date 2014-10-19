@@ -5,8 +5,8 @@
 #include <ode/ode.h>
 #include <iostream>
 #include <cmath>
+#include <vector>
 #include "helper.h"
-#include "controller.h"
 
 class ODEBodies
 {

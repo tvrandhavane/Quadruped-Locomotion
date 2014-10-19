@@ -1,17 +1,24 @@
 #include "inverseKinematics.h"
 
-inverseKinematics::inverseKinematics(vector<float> lengths, vector<float> angles, vector<float> endEffector){
+inverseKinematics::inverseKinematics(vector<float> lengths, vector<float> angles, vector<float> targetPosition, QSMatrix<float> transformationMatrix, QSMatrix<float> axis){
 	this->angles = angles;
 	this->lengths = lengths;
 	numLinks = lengths.size();
-	jacobian = QSMatrix<float> (6, numLinks-1, 0.0);
+	jacobian = QSMatrix<float> (6, numLinks, 0.0);
 
 	QSMatrix<float> Pn(4, 1, 1.0);
-	Pn(0, 0) = endEffector[0];
-	Pn(1, 0) = endEffector[1];
-	Pn(2, 0) = endEffector[2];
-	createJacobian(Pn);
+	Pn(0, 0) = targetPosition[0];
+	Pn(1, 0) = targetPosition[1];
+	Pn(2, 0) = targetPosition[2];
+	createJacobian(Pn, transformationMatrix, axis);
 	invertJacobian();
+	computeJointAngleChange(Pn);
+	for (int i=0; i<jointAngleChange.get_rows(); i++) {
+	    for (int j=0; j<jointAngleChange.get_cols(); j++) {
+	      	cout << jointAngleChange(i, j) << " ";
+	    }
+	    cout << endl;
+	}
 }
 
 QSMatrix<float> inverseKinematics::getTransformationMatrix(float l, float theta){
@@ -42,11 +49,12 @@ QSMatrix<float> inverseKinematics::crossProduct(QSMatrix<float> m1, QSMatrix<flo
 	return cross;
 }
 
-void inverseKinematics::createJacobian(QSMatrix<float> Pn){
+void inverseKinematics::createJacobian(QSMatrix<float> Pn, QSMatrix<float> T0, QSMatrix<float> Z0){
 	QSMatrix<float> Tj(4, 4, 0.0);
 	for(int i = 0; i < Tj.get_rows(); i++){
 	    Tj(i,i) = 1;
 	}
+
 	QSMatrix<float> Zj(4, 1, 0.0);
 	Zj(2, 0) = 1;
 	Zj(3, 0) = 1;
@@ -54,8 +62,19 @@ void inverseKinematics::createJacobian(QSMatrix<float> Pn){
 	QSMatrix<float> Oj(4, 1, 0.0);
 	Oj(3, 0) = 1;
 
- 	for(int i = 0; i < numLinks-1; i++){
-		Tj = Tj*getTransformationMatrix(lengths[i], angles[i+1] - angles[i]);
+	Tj = T0;
+	QSMatrix<float> TjZj = Tj*Z0;
+	QSMatrix<float> Pj = Tj*Oj;
+	QSMatrix<float> cross = crossProduct(TjZj, Pn - Pj);
+	jacobian(0, 0) = cross(0, 0);
+	jacobian(1, 0) = cross(1, 0);
+	jacobian(2, 0) = cross(2, 0);
+	jacobian(3, 0) = TjZj(0, 0);
+	jacobian(4, 0) = TjZj(1, 0);
+	jacobian(5, 0) = TjZj(2, 0);
+
+ 	for(int i = 1; i < numLinks; i++){
+		Tj = Tj*getTransformationMatrix(lengths[i-1], angles[i-1] - angles[i]);
 		QSMatrix<float> TjZj = Tj*Zj;
 		QSMatrix<float> Pj = Tj*Oj;
 		QSMatrix<float> cross = crossProduct(TjZj, Pn - Pj);
@@ -66,6 +85,10 @@ void inverseKinematics::createJacobian(QSMatrix<float> Pn){
 		jacobian(4, i) = TjZj(1, 0);
 		jacobian(5, i) = TjZj(2, 0);
 	}
+
+	Tj = Tj*getTransformationMatrix(lengths[numLinks-1], 0);
+	//endEffector = QSMatrix<float> (3, 1, 0.0);
+	endEffector = Tj*Oj;	
 }
 
 void inverseKinematics::invertJacobian(){
@@ -122,4 +145,13 @@ void inverseKinematics::invertJacobian(){
 
 	QSMatrix<float> temp = Sdagger*Utranspose;
 	inverseJacobian = V*temp;
+}
+
+void inverseKinematics::computeJointAngleChange(QSMatrix<float> target_pos){
+	QSMatrix<float> x(6, 1, 0.0);
+	QSMatrix<float> temp = target_pos - endEffector;
+	x(0, 0) = temp(0, 0);
+	x(1, 0) = temp(1, 0);
+	x(2, 0) = temp(2, 0);
+	jointAngleChange = inverseJacobian*x;
 }
