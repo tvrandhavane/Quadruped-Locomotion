@@ -20,10 +20,10 @@ private:
 	QSMatrix<float> jointAngleChange;
 	QSMatrix<float> endEffector;
 
-	QSMatrix<float> getTransformationMatrix(float l, float theta);
 	QSMatrix<float> crossProduct(QSMatrix<float> m1, QSMatrix<float> m2);
 
 public:
+	QSMatrix<float> getTransformationMatrix(float l, float theta);
 	inverseKinematics(vector<float> lengths, vector<float> angles, vector<float> targetPosition, QSMatrix<float> transformationMatrix, QSMatrix<float> axis);
 	void createJacobian(QSMatrix<float> Pn, QSMatrix<float> T0, QSMatrix<float> Z0);
 	void invertJacobian();

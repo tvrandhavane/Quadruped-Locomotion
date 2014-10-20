@@ -11,14 +11,31 @@ inverseKinematics::inverseKinematics(vector<float> lengths, vector<float> angles
 	Pn(1, 0) = targetPosition[1];
 	Pn(2, 0) = targetPosition[2];
 	createJacobian(Pn, transformationMatrix, axis);
+	cout << "endEffector = " << endl;
+	for (int i=0; i<endEffector.get_rows(); i++) {
+	    for (int j=0; j<endEffector.get_cols(); j++) {
+	      	cout << endEffector(i, j) << " ";
+	    }
+	    cout << endl;
+	}
+	/*
+	cout << "targetPosition = " << endl;
+	for (int i=0; i<targetPosition.size(); i++) {
+	    cout << targetPosition[i] << " ";
+	}
 	invertJacobian();
+	Pn(0, 0) = endEffector(0,0);
+	Pn(1, 0) = endEffector(1,0) + 1.0;
+	Pn(2, 0) = endEffector(2,0);
 	computeJointAngleChange(Pn);
+	//computeJointAngleChange(endEffector);
+	cout << "jointAngleChange = " << endl;
 	for (int i=0; i<jointAngleChange.get_rows(); i++) {
 	    for (int j=0; j<jointAngleChange.get_cols(); j++) {
 	      	cout << jointAngleChange(i, j) << " ";
 	    }
 	    cout << endl;
-	}
+	}*/
 }
 
 QSMatrix<float> inverseKinematics::getTransformationMatrix(float l, float theta){
@@ -51,9 +68,6 @@ QSMatrix<float> inverseKinematics::crossProduct(QSMatrix<float> m1, QSMatrix<flo
 
 void inverseKinematics::createJacobian(QSMatrix<float> Pn, QSMatrix<float> T0, QSMatrix<float> Z0){
 	QSMatrix<float> Tj(4, 4, 0.0);
-	for(int i = 0; i < Tj.get_rows(); i++){
-	    Tj(i,i) = 1;
-	}
 
 	QSMatrix<float> Zj(4, 1, 0.0);
 	Zj(2, 0) = 1;
@@ -75,6 +89,7 @@ void inverseKinematics::createJacobian(QSMatrix<float> Pn, QSMatrix<float> T0, Q
 
  	for(int i = 1; i < numLinks; i++){
 		Tj = Tj*getTransformationMatrix(lengths[i-1], angles[i-1] - angles[i]);
+		Zj = getTransformationMatrix(lengths[i-1], angles[i-1] - angles[i])*Zj;
 		QSMatrix<float> TjZj = Tj*Zj;
 		QSMatrix<float> Pj = Tj*Oj;
 		QSMatrix<float> cross = crossProduct(TjZj, Pn - Pj);
@@ -87,8 +102,7 @@ void inverseKinematics::createJacobian(QSMatrix<float> Pn, QSMatrix<float> T0, Q
 	}
 
 	Tj = Tj*getTransformationMatrix(lengths[numLinks-1], 0);
-	//endEffector = QSMatrix<float> (3, 1, 0.0);
-	endEffector = Tj*Oj;	
+	endEffector = Tj*Oj;
 }
 
 void inverseKinematics::invertJacobian(){

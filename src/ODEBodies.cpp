@@ -471,7 +471,7 @@ void ODEBodies::set_front_legs(){
     front_left_foot_link_1_position[0] = start_location[0];
     front_left_foot_link_1_position[1] = start_location[1];
     front_left_foot_link_1_position[2] = start_location[2] + 120;
-
+    
     setLink(&front_left_foot_link_1_body, &front_left_foot_link_1_mass, front_foot_link_1_length, front_foot_link_1_theta, &front_left_foot_link_1_geom, front_left_foot_link_1_position);
 
     //Link 2    
@@ -479,7 +479,7 @@ void ODEBodies::set_front_legs(){
     front_left_foot_link_2_position[0] = start_location[0] - abs((front_foot_link_2_length/2)*sin(front_foot_link_2_theta));
     front_left_foot_link_2_position[1] = start_location[1] - front_foot_link_1_length/2 - abs((front_foot_link_2_length/2)*cos(front_foot_link_2_theta));
     front_left_foot_link_2_position[2] = start_location[2] + 120;
-
+    
     setLink(&front_left_foot_link_2_body, &front_left_foot_link_2_mass, front_foot_link_2_length, front_foot_link_2_theta, &front_left_foot_link_2_geom, front_left_foot_link_2_position);
 
     //Link 3
@@ -487,7 +487,7 @@ void ODEBodies::set_front_legs(){
     front_left_foot_link_3_position[0] = start_location[0] - abs(front_foot_link_2_length*sin(front_foot_link_2_theta)) - abs((front_foot_link_3_length/2)*sin(front_foot_link_3_theta));
     front_left_foot_link_3_position[1] = start_location[1] - front_foot_link_1_length/2 - abs(front_foot_link_2_length*cos(front_foot_link_2_theta)) - abs((front_foot_link_3_length/2)*cos(front_foot_link_3_theta));
     front_left_foot_link_3_position[2] = start_location[2] + 120;
-
+    
     setLink(&front_left_foot_link_3_body, &front_left_foot_link_3_mass, front_foot_link_3_length, front_foot_link_3_theta, &front_left_foot_link_3_geom, front_left_foot_link_3_position);
 
     //Link 4
@@ -495,7 +495,7 @@ void ODEBodies::set_front_legs(){
     front_left_foot_link_4_position[0] = start_location[0] - abs(front_foot_link_2_length*sin(front_foot_link_2_theta)) - abs(front_foot_link_3_length*sin(front_foot_link_3_theta)) - front_foot_link_4_length/2;
     front_left_foot_link_4_position[1] = start_location[1] - front_foot_link_1_length/2 - abs(front_foot_link_2_length*cos(front_foot_link_2_theta)) - abs(front_foot_link_3_length*cos(front_foot_link_3_theta)) - 2;
     front_left_foot_link_4_position[2] = start_location[2] + 120;
-
+    
     setLink(&front_left_foot_link_4_body, &front_left_foot_link_4_mass, front_foot_link_4_length, front_foot_link_4_theta, &front_left_foot_link_4_geom, front_left_foot_link_4_position);
 
     //Joints
