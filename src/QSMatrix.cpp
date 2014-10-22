@@ -120,7 +120,7 @@ QSMatrix<T> QSMatrix<T>::operator*(const QSMatrix<T>& rhs) {
 
   for (unsigned i=0; i<rows; i++) {
     for (unsigned j=0; j<cols; j++) {
-      for (unsigned k=0; k<rows; k++) {
+      for (unsigned k=0; k<rhs.get_rows(); k++) {
         result(i,j) += this->mat[i][k] * rhs(k,j);
       }
     }

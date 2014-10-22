@@ -11,6 +11,15 @@ inverseKinematics::inverseKinematics(vector<float> lengths, vector<float> angles
 	Pn(1, 0) = targetPosition[1];
 	Pn(2, 0) = targetPosition[2];
 	createJacobian(Pn, transformationMatrix, axis);
+
+	cout << "jacobian = " << endl;
+	for (int i=0; i<jacobian.get_rows(); i++) {
+	    for (int j=0; j<jacobian.get_cols(); j++) {
+	      	cout << jacobian(i, j) << " ";
+	    }
+	    cout << endl;
+	}
+	
 	cout << "endEffector = " << endl;
 	for (int i=0; i<endEffector.get_rows(); i++) {
 	    for (int j=0; j<endEffector.get_cols(); j++) {
@@ -18,12 +27,29 @@ inverseKinematics::inverseKinematics(vector<float> lengths, vector<float> angles
 	    }
 	    cout << endl;
 	}
-	/*
+	
 	cout << "targetPosition = " << endl;
 	for (int i=0; i<targetPosition.size(); i++) {
 	    cout << targetPosition[i] << " ";
 	}
+	cout << endl;
 	invertJacobian();
+	cout << "inverseJacobian = " << endl;
+	for (int i=0; i<inverseJacobian.get_rows(); i++) {
+	    for (int j=0; j<inverseJacobian.get_cols(); j++) {
+	      	cout << inverseJacobian(i, j) << " ";
+	    }
+	    cout << endl;
+	}
+	QSMatrix<float> identity = inverseJacobian*jacobian;
+	cout << "identity = " << endl;
+	for (int i=0; i<identity.get_rows(); i++) {
+	    for (int j=0; j<identity.get_cols(); j++) {
+	      	cout << identity(i, j) << " ";
+	    }
+	    cout << endl;
+	}
+	/*
 	Pn(0, 0) = endEffector(0,0);
 	Pn(1, 0) = endEffector(1,0) + 1.0;
 	Pn(2, 0) = endEffector(2,0);
@@ -35,7 +61,8 @@ inverseKinematics::inverseKinematics(vector<float> lengths, vector<float> angles
 	      	cout << jointAngleChange(i, j) << " ";
 	    }
 	    cout << endl;
-	}*/
+	}
+	*/
 }
 
 QSMatrix<float> inverseKinematics::getTransformationMatrix(float l, float theta){
@@ -106,6 +133,7 @@ void inverseKinematics::createJacobian(QSMatrix<float> Pn, QSMatrix<float> T0, Q
 }
 
 void inverseKinematics::invertJacobian(){
+	float lambda = 0.0;
 	Eigen::MatrixXf m = Eigen::MatrixXf::Random(jacobian.get_rows(),jacobian.get_cols());
 
 	for (int i=0; i<jacobian.get_rows(); i++) {
@@ -133,32 +161,32 @@ void inverseKinematics::invertJacobian(){
 	}
 
 	for (int i=0; i< svd.singularValues().size(); i++) {
+		lambda += svd.singularValues()(i);
 	    S(i, i) = svd.singularValues()(i);
 	}	
+	lambda /= svd.singularValues().size();
 
-	inverseJacobian = QSMatrix<float> (numLinks-1, 6, 0.0);
-	QSMatrix<float> Sdagger = QSMatrix<float>(S.get_cols(), S.get_rows(), 0.0);
-	for (int i=0; i< svd.singularValues().size(); i++) {
-	    Sdagger(i, i) = S(i, i);
+	inverseJacobian = QSMatrix<float> (numLinks, 6, 0.0);
+	for(int i = 0; i < svd.singularValues().size(); i++){
+		QSMatrix<float> vi(V.get_rows(), 1, 0.0);
+		for(int j = 0; j < V.get_rows(); j++){
+			vi(j, 0) = V(j, i);
+		}
+		QSMatrix<float> ui(1, U.get_rows(), 0.0);
+		for(int j = 0; j < U.get_rows(); j++){
+			ui(0, j) = U(j, i);
+		}
+		QSMatrix<float> temp(numLinks-1, 6, 0.0);
+		temp = vi*ui;
+		cout << S(i, i) << endl;
+		for (int k=0; k<temp.get_rows(); k++) {
+		    for (int j=0; j<temp.get_cols(); j++) {
+		      	//temp(k, j) = (S(i, i)/(S(i, i)*S(i, i) + S(i, i)))*temp(k, j);
+		      	temp(k, j) = (S(i,i)/(S(i, i)*S(i, i) + lambda*lambda))*temp(k, j);
+		    }
+		}
+		inverseJacobian = inverseJacobian + temp;
 	}
-
-	for (int i=0; i<Sdagger.get_rows(); i++) {
-	    for (int j=0; j<Sdagger.get_cols(); j++) {
-	      	if(Sdagger(i,j) != 0){
-	      		Sdagger(i, j) = 1/Sdagger(i, j);
-	      	}
-	    }
-	}
-
-	QSMatrix<float> Utranspose(U.get_cols(), U.get_rows(), 0.0);
-	for (int i=0; i<Utranspose.get_rows(); i++) {
-	    for (int j=0; j<Utranspose.get_cols(); j++) {
-	      	Utranspose(i, j) = U(j, i);
-	    }
-	}
-
-	QSMatrix<float> temp = Sdagger*Utranspose;
-	inverseJacobian = V*temp;
 }
 
 void inverseKinematics::computeJointAngleChange(QSMatrix<float> target_pos){
