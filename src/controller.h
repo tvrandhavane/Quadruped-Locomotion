@@ -31,6 +31,8 @@ private:
     float next_stepping_location[4][3];
     float current_foot_location[4][3];
 
+    float * root_position;
+
     ODEBodies * body_bag;
 
 	//Private Methods
@@ -39,10 +41,11 @@ private:
     void setFootLocation(int leg_id, int phase);
     void stanceLegTreatment(int leg_id);
     float computeSwingPhase(int leg_id, int phase);
-
+    void legController(int leg_id, int phase);
+    float* getTargetPosition(int leg_id);
 public:
     //Constructor
-    controller(ODEBodies * body_bag);
+    controller(ODEBodies * body_bag, float * root_position);
     
     //Public Methods
     void takeStep();

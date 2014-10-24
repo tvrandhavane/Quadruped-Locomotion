@@ -30,22 +30,7 @@ private:
     dBodyID tail_link_2_body;
     dBodyID tail_link_3_body;
     dBodyID tail_link_4_body;
-    dBodyID front_left_foot_link_1_body;
-    dBodyID front_left_foot_link_2_body;
-    dBodyID front_left_foot_link_3_body;
-    dBodyID front_left_foot_link_4_body;
-    dBodyID front_right_foot_link_1_body;
-    dBodyID front_right_foot_link_2_body;
-    dBodyID front_right_foot_link_3_body;
-    dBodyID front_right_foot_link_4_body;
-    dBodyID back_left_foot_link_1_body;
-    dBodyID back_left_foot_link_2_body;
-    dBodyID back_left_foot_link_3_body;
-    dBodyID back_left_foot_link_4_body;
-    dBodyID back_right_foot_link_1_body;
-    dBodyID back_right_foot_link_2_body;
-    dBodyID back_right_foot_link_3_body;
-    dBodyID back_right_foot_link_4_body;
+    dBodyID foot_link_body[4][4];
 	dBodyID ball_body;
 
     dGeomID back_link_1_geom;
@@ -119,14 +104,7 @@ private:
     dReal back_link_4_length;
     dReal back_link_5_length;
     dReal back_link_6_length;
-    dReal front_foot_link_1_length;
-    dReal front_foot_link_2_length;
-    dReal front_foot_link_3_length;
-    dReal front_foot_link_4_length;
-    dReal back_foot_link_1_length;
-    dReal back_foot_link_2_length;
-    dReal back_foot_link_3_length;
-    dReal back_foot_link_4_length;
+    dReal foot_link_length[4][4];
 
     float back_link_1_theta;
     float back_link_2_theta;
@@ -163,7 +141,6 @@ public:
 
     //Public Methods
     void init();
-    void step();
 
     //Getters
     dBodyID getBallBody();
@@ -184,26 +161,9 @@ public:
     dBodyID getTailLink2Body();
     dBodyID getTailLink3Body();
     dBodyID getTailLink4Body();
-    //Front left foot
-    dBodyID getFrontLeftFootLink1Body();
-    dBodyID getFrontLeftFootLink2Body();
-    dBodyID getFrontLeftFootLink3Body();
-    dBodyID getFrontLeftFootLink4Body();
-    //Front right foot    
-    dBodyID getFrontRightFootLink1Body();
-    dBodyID getFrontRightFootLink2Body();
-    dBodyID getFrontRightFootLink3Body();
-    dBodyID getFrontRightFootLink4Body();
-    //Back left foot
-    dBodyID getBackLeftFootLink1Body();
-    dBodyID getBackLeftFootLink2Body();
-    dBodyID getBackLeftFootLink3Body();
-    dBodyID getBackLeftFootLink4Body();
-    //Back right foot    
-    dBodyID getBackRightFootLink1Body();
-    dBodyID getBackRightFootLink2Body();
-    dBodyID getBackRightFootLink3Body();
-    dBodyID getBackRightFootLink4Body();
+
+    dBodyID getFootLinkBody(int leg_id, int link_id);
+    float getFootLinkLength(int leg_id, int link_id);
 
     float getBackLink1Length();
     float getBackLink2Length();
@@ -212,15 +172,7 @@ public:
     float getBackLink5Length();
     float getBackLink6Length();
 
-    float getFrontFootLink1Length();
-    float getFrontFootLink2Length();
-    float getFrontFootLink3Length();
-    float getFrontFootLink4Length();
-
-    float getBackFootLink1Length();
-    float getBackFootLink2Length();
-    float getBackFootLink3Length();
-    float getBackFootLink4Length();
+    
 
     dGeomID getPlaneGeom();
     helper * getGlobalHelper();

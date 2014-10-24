@@ -5,27 +5,13 @@ ODEBodies::ODEBodies(helper * global_helper, float * root_position){
     this->root_position = root_position;
 }
 
-void ODEBodies::step(){
-    //Apply forces
-    //dBodyAddForce(back_link_2_body, 0.0, 98.1, 0.0);
-}
-
 vector<float> ODEBodies::getLengths(int leg_id){
     vector<float> ret(4);
     //front
-    if(leg_id == 0){
-        ret[0] = front_foot_link_1_length;
-        ret[1] = front_foot_link_2_length;
-        ret[2] = front_foot_link_3_length;
-        ret[3] = front_foot_link_4_length;
-    }
-    //back
-    else{
-        ret[0] = back_foot_link_1_length;
-        ret[1] = back_foot_link_2_length;
-        ret[2] = back_foot_link_3_length;
-        ret[3] = back_foot_link_4_length;
-    }
+    ret[0] = foot_link_length[leg_id][0];
+    ret[1] = foot_link_length[leg_id][1];
+    ret[2] = foot_link_length[leg_id][2];
+    ret[3] = foot_link_length[leg_id][3];
     return ret;
 }
 
@@ -455,14 +441,19 @@ void ODEBodies::set_front_legs(){
     front_foot_link_3_theta = (30*M_PI)/180;
     front_foot_link_4_theta = (90*M_PI)/180;
     dReal length_multiplier = 462/(5 + 4*abs(cos(front_foot_link_2_theta)) + 3*abs(cos(front_foot_link_3_theta)));    
-    front_foot_link_1_length = 5*length_multiplier;
-    front_foot_link_2_length = 4*length_multiplier;
-    front_foot_link_3_length = 3*length_multiplier;
-    front_foot_link_4_length = 40;
+    foot_link_length[0][0] = 5*length_multiplier;
+    foot_link_length[0][1] = 4*length_multiplier;
+    foot_link_length[0][2] = 3*length_multiplier;
+    foot_link_length[0][3] = 40;
+
+    foot_link_length[1][0] = 5*length_multiplier;
+    foot_link_length[1][1] = 4*length_multiplier;
+    foot_link_length[1][2] = 3*length_multiplier;
+    foot_link_length[1][3] = 40;
     
     dReal start_location[3];
     start_location[0] = root_position[0];
-    start_location[1] = root_position[1] - front_foot_link_1_length/2;
+    start_location[1] = root_position[1] - foot_link_length[0][0]/2;
     start_location[2] = root_position[2];
 
     /***** Left Leg ******/
@@ -472,41 +463,41 @@ void ODEBodies::set_front_legs(){
     front_left_foot_link_1_position[1] = start_location[1];
     front_left_foot_link_1_position[2] = start_location[2] + 120;
     
-    setLink(&front_left_foot_link_1_body, &front_left_foot_link_1_mass, front_foot_link_1_length, front_foot_link_1_theta, &front_left_foot_link_1_geom, front_left_foot_link_1_position);
+    setLink(&foot_link_body[0][0], &front_left_foot_link_1_mass, foot_link_length[0][0], front_foot_link_1_theta, &front_left_foot_link_1_geom, front_left_foot_link_1_position);
 
     //Link 2    
     dReal front_left_foot_link_2_position[3];
-    front_left_foot_link_2_position[0] = start_location[0] - abs((front_foot_link_2_length/2)*sin(front_foot_link_2_theta));
-    front_left_foot_link_2_position[1] = start_location[1] - front_foot_link_1_length/2 - abs((front_foot_link_2_length/2)*cos(front_foot_link_2_theta));
+    front_left_foot_link_2_position[0] = start_location[0] - abs((foot_link_length[0][1]/2)*sin(front_foot_link_2_theta));
+    front_left_foot_link_2_position[1] = start_location[1] - foot_link_length[0][0]/2 - abs((foot_link_length[0][1]/2)*cos(front_foot_link_2_theta));
     front_left_foot_link_2_position[2] = start_location[2] + 120;
     
-    setLink(&front_left_foot_link_2_body, &front_left_foot_link_2_mass, front_foot_link_2_length, front_foot_link_2_theta, &front_left_foot_link_2_geom, front_left_foot_link_2_position);
+    setLink(&foot_link_body[0][1], &front_left_foot_link_2_mass, foot_link_length[0][1], front_foot_link_2_theta, &front_left_foot_link_2_geom, front_left_foot_link_2_position);
 
     //Link 3
     dReal front_left_foot_link_3_position[3];
-    front_left_foot_link_3_position[0] = start_location[0] - abs(front_foot_link_2_length*sin(front_foot_link_2_theta)) - abs((front_foot_link_3_length/2)*sin(front_foot_link_3_theta));
-    front_left_foot_link_3_position[1] = start_location[1] - front_foot_link_1_length/2 - abs(front_foot_link_2_length*cos(front_foot_link_2_theta)) - abs((front_foot_link_3_length/2)*cos(front_foot_link_3_theta));
+    front_left_foot_link_3_position[0] = start_location[0] - abs(foot_link_length[0][1]*sin(front_foot_link_2_theta)) - abs((foot_link_length[0][2]/2)*sin(front_foot_link_3_theta));
+    front_left_foot_link_3_position[1] = start_location[1] - foot_link_length[0][0]/2 - abs(foot_link_length[0][1]*cos(front_foot_link_2_theta)) - abs((foot_link_length[0][2]/2)*cos(front_foot_link_3_theta));
     front_left_foot_link_3_position[2] = start_location[2] + 120;
     
-    setLink(&front_left_foot_link_3_body, &front_left_foot_link_3_mass, front_foot_link_3_length, front_foot_link_3_theta, &front_left_foot_link_3_geom, front_left_foot_link_3_position);
+    setLink(&foot_link_body[0][2], &front_left_foot_link_3_mass, foot_link_length[0][2], front_foot_link_3_theta, &front_left_foot_link_3_geom, front_left_foot_link_3_position);
 
     //Link 4
     dReal front_left_foot_link_4_position[3];
-    front_left_foot_link_4_position[0] = start_location[0] - abs(front_foot_link_2_length*sin(front_foot_link_2_theta)) - abs(front_foot_link_3_length*sin(front_foot_link_3_theta)) - front_foot_link_4_length/2;
-    front_left_foot_link_4_position[1] = start_location[1] - front_foot_link_1_length/2 - abs(front_foot_link_2_length*cos(front_foot_link_2_theta)) - abs(front_foot_link_3_length*cos(front_foot_link_3_theta)) - 2;
+    front_left_foot_link_4_position[0] = start_location[0] - abs(foot_link_length[0][1]*sin(front_foot_link_2_theta)) - abs(foot_link_length[0][2]*sin(front_foot_link_3_theta)) - foot_link_length[0][3]/2;
+    front_left_foot_link_4_position[1] = start_location[1] - foot_link_length[0][0]/2 - abs(foot_link_length[0][1]*cos(front_foot_link_2_theta)) - abs(foot_link_length[0][2]*cos(front_foot_link_3_theta)) - 2;
     front_left_foot_link_4_position[2] = start_location[2] + 120;
     
-    setLink(&front_left_foot_link_4_body, &front_left_foot_link_4_mass, front_foot_link_4_length, front_foot_link_4_theta, &front_left_foot_link_4_geom, front_left_foot_link_4_position);
+    setLink(&foot_link_body[0][3], &front_left_foot_link_4_mass, foot_link_length[0][3], front_foot_link_4_theta, &front_left_foot_link_4_geom, front_left_foot_link_4_position);
 
     //Joints
     //back and Link 1
     dReal front_left_foot_joint_back_1_left_1_position[3];
     front_left_foot_joint_back_1_left_1_position[0] = start_location[0];
-    front_left_foot_joint_back_1_left_1_position[1] = start_location[1] + front_foot_link_1_length/2;
+    front_left_foot_joint_back_1_left_1_position[1] = start_location[1] + foot_link_length[0][0]/2;
     front_left_foot_joint_back_1_left_1_position[2] = start_location[2] + 120;
 
     dJointID front_left_foot_joint_back_1_left_1 = dJointCreateUniversal(global_helper->getWorld(), 0);
-    dJointAttach(front_left_foot_joint_back_1_left_1, back_link_1_body, front_left_foot_link_1_body);
+    dJointAttach(front_left_foot_joint_back_1_left_1, back_link_1_body, foot_link_body[0][0]);
     dJointSetUniversalAxis1(front_left_foot_joint_back_1_left_1, 1, 0, 0);
     dJointSetUniversalAxis2(front_left_foot_joint_back_1_left_1, 0, 1, 0);
     dJointSetUniversalAnchor(front_left_foot_joint_back_1_left_1, front_left_foot_joint_back_1_left_1_position[0], front_left_foot_joint_back_1_left_1_position[1], front_left_foot_joint_back_1_left_1_position[2]);
@@ -514,33 +505,33 @@ void ODEBodies::set_front_legs(){
     //Link 1 and link 2
     dReal front_left_foot_joint_left_1_left_2_position[3];
     front_left_foot_joint_left_1_left_2_position[0] = start_location[0];
-    front_left_foot_joint_left_1_left_2_position[1] = start_location[1] - front_foot_link_1_length/2;
+    front_left_foot_joint_left_1_left_2_position[1] = start_location[1] - foot_link_length[0][0]/2;
     front_left_foot_joint_left_1_left_2_position[2] = start_location[2] + 120;
 
     dJointID front_left_foot_joint_left_1_left_2 = dJointCreateHinge(global_helper->getWorld(), 0);
-    dJointAttach(front_left_foot_joint_left_1_left_2, front_left_foot_link_1_body, front_left_foot_link_2_body);
+    dJointAttach(front_left_foot_joint_left_1_left_2, foot_link_body[0][0], foot_link_body[0][1]);
     dJointSetHingeAnchor(front_left_foot_joint_left_1_left_2, front_left_foot_joint_left_1_left_2_position[0], front_left_foot_joint_left_1_left_2_position[1], front_left_foot_joint_left_1_left_2_position[2]);
     dJointSetHingeAxis(front_left_foot_joint_left_1_left_2, 0, 0, 1);
 
     //Link 2 and link 3
     dReal front_left_foot_joint_left_2_left_3_position[3];
-    front_left_foot_joint_left_2_left_3_position[0] = start_location[0] - abs(front_foot_link_2_length*sin(front_foot_link_2_theta));
-    front_left_foot_joint_left_2_left_3_position[1] = start_location[1] - front_foot_link_1_length/2 - abs(front_foot_link_2_length*cos(front_foot_link_2_theta));
+    front_left_foot_joint_left_2_left_3_position[0] = start_location[0] - abs(foot_link_length[0][1]*sin(front_foot_link_2_theta));
+    front_left_foot_joint_left_2_left_3_position[1] = start_location[1] - foot_link_length[0][0]/2 - abs(foot_link_length[0][1]*cos(front_foot_link_2_theta));
     front_left_foot_joint_left_2_left_3_position[2] = start_location[2] + 120;
 
     dJointID front_left_foot_joint_left_2_left_3 = dJointCreateHinge(global_helper->getWorld(), 0);
-    dJointAttach(front_left_foot_joint_left_2_left_3, front_left_foot_link_2_body, front_left_foot_link_3_body);
+    dJointAttach(front_left_foot_joint_left_2_left_3, foot_link_body[0][1], foot_link_body[0][2]);
     dJointSetHingeAnchor(front_left_foot_joint_left_2_left_3, front_left_foot_joint_left_2_left_3_position[0], front_left_foot_joint_left_2_left_3_position[1], front_left_foot_joint_left_2_left_3_position[2]);
     dJointSetHingeAxis(front_left_foot_joint_left_2_left_3, 0, 0, 1);
 
     //Link 3 and link 4
     dReal front_left_foot_joint_left_3_left_4_position[3];
-    front_left_foot_joint_left_3_left_4_position[0] = start_location[0] - abs(front_foot_link_2_length*sin(front_foot_link_2_theta)) - abs(front_foot_link_3_length*sin(front_foot_link_3_theta));
-    front_left_foot_joint_left_3_left_4_position[1] = start_location[1] - front_foot_link_1_length/2 - abs(front_foot_link_2_length*cos(front_foot_link_2_theta)) - abs(front_foot_link_3_length*cos(front_foot_link_3_theta));
+    front_left_foot_joint_left_3_left_4_position[0] = start_location[0] - abs(foot_link_length[0][1]*sin(front_foot_link_2_theta)) - abs(foot_link_length[0][2]*sin(front_foot_link_3_theta));
+    front_left_foot_joint_left_3_left_4_position[1] = start_location[1] - foot_link_length[0][0]/2 - abs(foot_link_length[0][1]*cos(front_foot_link_2_theta)) - abs(foot_link_length[0][2]*cos(front_foot_link_3_theta));
     front_left_foot_joint_left_3_left_4_position[2] = start_location[2] + 120;
 
     dJointID front_left_foot_joint_left_3_left_4 = dJointCreateHinge(global_helper->getWorld(), 0);
-    dJointAttach(front_left_foot_joint_left_3_left_4, front_left_foot_link_3_body, front_left_foot_link_4_body);
+    dJointAttach(front_left_foot_joint_left_3_left_4, foot_link_body[0][2], foot_link_body[0][3]);
     dJointSetHingeAnchor(front_left_foot_joint_left_3_left_4, front_left_foot_joint_left_3_left_4_position[0], front_left_foot_joint_left_3_left_4_position[1], front_left_foot_joint_left_3_left_4_position[2]);
     dJointSetHingeAxis(front_left_foot_joint_left_3_left_4, 0, 0, 1);
 
@@ -551,41 +542,41 @@ void ODEBodies::set_front_legs(){
     front_right_foot_link_1_position[1] = start_location[1];
     front_right_foot_link_1_position[2] = start_location[2] - 120;
 
-    setLink(&front_right_foot_link_1_body, &front_right_foot_link_1_mass, front_foot_link_1_length, front_foot_link_1_theta, &front_right_foot_link_1_geom, front_right_foot_link_1_position);
+    setLink(&foot_link_body[1][0], &front_right_foot_link_1_mass, foot_link_length[1][0], front_foot_link_1_theta, &front_right_foot_link_1_geom, front_right_foot_link_1_position);
 
     //Link 2    
     dReal front_right_foot_link_2_position[3];
-    front_right_foot_link_2_position[0] = start_location[0] - abs((front_foot_link_2_length/2)*sin(front_foot_link_2_theta));
-    front_right_foot_link_2_position[1] = start_location[1] - front_foot_link_1_length/2 - abs((front_foot_link_2_length/2)*cos(front_foot_link_2_theta));
+    front_right_foot_link_2_position[0] = start_location[0] - abs((foot_link_length[1][1]/2)*sin(front_foot_link_2_theta));
+    front_right_foot_link_2_position[1] = start_location[1] - foot_link_length[1][0]/2 - abs((foot_link_length[1][1]/2)*cos(front_foot_link_2_theta));
     front_right_foot_link_2_position[2] = start_location[2] - 120;
 
-    setLink(&front_right_foot_link_2_body, &front_right_foot_link_2_mass, front_foot_link_2_length, front_foot_link_2_theta, &front_right_foot_link_2_geom, front_right_foot_link_2_position);
+    setLink(&foot_link_body[1][1], &front_right_foot_link_2_mass, foot_link_length[1][1], front_foot_link_2_theta, &front_right_foot_link_2_geom, front_right_foot_link_2_position);
 
     //Link 3
     dReal front_right_foot_link_3_position[3];
-    front_right_foot_link_3_position[0] = start_location[0] - abs(front_foot_link_2_length*sin(front_foot_link_2_theta)) - abs((front_foot_link_3_length/2)*sin(front_foot_link_3_theta));
-    front_right_foot_link_3_position[1] = start_location[1] - front_foot_link_1_length/2 - abs(front_foot_link_2_length*cos(front_foot_link_2_theta)) - abs((front_foot_link_3_length/2)*cos(front_foot_link_3_theta));
+    front_right_foot_link_3_position[0] = start_location[0] - abs(foot_link_length[1][1]*sin(front_foot_link_2_theta)) - abs((foot_link_length[1][2]/2)*sin(front_foot_link_3_theta));
+    front_right_foot_link_3_position[1] = start_location[1] - foot_link_length[1][0]/2 - abs(foot_link_length[1][1]*cos(front_foot_link_2_theta)) - abs((foot_link_length[1][2]/2)*cos(front_foot_link_3_theta));
     front_right_foot_link_3_position[2] = start_location[2] - 120;
 
-    setLink(&front_right_foot_link_3_body, &front_right_foot_link_3_mass, front_foot_link_3_length, front_foot_link_3_theta, &front_right_foot_link_3_geom, front_right_foot_link_3_position);
+    setLink(&foot_link_body[1][2], &front_right_foot_link_3_mass, foot_link_length[1][2], front_foot_link_3_theta, &front_right_foot_link_3_geom, front_right_foot_link_3_position);
 
     //Link 4
     dReal front_right_foot_link_4_position[3];
-    front_right_foot_link_4_position[0] = start_location[0] - abs(front_foot_link_2_length*sin(front_foot_link_2_theta)) - abs(front_foot_link_3_length*sin(front_foot_link_3_theta)) - front_foot_link_4_length/2;
-    front_right_foot_link_4_position[1] = start_location[1] - front_foot_link_1_length/2 - abs(front_foot_link_2_length*cos(front_foot_link_2_theta)) - abs(front_foot_link_3_length*cos(front_foot_link_3_theta)) - 2;
+    front_right_foot_link_4_position[0] = start_location[0] - abs(foot_link_length[1][1]*sin(front_foot_link_2_theta)) - abs(foot_link_length[1][2]*sin(front_foot_link_3_theta)) - foot_link_length[1][3]/2;
+    front_right_foot_link_4_position[1] = start_location[1] - foot_link_length[1][0]/2 - abs(foot_link_length[1][1]*cos(front_foot_link_2_theta)) - abs(foot_link_length[1][2]*cos(front_foot_link_3_theta)) - 2;
     front_right_foot_link_4_position[2] = start_location[2] - 120;
 
-    setLink(&front_right_foot_link_4_body, &front_right_foot_link_4_mass, front_foot_link_4_length, front_foot_link_4_theta, &front_right_foot_link_4_geom, front_right_foot_link_4_position);
+    setLink(&foot_link_body[1][3], &front_right_foot_link_4_mass, foot_link_length[1][3], front_foot_link_4_theta, &front_right_foot_link_4_geom, front_right_foot_link_4_position);
 
     //Joints
     //back and Link 1
     dReal front_right_foot_joint_back_1_right_1_position[3];
     front_right_foot_joint_back_1_right_1_position[0] = start_location[0];
-    front_right_foot_joint_back_1_right_1_position[1] = start_location[1] + front_foot_link_1_length/2;
+    front_right_foot_joint_back_1_right_1_position[1] = start_location[1] + foot_link_length[1][0]/2;
     front_right_foot_joint_back_1_right_1_position[2] = start_location[2] - 120;
 
     dJointID front_right_foot_joint_back_1_right_1 = dJointCreateUniversal(global_helper->getWorld(), 0);
-    dJointAttach(front_right_foot_joint_back_1_right_1, back_link_1_body, front_right_foot_link_1_body);
+    dJointAttach(front_right_foot_joint_back_1_right_1, back_link_1_body, foot_link_body[1][0]);
     dJointSetUniversalAxis1(front_right_foot_joint_back_1_right_1, 1, 0, 0);
     dJointSetUniversalAxis2(front_right_foot_joint_back_1_right_1, 0, 1, 0);
     dJointSetUniversalAnchor(front_right_foot_joint_back_1_right_1, front_right_foot_joint_back_1_right_1_position[0], front_right_foot_joint_back_1_right_1_position[1], front_right_foot_joint_back_1_right_1_position[2]);
@@ -593,33 +584,33 @@ void ODEBodies::set_front_legs(){
     //Link 1 and link 2
     dReal front_right_foot_joint_right_1_right_2_position[3];
     front_right_foot_joint_right_1_right_2_position[0] = start_location[0];
-    front_right_foot_joint_right_1_right_2_position[1] = start_location[1] - front_foot_link_1_length/2;
+    front_right_foot_joint_right_1_right_2_position[1] = start_location[1] - foot_link_length[1][0]/2;
     front_right_foot_joint_right_1_right_2_position[2] = start_location[2] - 120;
 
     dJointID front_right_foot_joint_right_1_right_2 = dJointCreateHinge(global_helper->getWorld(), 0);
-    dJointAttach(front_right_foot_joint_right_1_right_2, front_right_foot_link_1_body, front_right_foot_link_2_body);
+    dJointAttach(front_right_foot_joint_right_1_right_2, foot_link_body[1][0], foot_link_body[1][1]);
     dJointSetHingeAnchor(front_right_foot_joint_right_1_right_2, front_right_foot_joint_right_1_right_2_position[0], front_right_foot_joint_right_1_right_2_position[1], front_right_foot_joint_right_1_right_2_position[2]);
     dJointSetHingeAxis(front_right_foot_joint_right_1_right_2, 0, 0, 1);
 
     //Link 2 and link 3
     dReal front_right_foot_joint_right_2_right_3_position[3];
-    front_right_foot_joint_right_2_right_3_position[0] = start_location[0] - abs(front_foot_link_2_length*sin(front_foot_link_2_theta));
-    front_right_foot_joint_right_2_right_3_position[1] = start_location[1] - front_foot_link_1_length/2 - abs(front_foot_link_2_length*cos(front_foot_link_2_theta));
+    front_right_foot_joint_right_2_right_3_position[0] = start_location[0] - abs(foot_link_length[1][1]*sin(front_foot_link_2_theta));
+    front_right_foot_joint_right_2_right_3_position[1] = start_location[1] - foot_link_length[1][0]/2 - abs(foot_link_length[1][1]*cos(front_foot_link_2_theta));
     front_right_foot_joint_right_2_right_3_position[2] = start_location[2] - 120;
 
     dJointID front_right_foot_joint_right_2_right_3 = dJointCreateHinge(global_helper->getWorld(), 0);
-    dJointAttach(front_right_foot_joint_right_2_right_3, front_right_foot_link_2_body, front_right_foot_link_3_body);
+    dJointAttach(front_right_foot_joint_right_2_right_3, foot_link_body[1][1], foot_link_body[1][2]);
     dJointSetHingeAnchor(front_right_foot_joint_right_2_right_3, front_right_foot_joint_right_2_right_3_position[0], front_right_foot_joint_right_2_right_3_position[1], front_right_foot_joint_right_2_right_3_position[2]);
     dJointSetHingeAxis(front_right_foot_joint_right_2_right_3, 0, 0, 1);
 
     //Link 3 and link 4
     dReal front_right_foot_joint_right_3_right_4_position[3];
-    front_right_foot_joint_right_3_right_4_position[0] = start_location[0] - abs(front_foot_link_2_length*sin(front_foot_link_2_theta)) - abs(front_foot_link_3_length*sin(front_foot_link_3_theta));
-    front_right_foot_joint_right_3_right_4_position[1] = start_location[1] - front_foot_link_1_length/2 - abs(front_foot_link_2_length*cos(front_foot_link_2_theta)) - abs(front_foot_link_3_length*cos(front_foot_link_3_theta));
+    front_right_foot_joint_right_3_right_4_position[0] = start_location[0] - abs(foot_link_length[1][1]*sin(front_foot_link_2_theta)) - abs(foot_link_length[1][2]*sin(front_foot_link_3_theta));
+    front_right_foot_joint_right_3_right_4_position[1] = start_location[1] - foot_link_length[1][0]/2 - abs(foot_link_length[1][1]*cos(front_foot_link_2_theta)) - abs(foot_link_length[1][2]*cos(front_foot_link_3_theta));
     front_right_foot_joint_right_3_right_4_position[2] = start_location[2] - 120;
 
     dJointID front_right_foot_joint_right_3_right_4 = dJointCreateHinge(global_helper->getWorld(), 0);
-    dJointAttach(front_right_foot_joint_right_3_right_4, front_right_foot_link_3_body, front_right_foot_link_4_body);
+    dJointAttach(front_right_foot_joint_right_3_right_4, foot_link_body[1][2], foot_link_body[1][3]);
     dJointSetHingeAnchor(front_right_foot_joint_right_3_right_4, front_right_foot_joint_right_3_right_4_position[0], front_right_foot_joint_right_3_right_4_position[1], front_right_foot_joint_right_3_right_4_position[2]);
     dJointSetHingeAxis(front_right_foot_joint_right_3_right_4, 0, 0, 1);
 }
@@ -631,14 +622,19 @@ void ODEBodies::set_back_legs(){
     back_foot_link_4_theta = (90*M_PI)/180;
     dReal length_multiplier = 446/(5 + 4*abs(sin(back_foot_link_2_theta)) + 3*abs(sin(back_foot_link_3_theta)));   
   
-    back_foot_link_1_length = 5*length_multiplier;
-    back_foot_link_2_length = 4*length_multiplier;
-    back_foot_link_3_length = 3*length_multiplier;
-    back_foot_link_4_length = 40;
+    foot_link_length[2][0] = 5*length_multiplier;
+    foot_link_length[2][1] = 4*length_multiplier;
+    foot_link_length[2][2] = 3*length_multiplier;
+    foot_link_length[2][3] = 40;
+
+    foot_link_length[3][0] = 5*length_multiplier;
+    foot_link_length[3][1] = 4*length_multiplier;
+    foot_link_length[3][2] = 3*length_multiplier;
+    foot_link_length[3][3] = 40;
 
     dReal start_location[3];
     start_location[0] = root_position[0] + back_link_1_length + back_link_2_length + back_link_3_length + back_link_4_length*sin(back_link_4_theta) + back_link_5_length + back_link_6_length*sin(back_link_6_theta) ;
-    start_location[1] = root_position[1] + back_link_4_length*cos(back_link_4_theta) + back_link_6_length*cos(back_link_6_theta) - back_foot_link_1_length/2;
+    start_location[1] = root_position[1] + back_link_4_length*cos(back_link_4_theta) + back_link_6_length*cos(back_link_6_theta) - foot_link_length[2][0]/2;
     start_location[2] = root_position[2];
     
     /***** Left Leg ******/
@@ -648,42 +644,42 @@ void ODEBodies::set_back_legs(){
     back_left_foot_link_1_position[1] = start_location[1];
     back_left_foot_link_1_position[2] = start_location[2] + 120;
 
-    setLink(&back_left_foot_link_1_body, &back_left_foot_link_1_mass, back_foot_link_1_length, back_foot_link_1_theta, &back_left_foot_link_1_geom, back_left_foot_link_1_position);
+    setLink(&foot_link_body[2][0], &back_left_foot_link_1_mass, foot_link_length[2][0], back_foot_link_1_theta, &back_left_foot_link_1_geom, back_left_foot_link_1_position);
 
     
     //Link 2    
     dReal back_left_foot_link_2_position[3];
-    back_left_foot_link_2_position[0] = start_location[0] - abs((back_foot_link_2_length/2)*sin(back_foot_link_2_theta));
-    back_left_foot_link_2_position[1] = start_location[1] - back_foot_link_1_length/2 - abs((back_foot_link_2_length/2)*cos(back_foot_link_2_theta));
+    back_left_foot_link_2_position[0] = start_location[0] - abs((foot_link_length[2][1]/2)*sin(back_foot_link_2_theta));
+    back_left_foot_link_2_position[1] = start_location[1] - foot_link_length[2][0]/2 - abs((foot_link_length[2][1]/2)*cos(back_foot_link_2_theta));
     back_left_foot_link_2_position[2] = start_location[2] + 120;
 
-    setLink(&back_left_foot_link_2_body, &back_left_foot_link_2_mass, back_foot_link_2_length, back_foot_link_2_theta, &back_left_foot_link_2_geom, back_left_foot_link_2_position);
+    setLink(&foot_link_body[2][1], &back_left_foot_link_2_mass, foot_link_length[2][1], back_foot_link_2_theta, &back_left_foot_link_2_geom, back_left_foot_link_2_position);
     
     //Link 3
     dReal back_left_foot_link_3_position[3];
-    back_left_foot_link_3_position[0] = start_location[0] - abs(back_foot_link_2_length*sin(back_foot_link_2_theta)) - abs((back_foot_link_3_length/2)*sin(back_foot_link_3_theta));
-    back_left_foot_link_3_position[1] = start_location[1] - back_foot_link_1_length/2 - abs(back_foot_link_2_length*cos(back_foot_link_2_theta)) - abs((back_foot_link_3_length/2)*cos(back_foot_link_3_theta));
+    back_left_foot_link_3_position[0] = start_location[0] - abs(foot_link_length[2][1]*sin(back_foot_link_2_theta)) - abs((foot_link_length[2][2]/2)*sin(back_foot_link_3_theta));
+    back_left_foot_link_3_position[1] = start_location[1] - foot_link_length[2][0]/2 - abs(foot_link_length[2][1]*cos(back_foot_link_2_theta)) - abs((foot_link_length[2][2]/2)*cos(back_foot_link_3_theta));
     back_left_foot_link_3_position[2] = start_location[2] + 120;
 
-    setLink(&back_left_foot_link_3_body, &back_left_foot_link_3_mass, back_foot_link_3_length, back_foot_link_3_theta, &back_left_foot_link_3_geom, back_left_foot_link_3_position);
+    setLink(&foot_link_body[2][2], &back_left_foot_link_3_mass, foot_link_length[2][2], back_foot_link_3_theta, &back_left_foot_link_3_geom, back_left_foot_link_3_position);
 
     //Link 4
     dReal back_left_foot_link_4_position[3];
-    back_left_foot_link_4_position[0] = start_location[0] - abs(back_foot_link_2_length*sin(back_foot_link_2_theta)) - abs(back_foot_link_3_length*sin(back_foot_link_3_theta)) - back_foot_link_4_length/2;
-    back_left_foot_link_4_position[1] = start_location[1] - back_foot_link_1_length/2 - abs(back_foot_link_2_length*cos(back_foot_link_2_theta)) - abs(back_foot_link_3_length*cos(back_foot_link_3_theta)) - 2;
+    back_left_foot_link_4_position[0] = start_location[0] - abs(foot_link_length[2][1]*sin(back_foot_link_2_theta)) - abs(foot_link_length[2][2]*sin(back_foot_link_3_theta)) - foot_link_length[2][3]/2;
+    back_left_foot_link_4_position[1] = start_location[1] - foot_link_length[2][0]/2 - abs(foot_link_length[2][1]*cos(back_foot_link_2_theta)) - abs(foot_link_length[2][2]*cos(back_foot_link_3_theta)) - 2;
     back_left_foot_link_4_position[2] = start_location[2] + 120;
 
-    setLink(&back_left_foot_link_4_body, &back_left_foot_link_4_mass, back_foot_link_4_length, back_foot_link_4_theta, &back_left_foot_link_4_geom, back_left_foot_link_4_position);
+    setLink(&foot_link_body[2][3], &back_left_foot_link_4_mass, foot_link_length[2][3], back_foot_link_4_theta, &back_left_foot_link_4_geom, back_left_foot_link_4_position);
 
     //Joints
     //back and Link 1
     dReal back_left_foot_joint_back_6_left_1_position[3];
     back_left_foot_joint_back_6_left_1_position[0] = start_location[0];
-    back_left_foot_joint_back_6_left_1_position[1] = start_location[1] + back_foot_link_1_length/2;
+    back_left_foot_joint_back_6_left_1_position[1] = start_location[1] + foot_link_length[2][0]/2;
     back_left_foot_joint_back_6_left_1_position[2] = start_location[2] + 120;
 
     dJointID back_left_foot_joint_back_6_left_1 = dJointCreateUniversal(global_helper->getWorld(), 0);
-    dJointAttach(back_left_foot_joint_back_6_left_1, back_link_6_body, back_left_foot_link_1_body);
+    dJointAttach(back_left_foot_joint_back_6_left_1, back_link_6_body, foot_link_body[2][0]);
     dJointSetUniversalAxis1(back_left_foot_joint_back_6_left_1, 1, 0, 0);
     dJointSetUniversalAxis2(back_left_foot_joint_back_6_left_1, 0, 1, 0);
     dJointSetUniversalAnchor(back_left_foot_joint_back_6_left_1, back_left_foot_joint_back_6_left_1_position[0], back_left_foot_joint_back_6_left_1_position[1], back_left_foot_joint_back_6_left_1_position[2]);
@@ -691,33 +687,33 @@ void ODEBodies::set_back_legs(){
     //Link 1 and link 2
     dReal back_left_foot_joint_left_1_left_2_position[3];
     back_left_foot_joint_left_1_left_2_position[0] = start_location[0];
-    back_left_foot_joint_left_1_left_2_position[1] = start_location[1] - back_foot_link_1_length/2;
+    back_left_foot_joint_left_1_left_2_position[1] = start_location[1] - foot_link_length[2][0]/2;
     back_left_foot_joint_left_1_left_2_position[2] = start_location[2] + 120;
 
     dJointID back_left_foot_joint_left_1_left_2 = dJointCreateHinge(global_helper->getWorld(), 0);
-    dJointAttach(back_left_foot_joint_left_1_left_2, back_left_foot_link_1_body, back_left_foot_link_2_body);
+    dJointAttach(back_left_foot_joint_left_1_left_2, foot_link_body[2][0], foot_link_body[2][1]);
     dJointSetHingeAnchor(back_left_foot_joint_left_1_left_2, back_left_foot_joint_left_1_left_2_position[0], back_left_foot_joint_left_1_left_2_position[1], back_left_foot_joint_left_1_left_2_position[2]);
     dJointSetHingeAxis(back_left_foot_joint_left_1_left_2, 0, 0, 1);
 
     //Link 2 and link 3
     dReal back_left_foot_joint_left_2_left_3_position[3];
-    back_left_foot_joint_left_2_left_3_position[0] = start_location[0] - abs(back_foot_link_2_length*sin(back_foot_link_2_theta));
-    back_left_foot_joint_left_2_left_3_position[1] = start_location[1] - back_foot_link_1_length/2 - abs(back_foot_link_2_length*cos(back_foot_link_2_theta));
+    back_left_foot_joint_left_2_left_3_position[0] = start_location[0] - abs(foot_link_length[2][1]*sin(back_foot_link_2_theta));
+    back_left_foot_joint_left_2_left_3_position[1] = start_location[1] - foot_link_length[2][0]/2 - abs(foot_link_length[2][1]*cos(back_foot_link_2_theta));
     back_left_foot_joint_left_2_left_3_position[2] = start_location[2] + 120;
 
     dJointID back_left_foot_joint_left_2_left_3 = dJointCreateHinge(global_helper->getWorld(), 0);
-    dJointAttach(back_left_foot_joint_left_2_left_3, back_left_foot_link_2_body, back_left_foot_link_3_body);
+    dJointAttach(back_left_foot_joint_left_2_left_3, foot_link_body[2][1], foot_link_body[2][2]);
     dJointSetHingeAnchor(back_left_foot_joint_left_2_left_3, back_left_foot_joint_left_2_left_3_position[0], back_left_foot_joint_left_2_left_3_position[1], back_left_foot_joint_left_2_left_3_position[2]);
     dJointSetHingeAxis(back_left_foot_joint_left_2_left_3, 0, 0, 1);
 
     //Link 3 and link 4
     dReal back_left_foot_joint_left_3_left_4_position[3];
-    back_left_foot_joint_left_3_left_4_position[0] = start_location[0] - abs(back_foot_link_2_length*sin(back_foot_link_2_theta)) - abs(back_foot_link_3_length*sin(back_foot_link_3_theta));
-    back_left_foot_joint_left_3_left_4_position[1] = start_location[1] - back_foot_link_1_length/2 - abs(back_foot_link_2_length*cos(back_foot_link_2_theta)) - abs(back_foot_link_3_length*cos(back_foot_link_3_theta));
+    back_left_foot_joint_left_3_left_4_position[0] = start_location[0] - abs(foot_link_length[2][1]*sin(back_foot_link_2_theta)) - abs(foot_link_length[2][2]*sin(back_foot_link_3_theta));
+    back_left_foot_joint_left_3_left_4_position[1] = start_location[1] - foot_link_length[2][0]/2 - abs(foot_link_length[2][1]*cos(back_foot_link_2_theta)) - abs(foot_link_length[2][2]*cos(back_foot_link_3_theta));
     back_left_foot_joint_left_3_left_4_position[2] = start_location[2] + 120;
 
     dJointID back_left_foot_joint_left_3_left_4 = dJointCreateHinge(global_helper->getWorld(), 0);
-    dJointAttach(back_left_foot_joint_left_3_left_4, back_left_foot_link_3_body, back_left_foot_link_4_body);
+    dJointAttach(back_left_foot_joint_left_3_left_4, foot_link_body[2][2], foot_link_body[2][3]);
     dJointSetHingeAnchor(back_left_foot_joint_left_3_left_4, back_left_foot_joint_left_3_left_4_position[0], back_left_foot_joint_left_3_left_4_position[1], back_left_foot_joint_left_3_left_4_position[2]);
     dJointSetHingeAxis(back_left_foot_joint_left_3_left_4, 0, 0, 1);
 
@@ -729,41 +725,41 @@ void ODEBodies::set_back_legs(){
     back_right_foot_link_1_position[1] = start_location[1];
     back_right_foot_link_1_position[2] = start_location[2] - 120;
 
-    setLink(&back_right_foot_link_1_body, &back_right_foot_link_1_mass, back_foot_link_1_length, back_foot_link_1_theta, &back_right_foot_link_1_geom, back_right_foot_link_1_position);
+    setLink(&foot_link_body[3][0], &back_right_foot_link_1_mass, foot_link_length[3][0], back_foot_link_1_theta, &back_right_foot_link_1_geom, back_right_foot_link_1_position);
 
     //Link 2    
     dReal back_right_foot_link_2_position[3];
-    back_right_foot_link_2_position[0] = start_location[0] - abs((back_foot_link_2_length/2)*sin(back_foot_link_2_theta));
-    back_right_foot_link_2_position[1] = start_location[1] - back_foot_link_1_length/2 - abs((back_foot_link_2_length/2)*cos(back_foot_link_2_theta));
+    back_right_foot_link_2_position[0] = start_location[0] - abs((foot_link_length[3][1]/2)*sin(back_foot_link_2_theta));
+    back_right_foot_link_2_position[1] = start_location[1] - foot_link_length[3][0]/2 - abs((foot_link_length[3][1]/2)*cos(back_foot_link_2_theta));
     back_right_foot_link_2_position[2] = start_location[2] - 120;
 
-    setLink(&back_right_foot_link_2_body, &back_right_foot_link_2_mass, back_foot_link_2_length, back_foot_link_2_theta, &back_right_foot_link_2_geom, back_right_foot_link_2_position);
+    setLink(&foot_link_body[3][1], &back_right_foot_link_2_mass, foot_link_length[3][1], back_foot_link_2_theta, &back_right_foot_link_2_geom, back_right_foot_link_2_position);
 
     //Link 3
     dReal back_right_foot_link_3_position[3];
-    back_right_foot_link_3_position[0] = start_location[0] - abs(back_foot_link_2_length*sin(back_foot_link_2_theta)) - abs((back_foot_link_3_length/2)*sin(back_foot_link_3_theta));
-    back_right_foot_link_3_position[1] = start_location[1] - back_foot_link_1_length/2 - abs(back_foot_link_2_length*cos(back_foot_link_2_theta)) - abs((back_foot_link_3_length/2)*cos(back_foot_link_3_theta));
+    back_right_foot_link_3_position[0] = start_location[0] - abs(foot_link_length[3][1]*sin(back_foot_link_2_theta)) - abs((foot_link_length[3][2]/2)*sin(back_foot_link_3_theta));
+    back_right_foot_link_3_position[1] = start_location[1] - foot_link_length[3][0]/2 - abs(foot_link_length[3][1]*cos(back_foot_link_2_theta)) - abs((foot_link_length[3][2]/2)*cos(back_foot_link_3_theta));
     back_right_foot_link_3_position[2] = start_location[2] - 120;
 
-    setLink(&back_right_foot_link_3_body, &back_right_foot_link_3_mass, back_foot_link_3_length, back_foot_link_3_theta, &back_right_foot_link_3_geom, back_right_foot_link_3_position);
+    setLink(&foot_link_body[3][2], &back_right_foot_link_3_mass, foot_link_length[3][2], back_foot_link_3_theta, &back_right_foot_link_3_geom, back_right_foot_link_3_position);
 
     //Link 4
     dReal back_right_foot_link_4_position[3];
-    back_right_foot_link_4_position[0] = start_location[0] - abs(back_foot_link_2_length*sin(back_foot_link_2_theta)) - abs(back_foot_link_3_length*sin(back_foot_link_3_theta)) - back_foot_link_4_length/2;
-    back_right_foot_link_4_position[1] = start_location[1] - back_foot_link_1_length/2 - abs(back_foot_link_2_length*cos(back_foot_link_2_theta)) - abs(back_foot_link_3_length*cos(back_foot_link_3_theta)) - 2;
+    back_right_foot_link_4_position[0] = start_location[0] - abs(foot_link_length[3][1]*sin(back_foot_link_2_theta)) - abs(foot_link_length[3][2]*sin(back_foot_link_3_theta)) - foot_link_length[3][3]/2;
+    back_right_foot_link_4_position[1] = start_location[1] - foot_link_length[3][0]/2 - abs(foot_link_length[3][1]*cos(back_foot_link_2_theta)) - abs(foot_link_length[3][2]*cos(back_foot_link_3_theta)) - 2;
     back_right_foot_link_4_position[2] = start_location[2] - 120;
 
-    setLink(&back_right_foot_link_4_body, &back_right_foot_link_4_mass, back_foot_link_4_length, back_foot_link_4_theta, &back_right_foot_link_4_geom, back_right_foot_link_4_position);
+    setLink(&foot_link_body[3][3], &back_right_foot_link_4_mass, foot_link_length[3][3], back_foot_link_4_theta, &back_right_foot_link_4_geom, back_right_foot_link_4_position);
 
     //Joints
     //back and Link 1
     dReal back_right_foot_joint_back_6_right_1_position[3];
     back_right_foot_joint_back_6_right_1_position[0] = start_location[0];
-    back_right_foot_joint_back_6_right_1_position[1] = start_location[1] + back_foot_link_1_length/2;
+    back_right_foot_joint_back_6_right_1_position[1] = start_location[1] + foot_link_length[3][0]/2;
     back_right_foot_joint_back_6_right_1_position[2] = start_location[2] - 120;
 
     dJointID back_right_foot_joint_back_6_right_1 = dJointCreateUniversal(global_helper->getWorld(), 0);
-    dJointAttach(back_right_foot_joint_back_6_right_1, back_link_6_body, back_right_foot_link_1_body);
+    dJointAttach(back_right_foot_joint_back_6_right_1, back_link_6_body, foot_link_body[3][0]);
     dJointSetUniversalAxis1(back_right_foot_joint_back_6_right_1, 1, 0, 0);
     dJointSetUniversalAxis2(back_right_foot_joint_back_6_right_1, 0, 1, 0);
     dJointSetUniversalAnchor(back_right_foot_joint_back_6_right_1, back_right_foot_joint_back_6_right_1_position[0], back_right_foot_joint_back_6_right_1_position[1], back_right_foot_joint_back_6_right_1_position[2]);
@@ -771,33 +767,33 @@ void ODEBodies::set_back_legs(){
     //Link 1 and link 2
     dReal back_right_foot_joint_right_1_right_2_position[3];
     back_right_foot_joint_right_1_right_2_position[0] = start_location[0];
-    back_right_foot_joint_right_1_right_2_position[1] = start_location[1] - back_foot_link_1_length/2;
+    back_right_foot_joint_right_1_right_2_position[1] = start_location[1] - foot_link_length[3][0]/2;
     back_right_foot_joint_right_1_right_2_position[2] = start_location[2] - 120;
 
     dJointID back_right_foot_joint_right_1_right_2 = dJointCreateHinge(global_helper->getWorld(), 0);
-    dJointAttach(back_right_foot_joint_right_1_right_2, back_right_foot_link_1_body, back_right_foot_link_2_body);
+    dJointAttach(back_right_foot_joint_right_1_right_2, foot_link_body[3][0], foot_link_body[3][1]);
     dJointSetHingeAnchor(back_right_foot_joint_right_1_right_2, back_right_foot_joint_right_1_right_2_position[0], back_right_foot_joint_right_1_right_2_position[1], back_right_foot_joint_right_1_right_2_position[2]);
     dJointSetHingeAxis(back_right_foot_joint_right_1_right_2, 0, 0, 1);
 
     //Link 2 and link 3
     dReal back_right_foot_joint_right_2_right_3_position[3];
-    back_right_foot_joint_right_2_right_3_position[0] = start_location[0] - abs(back_foot_link_2_length*sin(back_foot_link_2_theta));
-    back_right_foot_joint_right_2_right_3_position[1] = start_location[1] - back_foot_link_1_length/2 - abs(back_foot_link_2_length*cos(back_foot_link_2_theta));
+    back_right_foot_joint_right_2_right_3_position[0] = start_location[0] - abs(foot_link_length[3][1]*sin(back_foot_link_2_theta));
+    back_right_foot_joint_right_2_right_3_position[1] = start_location[1] - foot_link_length[3][0]/2 - abs(foot_link_length[3][1]*cos(back_foot_link_2_theta));
     back_right_foot_joint_right_2_right_3_position[2] = start_location[2] - 120;
 
     dJointID back_right_foot_joint_right_2_right_3 = dJointCreateHinge(global_helper->getWorld(), 0);
-    dJointAttach(back_right_foot_joint_right_2_right_3, back_right_foot_link_2_body, back_right_foot_link_3_body);
+    dJointAttach(back_right_foot_joint_right_2_right_3, foot_link_body[3][1], foot_link_body[3][2]);
     dJointSetHingeAnchor(back_right_foot_joint_right_2_right_3, back_right_foot_joint_right_2_right_3_position[0], back_right_foot_joint_right_2_right_3_position[1], back_right_foot_joint_right_2_right_3_position[2]);
     dJointSetHingeAxis(back_right_foot_joint_right_2_right_3, 0, 0, 1);
 
     //Link 3 and link 4
     dReal back_right_foot_joint_right_3_right_4_position[3];
-    back_right_foot_joint_right_3_right_4_position[0] = start_location[0] - abs(back_foot_link_2_length*sin(back_foot_link_2_theta)) - abs(back_foot_link_3_length*sin(back_foot_link_3_theta));
-    back_right_foot_joint_right_3_right_4_position[1] = start_location[1] - back_foot_link_1_length/2 - abs(back_foot_link_2_length*cos(back_foot_link_2_theta)) - abs(back_foot_link_3_length*cos(back_foot_link_3_theta));
+    back_right_foot_joint_right_3_right_4_position[0] = start_location[0] - abs(foot_link_length[3][1]*sin(back_foot_link_2_theta)) - abs(foot_link_length[3][2]*sin(back_foot_link_3_theta));
+    back_right_foot_joint_right_3_right_4_position[1] = start_location[1] - foot_link_length[3][0]/2 - abs(foot_link_length[3][1]*cos(back_foot_link_2_theta)) - abs(foot_link_length[3][2]*cos(back_foot_link_3_theta));
     back_right_foot_joint_right_3_right_4_position[2] = start_location[2] - 120;
 
     dJointID back_right_foot_joint_right_3_right_4 = dJointCreateHinge(global_helper->getWorld(), 0);
-    dJointAttach(back_right_foot_joint_right_3_right_4, back_right_foot_link_3_body, back_right_foot_link_4_body);
+    dJointAttach(back_right_foot_joint_right_3_right_4, foot_link_body[3][2], foot_link_body[3][3]);
     dJointSetHingeAnchor(back_right_foot_joint_right_3_right_4, back_right_foot_joint_right_3_right_4_position[0], back_right_foot_joint_right_3_right_4_position[1], back_right_foot_joint_right_3_right_4_position[2]);
     dJointSetHingeAxis(back_right_foot_joint_right_3_right_4, 0, 0, 1);
 }
@@ -870,100 +866,12 @@ dBodyID ODEBodies::getTailLink4Body(){
     return tail_link_4_body;
 }
 
-dBodyID ODEBodies::getFrontLeftFootLink1Body(){
-    return front_left_foot_link_1_body;
+dBodyID ODEBodies::getFootLinkBody(int leg_id, int link_id){
+    return foot_link_body[leg_id][link_id];
 }
 
-dBodyID ODEBodies::getFrontLeftFootLink2Body(){
-    return front_left_foot_link_2_body;
-}
-
-dBodyID ODEBodies::getFrontLeftFootLink3Body(){
-    return front_left_foot_link_3_body;
-}
-
-dBodyID ODEBodies::getFrontLeftFootLink4Body(){
-    return front_left_foot_link_4_body;
-}
-
-dBodyID ODEBodies::getFrontRightFootLink1Body(){
-    return front_right_foot_link_1_body;
-}
-
-dBodyID ODEBodies::getFrontRightFootLink2Body(){
-    return front_right_foot_link_2_body;
-}
-
-dBodyID ODEBodies::getFrontRightFootLink3Body(){
-    return front_right_foot_link_3_body;
-}
-
-dBodyID ODEBodies::getFrontRightFootLink4Body(){
-    return front_right_foot_link_4_body;
-}
-
-dReal ODEBodies::getFrontFootLink1Length(){
-    return front_foot_link_1_length;
-}
-
-dReal ODEBodies::getFrontFootLink2Length(){
-    return front_foot_link_2_length;
-}
-
-dReal ODEBodies::getFrontFootLink3Length(){
-    return front_foot_link_3_length;
-}
-
-dReal ODEBodies::getFrontFootLink4Length(){
-    return front_foot_link_4_length;
-}
-
-dBodyID ODEBodies::getBackLeftFootLink1Body(){
-    return back_left_foot_link_1_body;
-}
-
-dBodyID ODEBodies::getBackLeftFootLink2Body(){
-    return back_left_foot_link_2_body;
-}
-
-dBodyID ODEBodies::getBackLeftFootLink3Body(){
-    return back_left_foot_link_3_body;
-}
-
-dBodyID ODEBodies::getBackLeftFootLink4Body(){
-    return back_left_foot_link_4_body;
-}
-
-dBodyID ODEBodies::getBackRightFootLink1Body(){
-    return back_right_foot_link_1_body;
-}
-
-dBodyID ODEBodies::getBackRightFootLink2Body(){
-    return back_right_foot_link_2_body;
-}
-
-dBodyID ODEBodies::getBackRightFootLink3Body(){
-    return back_right_foot_link_3_body;
-}
-
-dBodyID ODEBodies::getBackRightFootLink4Body(){
-    return back_right_foot_link_4_body;
-}
-
-dReal ODEBodies::getBackFootLink1Length(){
-    return back_foot_link_1_length;
-}
-
-dReal ODEBodies::getBackFootLink2Length(){
-    return back_foot_link_2_length;
-}
-
-dReal ODEBodies::getBackFootLink3Length(){
-    return back_foot_link_3_length;
-}
-
-dReal ODEBodies::getBackFootLink4Length(){
-    return back_foot_link_4_length;
+float ODEBodies::getFootLinkLength(int leg_id, int link_id){
+    return foot_link_length[leg_id][link_id];
 }
 
 dReal ODEBodies::getBackLink1Length(){

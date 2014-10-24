@@ -11,58 +11,8 @@ inverseKinematics::inverseKinematics(vector<float> lengths, vector<float> angles
 	Pn(1, 0) = targetPosition[1];
 	Pn(2, 0) = targetPosition[2];
 	createJacobian(Pn, transformationMatrix, axis);
-
-	cout << "jacobian = " << endl;
-	for (int i=0; i<jacobian.get_rows(); i++) {
-	    for (int j=0; j<jacobian.get_cols(); j++) {
-	      	cout << jacobian(i, j) << " ";
-	    }
-	    cout << endl;
-	}
-	
-	cout << "endEffector = " << endl;
-	for (int i=0; i<endEffector.get_rows(); i++) {
-	    for (int j=0; j<endEffector.get_cols(); j++) {
-	      	cout << endEffector(i, j) << " ";
-	    }
-	    cout << endl;
-	}
-	
-	cout << "targetPosition = " << endl;
-	for (int i=0; i<targetPosition.size(); i++) {
-	    cout << targetPosition[i] << " ";
-	}
-	cout << endl;
 	invertJacobian();
-	cout << "inverseJacobian = " << endl;
-	for (int i=0; i<inverseJacobian.get_rows(); i++) {
-	    for (int j=0; j<inverseJacobian.get_cols(); j++) {
-	      	cout << inverseJacobian(i, j) << " ";
-	    }
-	    cout << endl;
-	}
-	QSMatrix<float> identity = inverseJacobian*jacobian;
-	cout << "identity = " << endl;
-	for (int i=0; i<identity.get_rows(); i++) {
-	    for (int j=0; j<identity.get_cols(); j++) {
-	      	cout << identity(i, j) << " ";
-	    }
-	    cout << endl;
-	}
-	/*
-	Pn(0, 0) = endEffector(0,0);
-	Pn(1, 0) = endEffector(1,0) + 1.0;
-	Pn(2, 0) = endEffector(2,0);
 	computeJointAngleChange(Pn);
-	//computeJointAngleChange(endEffector);
-	cout << "jointAngleChange = " << endl;
-	for (int i=0; i<jointAngleChange.get_rows(); i++) {
-	    for (int j=0; j<jointAngleChange.get_cols(); j++) {
-	      	cout << jointAngleChange(i, j) << " ";
-	    }
-	    cout << endl;
-	}
-	*/
 }
 
 QSMatrix<float> inverseKinematics::getTransformationMatrix(float l, float theta){
@@ -178,10 +128,8 @@ void inverseKinematics::invertJacobian(){
 		}
 		QSMatrix<float> temp(numLinks-1, 6, 0.0);
 		temp = vi*ui;
-		cout << S(i, i) << endl;
 		for (int k=0; k<temp.get_rows(); k++) {
 		    for (int j=0; j<temp.get_cols(); j++) {
-		      	//temp(k, j) = (S(i, i)/(S(i, i)*S(i, i) + S(i, i)))*temp(k, j);
 		      	temp(k, j) = (S(i,i)/(S(i, i)*S(i, i) + lambda*lambda))*temp(k, j);
 		    }
 		}

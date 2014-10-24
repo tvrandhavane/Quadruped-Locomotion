@@ -50,12 +50,7 @@ static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
 
 void Draw() {
     quadFramework->takeStep();
-    //Controller step
-    quadFramework->getGaitController()->takeStep();   
-
-    //ODE functions to be called in each iteration
-    quadFramework->getBodyBag()->step();
-
+    
     //Collides all objects in space
     dSpaceCollide(quadFramework->getBodyBag()->getGlobalHelper()->getSpace(), 0 ,&nearCallback);
 

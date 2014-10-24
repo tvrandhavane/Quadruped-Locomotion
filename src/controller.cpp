@@ -1,8 +1,11 @@
 #include "controller.h"
 
-controller::controller(ODEBodies * body_bag){
+controller::controller(ODEBodies * body_bag, float * root_position){
 	time = 0;
 	T = 100;
+
+	this->root_position = root_position;
+
 	swingStart[0] = 1;
 	swingEnd[0] = 50;
 	swingStart[1] = 1;
@@ -42,8 +45,102 @@ controller::controller(ODEBodies * body_bag){
     }
 }
 
+void controller::takeStep(){
+	time = (time + 1);
+	int phase = time%T;
+
+	cout << "Time = " << time << endl;
+
+	//for each leg
+	for(int i = 0; i < 4; i++){
+		legController(i, phase);
+	}
+
+
+
+	vector<float> lengths = body_bag->getLengths(0);
+    vector<float> angles = body_bag->getAngles(0);
+    vector<float> endEffector(3);
+    const dReal *endEffectorPos = dBodyGetPosition(body_bag->getFootLinkBody(0, 3));
+    endEffector[0] = -(endEffectorPos[0]-body_bag->getFootLinkLength(0, 3)/2);
+    endEffector[1] = endEffectorPos[1];
+    endEffector[2] = endEffectorPos[2]-root_position[2];
+
+    QSMatrix<float> * matrix = new QSMatrix<float> (4, 4, 0.0);
+    for(int i = 0; i < matrix->get_rows(); i++){
+        (*matrix)(i,i) = 1;
+    }
+    (*matrix)(0, 3) = root_position[0];
+    (*matrix)(1, 3) = root_position[1];
+    (*matrix)(2, 3) = root_position[2] + 120.0;
+
+    QSMatrix<float> * matrix2 = new QSMatrix<float> (4, 4, 0.0);
+    float theta = -(90*M_PI)/180;
+    (*matrix2)(0, 0) = cos(theta);
+    (*matrix2)(0, 1) = -sin(theta);
+    (*matrix2)(1, 0) = sin(theta);
+    (*matrix2)(1, 1) = cos(theta);
+    (*matrix2)(2, 2) = 1;
+    (*matrix2)(3, 3) = 1;
+
+    QSMatrix<float> transformationMatrix = (*matrix) * (*matrix2);
+    QSMatrix<float> axis(4, 1, 0.0);
+    
+    axis(2, 0) = 1;
+    axis(3, 0) = 1;
+    applyIK(lengths, angles, endEffector, transformationMatrix, axis);
+
+    gravityCompensation();
+}
+
+void controller::legController(int leg_id, int phase){
+	if(swingStart[leg_id] == phase){		
+		computePlacementLocation(leg_id, lfHeight[0]);
+		setFootLocation(leg_id, phase);
+	}
+	else if(isInSwing(leg_id)){
+		setFootLocation(leg_id, phase);
+		float * targetPosition = getTargetPosition(leg_id);
+		//Apply IK and get change in angles
+		//Use PD controllers to get torque
+	}
+	else{
+		stanceLegTreatment(leg_id);
+	}
+}
+
+float * controller::getTargetPosition(int leg_id){
+	//translation
+	Eigen::MatrixXf mt = Eigen::MatrixXf::Identity(4, 4);
+	mt(0, 3) = body_bag->getFootLinkLength(leg_id, 3);
+
+	//rotation
+	Eigen::MatrixXf mr = Eigen::MatrixXf::Identity(4, 4);
+	const dReal *rotation_matrix_ode = dBodyGetRotation(body_bag->getFootLinkBody(leg_id, 3));
+	for(int i = 0; i < 3; i++){
+		for(int j = 0; j < 4; j++){
+			mr(i, j) = rotation_matrix_ode[i*4+j];
+		}
+	}
+
+	mr(3, 0) = 0;
+	mr(3, 1) = 0;
+	mr(3, 2) = 0;
+	mr(3, 3) = 1;
+
+	Eigen::MatrixXf transformationMatrix = mr*mt;
+	
+	cout << endl;
+	cout << "Here is the matrix transformationMatrix:" << endl << transformationMatrix << endl;
+	cout << "Its inverse is:" << endl << transformationMatrix.inverse() << endl;
+	cout << "The product of the two (supposedly the identity) is:" << endl << transformationMatrix.inverse()*transformationMatrix << endl;
+	//current_foot_location
+	//Subtract (vector) the last two links of the leg to get the target end effector position 
+}
+
 void controller::applyIK(vector<float> lengths, vector<float> angles, vector<float> endEffector, QSMatrix<float> transformationMatrix, QSMatrix<float> axis){
 	inverseKinematics * IKSolver = new inverseKinematics(lengths, angles, endEffector, transformationMatrix, axis);
+	delete IKSolver;
 }
 
 void controller::gravityCompensation(){
@@ -64,46 +161,25 @@ void controller::gravityCompensation(){
     dBodyAddForce(body_bag->getTailLink3Body(), 0.0, 98.1, 0.0);
     dBodyAddForce(body_bag->getTailLink4Body(), 0.0, 98.1, 0.0);
     //Front left foot
-    dBodyAddForce(body_bag->getFrontLeftFootLink1Body(), 0.0, 98.1, 0.0);
-    dBodyAddForce(body_bag->getFrontLeftFootLink2Body(), 0.0, 98.1, 0.0);
-    dBodyAddForce(body_bag->getFrontLeftFootLink3Body(), 0.0, 98.1, 0.0);
-    dBodyAddForce(body_bag->getFrontLeftFootLink4Body(), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getFootLinkBody(0,0), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getFootLinkBody(0,1), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getFootLinkBody(0,2), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getFootLinkBody(0,3), 0.0, 98.1, 0.0);
     //Front right foot    
-    dBodyAddForce(body_bag->getFrontRightFootLink1Body(), 0.0, 98.1, 0.0);
-    dBodyAddForce(body_bag->getFrontRightFootLink2Body(), 0.0, 98.1, 0.0);
-    dBodyAddForce(body_bag->getFrontRightFootLink3Body(), 0.0, 98.1, 0.0);
-    dBodyAddForce(body_bag->getFrontRightFootLink4Body(), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getFootLinkBody(1,0), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getFootLinkBody(1,1), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getFootLinkBody(1,2), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getFootLinkBody(1,3), 0.0, 98.1, 0.0);
     //Back left foot
-    dBodyAddForce(body_bag->getBackLeftFootLink1Body(), 0.0, 98.1, 0.0);
-    dBodyAddForce(body_bag->getBackLeftFootLink2Body(), 0.0, 98.1, 0.0);
-    dBodyAddForce(body_bag->getBackLeftFootLink3Body(), 0.0, 98.1, 0.0);
-    dBodyAddForce(body_bag->getBackLeftFootLink4Body(), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getFootLinkBody(2,0), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getFootLinkBody(2,1), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getFootLinkBody(2,2), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getFootLinkBody(2,3), 0.0, 98.1, 0.0);
     //Back right foot    
-    dBodyAddForce(body_bag->getBackRightFootLink1Body(), 0.0, 98.1, 0.0);
-    dBodyAddForce(body_bag->getBackRightFootLink2Body(), 0.0, 98.1, 0.0);
-    dBodyAddForce(body_bag->getBackRightFootLink3Body(), 0.0, 98.1, 0.0);
-    dBodyAddForce(body_bag->getBackRightFootLink4Body(), 0.0, 98.1, 0.0);
-}
-
-void controller::takeStep(){
-	time = (time + 1);
-	int phase = time%T;
-
-	cout << "Time = " << time << endl;
-
-	//for each leg
-	for(int i = 0; i < 4; i++){
-		if(swingStart[i] == phase){		
-			computePlacementLocation(i, lfHeight[0]);
-			setFootLocation(i, phase);
-		}
-		else if(isInSwing(i)){
-			setFootLocation(i, phase);
-		}
-		else{
-			stanceLegTreatment(i);
-		}
-	}
+    dBodyAddForce(body_bag->getFootLinkBody(3,0), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getFootLinkBody(3,1), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getFootLinkBody(3,2), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getFootLinkBody(3,3), 0.0, 98.1, 0.0);
 }
 
 float controller::computeSwingPhase(int leg_id, int phase){
