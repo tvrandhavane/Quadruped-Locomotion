@@ -31,17 +31,43 @@ controller::controller(ODEBodies * body_bag, float * root_position){
     lfHeight[3] = hipHeight;
 
     this->body_bag = body_bag;
-
+    
     for(int i = 0; i< 4; i++){
-    	prev_stepping_location[i][0] = 0.0;
-    	prev_stepping_location[i][1] = 0.0;
-    	prev_stepping_location[i][2] = 0.0;
-    	next_stepping_location[i][0] = 0.0;
-    	next_stepping_location[i][1] = 0.0;
-    	next_stepping_location[i][2] = 0.0;
-    	current_foot_location[i][0] = 0.0;
-    	current_foot_location[i][1] = 0.0;
-    	current_foot_location[i][2] = 0.0;
+    	const dReal *front_left_foot_link_4_location = dBodyGetPosition(body_bag->getFootLinkBody(i,3));
+
+    	//translation
+		Eigen::MatrixXf mt = Eigen::MatrixXf::Identity(4, 4);
+		mt(1, 3) = body_bag->getFootLinkLength(i, 3)/2;
+
+    	//rotation
+		Eigen::MatrixXf mr = Eigen::MatrixXf::Identity(4, 4);
+		const dReal *rotation_matrix_ode = dBodyGetRotation(body_bag->getFootLinkBody(i, 3));
+		for(int k = 0; k < 3; k++){
+			for(int j = 0; j < 4; j++){
+				mr(k, j) = rotation_matrix_ode[k*4+j];
+			}
+		}
+		mr(3, 0) = 0;
+		mr(3, 1) = 0;
+		mr(3, 2) = 0;
+		mr(3, 3) = 1;
+
+		Eigen::MatrixXf origin = Eigen::MatrixXf::Random(4, 1);
+		origin(0, 0) = 0;
+		origin(1, 0) = 0;
+		origin(2, 0) = 0;
+		origin(3, 0) = 1;
+
+		Eigen::MatrixXf addition = mr.inverse()*mt*origin;
+    	prev_stepping_location[i][0] = front_left_foot_link_4_location[0] + addition(0, 0);
+    	prev_stepping_location[i][1] = front_left_foot_link_4_location[1] + addition(1, 0);
+    	prev_stepping_location[i][2] = front_left_foot_link_4_location[2] + addition(2, 0);
+    	next_stepping_location[i][0] = prev_stepping_location[i][0];
+    	next_stepping_location[i][1] = prev_stepping_location[i][1];
+    	next_stepping_location[i][2] = prev_stepping_location[i][2];
+    	current_foot_location[i][0] = prev_stepping_location[i][0];
+    	current_foot_location[i][1] = prev_stepping_location[i][1];
+    	current_foot_location[i][2] = prev_stepping_location[i][2];
     }
 }
 
@@ -55,8 +81,6 @@ void controller::takeStep(){
 	for(int i = 0; i < 4; i++){
 		legController(i, phase);
 	}
-
-
 
 	vector<float> lengths = body_bag->getLengths(0);
     vector<float> angles = body_bag->getAngles(0);
@@ -110,10 +134,10 @@ void controller::legController(int leg_id, int phase){
 }
 
 float * controller::getTargetPosition(int leg_id){
+	//Last link
 	//translation
 	Eigen::MatrixXf mt = Eigen::MatrixXf::Identity(4, 4);
-	mt(2, 3) = body_bag->getFootLinkLength(leg_id, 3);
-	
+	mt(2, 3) = body_bag->getFootLinkLength(leg_id, 3);	
 	//rotation
 	Eigen::MatrixXf mr = Eigen::MatrixXf::Identity(4, 4);
 	const dReal *rotation_matrix_ode = dBodyGetRotation(body_bag->getFootLinkBody(leg_id, 3));
@@ -127,8 +151,6 @@ float * controller::getTargetPosition(int leg_id){
 	mr(3, 2) = 0;
 	mr(3, 3) = 1;
 
-	const dReal *front_left_foot_link_4_location = dBodyGetPosition(body_bag->getFootLinkBody(0,3));
-
 	Eigen::MatrixXf point = Eigen::MatrixXf::Random(4, 1);
 	point(0, 0) = current_foot_location[leg_id][0];
 	point(1, 0) = current_foot_location[leg_id][1];
@@ -136,10 +158,30 @@ float * controller::getTargetPosition(int leg_id){
 	point(3, 0) = 1;
 	Eigen::MatrixXf transformedPoint = mr*mt*mr.inverse()*point;
 
-	cout << transformedPoint << endl;
-	
-	//current_foot_location
-	//Subtract (vector) the last two links of the leg to get the target end effector position 
+	//Second last link
+	//translation
+	mt = Eigen::MatrixXf::Identity(4, 4);
+	mt(2, 3) = body_bag->getFootLinkLength(leg_id, 2);	
+	//rotation
+	mr = Eigen::MatrixXf::Identity(4, 4);
+	rotation_matrix_ode = dBodyGetRotation(body_bag->getFootLinkBody(leg_id, 2));
+	for(int i = 0; i < 3; i++){
+		for(int j = 0; j < 4; j++){
+			mr(i, j) = rotation_matrix_ode[i*4+j];
+		}
+	}
+	mr(3, 0) = 0;
+	mr(3, 1) = 0;
+	mr(3, 2) = 0;
+	mr(3, 3) = 1;
+
+	Eigen::MatrixXf endEffectorM = mr*mt*mr.inverse()*transformedPoint;
+
+	float * endEffector = new float(3);
+	endEffector[0] = endEffectorM(0,0);
+	endEffector[1] = endEffectorM(1,0);
+	endEffector[2] = endEffectorM(2,0);
+	return endEffector;
 }
 
 void controller::applyIK(vector<float> lengths, vector<float> angles, vector<float> endEffector, QSMatrix<float> transformationMatrix, QSMatrix<float> axis){
@@ -256,11 +298,17 @@ void controller::computePlacementLocation(int leg_id, float h){
 	df[1] = desired_velocity[1] * dfFactor;
 	df[2] = desired_velocity[2] * dfFactor;
 
-	prev_stepping_location[leg_id][0] = next_stepping_location[leg_id][0];
-	prev_stepping_location[leg_id][1] = next_stepping_location[leg_id][1];
-	prev_stepping_location[leg_id][2] = next_stepping_location[leg_id][2];
+	float temp[3];
 
-	next_stepping_location[leg_id][0] = df[0] + (current_velocity[0] - desired_velocity[0])*sqrt(h/g);
-	next_stepping_location[leg_id][1] = df[1] + (current_velocity[1] - desired_velocity[1])*sqrt(h/g);
-	next_stepping_location[leg_id][2] = df[2] + (current_velocity[2] - desired_velocity[2])*sqrt(h/g);
+	temp[0] = next_stepping_location[leg_id][0];
+	temp[1] = next_stepping_location[leg_id][1];
+	temp[2] = next_stepping_location[leg_id][2];
+
+	next_stepping_location[leg_id][0] = prev_stepping_location[leg_id][0] + df[0] + (current_velocity[0] - desired_velocity[0])*sqrt(h/g);
+	next_stepping_location[leg_id][1] = prev_stepping_location[leg_id][1] + df[1] + (current_velocity[1] - desired_velocity[1])*sqrt(h/g);
+	next_stepping_location[leg_id][2] = prev_stepping_location[leg_id][2] + df[2] + (current_velocity[2] - desired_velocity[2])*sqrt(h/g);
+
+	prev_stepping_location[leg_id][0] = temp[0];
+	prev_stepping_location[leg_id][1] = temp[1];
+	prev_stepping_location[leg_id][2] = temp[2];
 }
