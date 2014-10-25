@@ -112,8 +112,8 @@ void controller::legController(int leg_id, int phase){
 float * controller::getTargetPosition(int leg_id){
 	//translation
 	Eigen::MatrixXf mt = Eigen::MatrixXf::Identity(4, 4);
-	mt(0, 3) = body_bag->getFootLinkLength(leg_id, 3);
-
+	mt(2, 3) = body_bag->getFootLinkLength(leg_id, 3);
+	
 	//rotation
 	Eigen::MatrixXf mr = Eigen::MatrixXf::Identity(4, 4);
 	const dReal *rotation_matrix_ode = dBodyGetRotation(body_bag->getFootLinkBody(leg_id, 3));
@@ -122,18 +122,22 @@ float * controller::getTargetPosition(int leg_id){
 			mr(i, j) = rotation_matrix_ode[i*4+j];
 		}
 	}
-
 	mr(3, 0) = 0;
 	mr(3, 1) = 0;
 	mr(3, 2) = 0;
 	mr(3, 3) = 1;
 
-	Eigen::MatrixXf transformationMatrix = mr*mt;
+	const dReal *front_left_foot_link_4_location = dBodyGetPosition(body_bag->getFootLinkBody(0,3));
+
+	Eigen::MatrixXf point = Eigen::MatrixXf::Random(4, 1);
+	point(0, 0) = current_foot_location[leg_id][0];
+	point(1, 0) = current_foot_location[leg_id][1];
+	point(2, 0) = current_foot_location[leg_id][2];
+	point(3, 0) = 1;
+	Eigen::MatrixXf transformedPoint = mr*mt*mr.inverse()*point;
+
+	cout << transformedPoint << endl;
 	
-	cout << endl;
-	cout << "Here is the matrix transformationMatrix:" << endl << transformationMatrix << endl;
-	cout << "Its inverse is:" << endl << transformationMatrix.inverse() << endl;
-	cout << "The product of the two (supposedly the identity) is:" << endl << transformationMatrix.inverse()*transformationMatrix << endl;
 	//current_foot_location
 	//Subtract (vector) the last two links of the leg to get the target end effector position 
 }
