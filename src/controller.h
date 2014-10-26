@@ -42,7 +42,7 @@ private:
     void stanceLegTreatment(int leg_id);
     float computeSwingPhase(int leg_id, int phase);
     void legController(int leg_id, int phase);
-    float* getTargetPosition(int leg_id);
+    vector<float> getTargetPosition(int leg_id);
 public:
     //Constructor
     controller(ODEBodies * body_bag, float * root_position);

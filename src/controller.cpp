@@ -33,6 +33,13 @@ controller::controller(ODEBodies * body_bag, float * root_position){
     this->body_bag = body_bag;
     
     for(int i = 0; i< 4; i++){
+    	//Alignment from my co-ordinate system to ODE system
+    	Eigen::MatrixXf alignment = Eigen::MatrixXf::Identity(4, 4);
+		alignment(1, 1) = 0;
+		alignment(1, 2) = 1;
+		alignment(2, 1) = -1;
+		alignment(2, 2) = 0;
+
     	const dReal *front_left_foot_link_4_location = dBodyGetPosition(body_bag->getFootLinkBody(i,3));
 
     	//translation
@@ -58,7 +65,7 @@ controller::controller(ODEBodies * body_bag, float * root_position){
 		origin(2, 0) = 0;
 		origin(3, 0) = 1;
 
-		Eigen::MatrixXf addition = mr.inverse()*mt*origin;
+		Eigen::MatrixXf addition = alignment.inverse()*mr.inverse()*mt*origin;
     	prev_stepping_location[i][0] = front_left_foot_link_4_location[0] + addition(0, 0);
     	prev_stepping_location[i][1] = front_left_foot_link_4_location[1] + addition(1, 0);
     	prev_stepping_location[i][2] = front_left_foot_link_4_location[2] + addition(2, 0);
@@ -123,8 +130,87 @@ void controller::legController(int leg_id, int phase){
 		setFootLocation(leg_id, phase);
 	}
 	else if(isInSwing(leg_id)){
+		//Get target position
 		setFootLocation(leg_id, phase);
-		float * targetPosition = getTargetPosition(leg_id);
+		vector<float> targetPosition = getTargetPosition(leg_id);
+		//Get link lengths
+		vector<float> lengths(2);
+		for(int i = 0; i < 2; i++){
+			lengths[i] = body_bag->getFootLinkLength(leg_id, i);
+		}
+		//Set axis perpendicular to the kinematic chain plane
+		QSMatrix<float> axis(4, 1, 0.0);
+    	if(leg_id % 2 == 0){
+    		axis(2, 0) = 1;
+    	}
+    	else{
+    		axis(2, 0) = -1;
+    	}   		
+    	axis(3, 0) = 1;
+    	//Get transformation matrices
+    	vector<Eigen::MatrixXf> transformationMatrices(2);
+    	Eigen::MatrixXf alignment = Eigen::MatrixXf::Identity(4, 4);
+		alignment(1, 1) = 0;
+		alignment(1, 2) = 1;
+		alignment(2, 1) = -1;
+		alignment(2, 2) = 0;
+
+		Eigen::MatrixXf mr = Eigen::MatrixXf::Identity(4, 4);
+		const dReal *rotation_matrix_ode = dBodyGetRotation(body_bag->getFootLinkBody(leg_id, 3));
+		for(int i = 0; i < 3; i++){
+			for(int j = 0; j < 4; j++){
+				mr(i, j) = rotation_matrix_ode[i*4+j];
+			}
+		}
+		mr(3, 0) = 0;
+		mr(3, 1) = 0;
+		mr(3, 2) = 0;
+		mr(3, 3) = 1;
+
+		Eigen::MatrixXf mr2 = Eigen::MatrixXf::Identity(4, 4);
+		const dReal *rotation_matrix_ode2 = dBodyGetRotation(body_bag->getFootLinkBody(leg_id, 3));
+		for(int i = 0; i < 3; i++){
+			for(int j = 0; j < 4; j++){
+				mr2(i, j) = rotation_matrix_ode2[i*4+j];
+			}
+		}
+		mr2(3, 0) = 0;
+		mr2(3, 1) = 0;
+		mr2(3, 2) = 0;
+		mr2(3, 3) = 1;
+
+		transformationMatrices[0] = mr*alignment.inverse();
+		transformationMatrices[1] = mr2*alignment.inverse();
+		//Get translation matrix
+		const dReal *center_location = dBodyGetPosition(body_bag->getFootLinkBody(leg_id,0)); //get location of the center of the link
+		Eigen::MatrixXf mt = Eigen::MatrixXf::Identity(4, 4); //translate to the start of the link
+		mt(1, 3) = -body_bag->getFootLinkLength(leg_id, 0)/2;
+		mr = Eigen::MatrixXf::Identity(4, 4); //get orientation
+		rotation_matrix_ode = dBodyGetRotation(body_bag->getFootLinkBody(leg_id, 0));
+		for(int k = 0; k < 3; k++){
+			for(int j = 0; j < 4; j++){
+				mr(k, j) = rotation_matrix_ode[k*4+j];
+			}
+		}
+		mr(3, 0) = 0;
+		mr(3, 1) = 0;
+		mr(3, 2) = 0;
+		mr(3, 3) = 1;
+		Eigen::MatrixXf origin = Eigen::MatrixXf::Random(4, 1);
+		origin(0, 0) = 0;
+		origin(1, 0) = 0;
+		origin(2, 0) = 0;
+		origin(3, 0) = 1;
+		Eigen::MatrixXf addition = alignment.inverse()*mr.inverse()*mt*origin; //part to add to the center location
+		QSMatrix<float> * matrix = new QSMatrix<float> (4, 4, 0.0);
+	    for(int i = 0; i < matrix->get_rows(); i++){
+	        (*matrix)(i,i) = 1;
+	    }
+	    (*matrix)(0, 3) = center_location[0] + addition(0, 0);
+	    (*matrix)(1, 3) = center_location[1] + addition(1, 0);
+	    (*matrix)(2, 3) = center_location[2] + addition(2, 0);
+
+		//applyIK(lengths, angles, targetPosition, transformationMatrix, axis);
 		//Apply IK and get change in angles
 		//Use PD controllers to get torque
 	}
@@ -133,7 +219,7 @@ void controller::legController(int leg_id, int phase){
 	}
 }
 
-float * controller::getTargetPosition(int leg_id){
+vector<float> controller::getTargetPosition(int leg_id){
 	//Last link
 	//translation
 	Eigen::MatrixXf mt = Eigen::MatrixXf::Identity(4, 4);
@@ -177,7 +263,7 @@ float * controller::getTargetPosition(int leg_id){
 
 	Eigen::MatrixXf endEffectorM = mr*mt*mr.inverse()*transformedPoint;
 
-	float * endEffector = new float(3);
+	vector<float> endEffector(3);
 	endEffector[0] = endEffectorM(0,0);
 	endEffector[1] = endEffectorM(1,0);
 	endEffector[2] = endEffectorM(2,0);
