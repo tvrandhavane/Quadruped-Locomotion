@@ -49,7 +49,7 @@ public:
     
     //Public Methods
     void takeStep();
-    void applyIK(vector<float> lengths, vector<float> angles, vector<float> endEffector, QSMatrix<float> transformationMatrix, QSMatrix<float> axis);
+    void applyIK(vector<float> lengths, vector<Eigen::MatrixXf> transformationMatrices, vector<float> angles, vector<float> endEffector, Eigen::MatrixXf translationMatrix, Eigen::MatrixXf axis);
     void gravityCompensation();
 };
 

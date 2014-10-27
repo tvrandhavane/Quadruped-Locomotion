@@ -1,62 +1,50 @@
 #include "inverseKinematics.h"
 
-inverseKinematics::inverseKinematics(vector<float> lengths, vector<float> angles, vector<float> targetPosition, QSMatrix<float> transformationMatrix, QSMatrix<float> axis){
+inverseKinematics::inverseKinematics(vector<float> lengths, vector<Eigen::MatrixXf> transformationMatrices, vector<float> angles, vector<float> targetPosition, Eigen::MatrixXf translationMatrix, Eigen::MatrixXf axis){
 	this->angles = angles;
 	this->lengths = lengths;
 	numLinks = lengths.size();
-	jacobian = QSMatrix<float> (6, numLinks, 0.0);
+	jacobian = Eigen::MatrixXf::Random(6, numLinks);
 
-	QSMatrix<float> Pn(4, 1, 1.0);
+	Eigen::MatrixXf Pn = Eigen::MatrixXf::Random(4, 1);
 	Pn(0, 0) = targetPosition[0];
 	Pn(1, 0) = targetPosition[1];
 	Pn(2, 0) = targetPosition[2];
-	createJacobian(Pn, transformationMatrix, axis);
+	Pn(3, 0) = 1;
+	createJacobian(Pn, transformationMatrices, translationMatrix, axis);
 	invertJacobian();
-	computeJointAngleChange(Pn);
+	computeJointAngleChange(Pn);	
 }
 
-QSMatrix<float> inverseKinematics::getTransformationMatrix(float l, float theta){
-	QSMatrix<float> * matrix = new QSMatrix<float> (4, 4, 0.0);
-	for(int i = 0; i < matrix->get_rows(); i++){
-	    (*matrix)(i,i) = 1;
-	}
-	(*matrix)(0, 3) = l;
-
-	QSMatrix<float> * matrix2 = new QSMatrix<float> (4, 4, 0.0);
-	(*matrix2)(0, 0) = cos(theta);
-	(*matrix2)(0, 1) = -sin(theta);
-	(*matrix2)(1, 0) = sin(theta);
-	(*matrix2)(1, 1) = cos(theta);
-	(*matrix2)(2, 2) = 1;
-	(*matrix2)(3, 3) = 1;
-
-	QSMatrix<float> matrix3 = (*matrix) * (*matrix2);
-
-	return matrix3;
-}
-
-QSMatrix<float> inverseKinematics::crossProduct(QSMatrix<float> m1, QSMatrix<float> m2){
-	QSMatrix<float> cross = QSMatrix<float> (3, 1, 0.0);
+Eigen::MatrixXf inverseKinematics::crossProduct(Eigen::MatrixXf m1, Eigen::MatrixXf m2){
+	Eigen::MatrixXf cross = Eigen::MatrixXf::Random(3, 1);
 	cross(0, 0) = m1(1, 0)*m2(2, 0) - m1(2, 0)*m2(1, 0);
 	cross(1, 0) = m1(2, 0)*m2(0, 0) - m1(0, 0)*m2(2, 0);
 	cross(2, 0) = m1(0, 0)*m2(1, 0) - m1(1, 0)*m2(0, 0);
 	return cross;
 }
 
-void inverseKinematics::createJacobian(QSMatrix<float> Pn, QSMatrix<float> T0, QSMatrix<float> Z0){
-	QSMatrix<float> Tj(4, 4, 0.0);
+void inverseKinematics::createJacobian(Eigen::MatrixXf Pn, vector<Eigen::MatrixXf> transformationMatrices, Eigen::MatrixXf translationMatrix, Eigen::MatrixXf axis){
 
-	QSMatrix<float> Zj(4, 1, 0.0);
+	Eigen::MatrixXf Tj = translationMatrix;
+	Tj = transformationMatrices[0]*Tj;
+
+	Eigen::MatrixXf Zj = Eigen::MatrixXf::Random(4, 1);
+	Zj(0, 0) = 0;
+	Zj(0, 0) = 0;
 	Zj(2, 0) = 1;
 	Zj(3, 0) = 1;
 
-	QSMatrix<float> Oj(4, 1, 0.0);
-	Oj(3, 0) = 1;
+	Eigen::MatrixXf origin = Eigen::MatrixXf::Random(4, 1);
+	origin(0, 0) = 0;
+	origin(0, 0) = 0;
+	origin(2, 0) = 0;
+	origin(3, 0) = 1;
 
-	Tj = T0;
-	QSMatrix<float> TjZj = Tj*Z0;
-	QSMatrix<float> Pj = Tj*Oj;
-	QSMatrix<float> cross = crossProduct(TjZj, Pn - Pj);
+	Eigen::MatrixXf Pj = Tj*origin;
+	Eigen::MatrixXf TjZj = Tj*axis;
+	Eigen::MatrixXf cross = crossProduct(TjZj, Pn - Pj);
+
 	jacobian(0, 0) = cross(0, 0);
 	jacobian(1, 0) = cross(1, 0);
 	jacobian(2, 0) = cross(2, 0);
@@ -64,12 +52,18 @@ void inverseKinematics::createJacobian(QSMatrix<float> Pn, QSMatrix<float> T0, Q
 	jacobian(4, 0) = TjZj(1, 0);
 	jacobian(5, 0) = TjZj(2, 0);
 
- 	for(int i = 1; i < numLinks; i++){
-		Tj = Tj*getTransformationMatrix(lengths[i-1], angles[i-1] - angles[i]);
-		Zj = getTransformationMatrix(lengths[i-1], angles[i-1] - angles[i])*Zj;
-		QSMatrix<float> TjZj = Tj*Zj;
-		QSMatrix<float> Pj = Tj*Oj;
-		QSMatrix<float> cross = crossProduct(TjZj, Pn - Pj);
+
+	for(int i = 1; i < numLinks; i++){
+		Eigen::MatrixXf Tr = Eigen::MatrixXf::Identity(4, 4);
+	    Tr(0, 3) = lengths[i-1];
+
+		Tj = Tj*transformationMatrices[i]*Tr;
+		Zj = transformationMatrices[i]*Tr*Zj;
+
+		Eigen::MatrixXf Pj = Tj*origin;
+		Eigen::MatrixXf TjZj = Tj*Zj;
+		Eigen::MatrixXf cross = crossProduct(TjZj, Pn - Pj);
+
 		jacobian(0, i) = cross(0, 0);
 		jacobian(1, i) = cross(1, 0);
 		jacobian(2, i) = cross(2, 0);
@@ -78,37 +72,25 @@ void inverseKinematics::createJacobian(QSMatrix<float> Pn, QSMatrix<float> T0, Q
 		jacobian(5, i) = TjZj(2, 0);
 	}
 
-	Tj = Tj*getTransformationMatrix(lengths[numLinks-1], 0);
-	endEffector = Tj*Oj;
+	Eigen::MatrixXf Tr = Eigen::MatrixXf::Identity(4, 4);
+	Tr(0, 3) = lengths[numLinks-1];
+	Tj = Tj*Tr;
+	endEffector = Tj*origin;
 }
 
 void inverseKinematics::invertJacobian(){
 	float lambda = 0.0;
-	Eigen::MatrixXf m = Eigen::MatrixXf::Random(jacobian.get_rows(),jacobian.get_cols());
+	Eigen::MatrixXf m = Eigen::MatrixXf::Random(jacobian.rows(),jacobian.cols());
 
-	for (int i=0; i<jacobian.get_rows(); i++) {
-	    for (int j=0; j<jacobian.get_cols(); j++) {
+	for (int i=0; i<jacobian.rows(); i++) {
+	    for (int j=0; j<jacobian.cols(); j++) {
 	      	m(i, j) = jacobian(i,j);
 	    }
 	}
  
-	QSMatrix<float> U(jacobian.get_rows(), jacobian.get_rows(), 0.0);
-	QSMatrix<float> V(jacobian.get_cols(), jacobian.get_cols(), 0.0);
-	QSMatrix<float> S(jacobian.get_rows(), jacobian.get_cols(), 0.0);
+	Eigen::MatrixXf S = Eigen::MatrixXf::Zero(jacobian.rows(), jacobian.cols());
 
 	Eigen::JacobiSVD<Eigen::MatrixXf> svd(m, Eigen::ComputeFullU | Eigen::ComputeThinV);
-
-	for (int i=0; i<U.get_rows(); i++) {
-	    for (int j=0; j<U.get_cols(); j++) {
-	      	U(i,j) = svd.matrixU()(i, j);
-	    }
-	}
-
-	for (int i=0; i<V.get_rows(); i++) {
-	    for (int j=0; j<V.get_cols(); j++) {
-	      	V(i,j) = svd.matrixV()(i, j);
-	    }
-	}
 
 	for (int i=0; i< svd.singularValues().size(); i++) {
 		lambda += svd.singularValues()(i);
@@ -116,20 +98,20 @@ void inverseKinematics::invertJacobian(){
 	}	
 	lambda /= svd.singularValues().size();
 
-	inverseJacobian = QSMatrix<float> (numLinks, 6, 0.0);
+	inverseJacobian = Eigen::MatrixXf::Zero(numLinks, 6);
 	for(int i = 0; i < svd.singularValues().size(); i++){
-		QSMatrix<float> vi(V.get_rows(), 1, 0.0);
-		for(int j = 0; j < V.get_rows(); j++){
-			vi(j, 0) = V(j, i);
+		Eigen::MatrixXf vi = Eigen::MatrixXf::Zero(svd.matrixV().rows(), 1);
+		for(int j = 0; j < svd.matrixV().rows(); j++){
+			vi(j, 0) = svd.matrixV()(j, i);
 		}
-		QSMatrix<float> ui(1, U.get_rows(), 0.0);
-		for(int j = 0; j < U.get_rows(); j++){
-			ui(0, j) = U(j, i);
+		Eigen::MatrixXf ui = Eigen::MatrixXf::Zero(1, svd.matrixU().rows());
+		for(int j = 0; j < svd.matrixU().rows(); j++){
+			ui(0, j) = svd.matrixU()(j, i);
 		}
-		QSMatrix<float> temp(numLinks-1, 6, 0.0);
+		Eigen::MatrixXf temp = Eigen::MatrixXf::Zero(numLinks, 6);
 		temp = vi*ui;
-		for (int k=0; k<temp.get_rows(); k++) {
-		    for (int j=0; j<temp.get_cols(); j++) {
+		for (int k=0; k<temp.rows(); k++) {
+		    for (int j=0; j<temp.cols(); j++) {
 		      	temp(k, j) = (S(i,i)/(S(i, i)*S(i, i) + lambda*lambda))*temp(k, j);
 		    }
 		}
@@ -137,9 +119,9 @@ void inverseKinematics::invertJacobian(){
 	}
 }
 
-void inverseKinematics::computeJointAngleChange(QSMatrix<float> target_pos){
-	QSMatrix<float> x(6, 1, 0.0);
-	QSMatrix<float> temp = target_pos - endEffector;
+void inverseKinematics::computeJointAngleChange(Eigen::MatrixXf target_pos){
+	Eigen::MatrixXf x = Eigen::MatrixXf::Zero(6, 1);
+	Eigen::MatrixXf temp = target_pos - endEffector;
 	x(0, 0) = temp(0, 0);
 	x(1, 0) = temp(1, 0);
 	x(2, 0) = temp(2, 0);

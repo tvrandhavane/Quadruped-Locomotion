@@ -89,38 +89,6 @@ void controller::takeStep(){
 		legController(i, phase);
 	}
 
-	vector<float> lengths = body_bag->getLengths(0);
-    vector<float> angles = body_bag->getAngles(0);
-    vector<float> endEffector(3);
-    const dReal *endEffectorPos = dBodyGetPosition(body_bag->getFootLinkBody(0, 3));
-    endEffector[0] = -(endEffectorPos[0]-body_bag->getFootLinkLength(0, 3)/2);
-    endEffector[1] = endEffectorPos[1];
-    endEffector[2] = endEffectorPos[2]-root_position[2];
-
-    QSMatrix<float> * matrix = new QSMatrix<float> (4, 4, 0.0);
-    for(int i = 0; i < matrix->get_rows(); i++){
-        (*matrix)(i,i) = 1;
-    }
-    (*matrix)(0, 3) = root_position[0];
-    (*matrix)(1, 3) = root_position[1];
-    (*matrix)(2, 3) = root_position[2] + 120.0;
-
-    QSMatrix<float> * matrix2 = new QSMatrix<float> (4, 4, 0.0);
-    float theta = -(90*M_PI)/180;
-    (*matrix2)(0, 0) = cos(theta);
-    (*matrix2)(0, 1) = -sin(theta);
-    (*matrix2)(1, 0) = sin(theta);
-    (*matrix2)(1, 1) = cos(theta);
-    (*matrix2)(2, 2) = 1;
-    (*matrix2)(3, 3) = 1;
-
-    QSMatrix<float> transformationMatrix = (*matrix) * (*matrix2);
-    QSMatrix<float> axis(4, 1, 0.0);
-    
-    axis(2, 0) = 1;
-    axis(3, 0) = 1;
-    applyIK(lengths, angles, endEffector, transformationMatrix, axis);
-
     gravityCompensation();
 }
 
@@ -139,14 +107,17 @@ void controller::legController(int leg_id, int phase){
 			lengths[i] = body_bag->getFootLinkLength(leg_id, i);
 		}
 		//Set axis perpendicular to the kinematic chain plane
-		QSMatrix<float> axis(4, 1, 0.0);
-    	if(leg_id % 2 == 0){
+		Eigen::MatrixXf axis = Eigen::MatrixXf::Random(4, 1);
+		axis(0, 0) = 0;
+		axis(1, 0) = 0;
+		if(leg_id % 2 == 0){
     		axis(2, 0) = 1;
     	}
     	else{
     		axis(2, 0) = -1;
     	}   		
     	axis(3, 0) = 1;
+    	
     	//Get transformation matrices
     	vector<Eigen::MatrixXf> transformationMatrices(2);
     	Eigen::MatrixXf alignment = Eigen::MatrixXf::Identity(4, 4);
@@ -202,15 +173,13 @@ void controller::legController(int leg_id, int phase){
 		origin(2, 0) = 0;
 		origin(3, 0) = 1;
 		Eigen::MatrixXf addition = alignment.inverse()*mr.inverse()*mt*origin; //part to add to the center location
-		QSMatrix<float> * matrix = new QSMatrix<float> (4, 4, 0.0);
-	    for(int i = 0; i < matrix->get_rows(); i++){
-	        (*matrix)(i,i) = 1;
-	    }
-	    (*matrix)(0, 3) = center_location[0] + addition(0, 0);
-	    (*matrix)(1, 3) = center_location[1] + addition(1, 0);
-	    (*matrix)(2, 3) = center_location[2] + addition(2, 0);
+		Eigen::MatrixXf translationMatrix = Eigen::MatrixXf::Identity(4, 4);
+	    translationMatrix(0, 3) = center_location[0] + addition(0, 0);
+	    translationMatrix(1, 3) = center_location[1] + addition(1, 0);
+	    translationMatrix(2, 3) = center_location[2] + addition(2, 0);
 
-		//applyIK(lengths, angles, targetPosition, transformationMatrix, axis);
+	    vector<float> angles = body_bag->getAngles(0);
+	    applyIK(lengths, transformationMatrices, angles, targetPosition, translationMatrix, axis);
 		//Apply IK and get change in angles
 		//Use PD controllers to get torque
 	}
@@ -270,8 +239,8 @@ vector<float> controller::getTargetPosition(int leg_id){
 	return endEffector;
 }
 
-void controller::applyIK(vector<float> lengths, vector<float> angles, vector<float> endEffector, QSMatrix<float> transformationMatrix, QSMatrix<float> axis){
-	inverseKinematics * IKSolver = new inverseKinematics(lengths, angles, endEffector, transformationMatrix, axis);
+void controller::applyIK(vector<float> lengths, vector<Eigen::MatrixXf> transformationMatrices, vector<float> angles, vector<float> endEffector, Eigen::MatrixXf translationMatrix, Eigen::MatrixXf axis){
+	inverseKinematics * IKSolver = new inverseKinematics(lengths, transformationMatrices, angles, endEffector, translationMatrix, axis);
 	delete IKSolver;
 }
 

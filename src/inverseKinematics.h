@@ -4,7 +4,6 @@
 #include <iostream>
 #include <cmath>
 #include <vector>
-#include "QSMatrix.h"
 #include <iostream>
 #include <Eigen/Dense>
 
@@ -15,18 +14,17 @@ private:
 	int numLinks;
 	vector<float> lengths;
 	vector<float> angles;
-	QSMatrix<float> jacobian;
-	QSMatrix<float> inverseJacobian;
-	QSMatrix<float> jointAngleChange;
-	QSMatrix<float> endEffector;
+	Eigen::MatrixXf jacobian;
+	Eigen::MatrixXf inverseJacobian;
+	Eigen::MatrixXf jointAngleChange;
+	Eigen::MatrixXf endEffector;
 
-	QSMatrix<float> crossProduct(QSMatrix<float> m1, QSMatrix<float> m2);
+	Eigen::MatrixXf crossProduct(Eigen::MatrixXf m1, Eigen::MatrixXf m2);
 
 public:
-	QSMatrix<float> getTransformationMatrix(float l, float theta);
-	inverseKinematics(vector<float> lengths, vector<float> angles, vector<float> targetPosition, QSMatrix<float> transformationMatrix, QSMatrix<float> axis);
-	void createJacobian(QSMatrix<float> Pn, QSMatrix<float> T0, QSMatrix<float> Z0);
+	inverseKinematics(vector<float> lengths, vector<Eigen::MatrixXf> transformationMatrices, vector<float> angles, vector<float> targetPosition, Eigen::MatrixXf translationMatrix, Eigen::MatrixXf axis);
+	void createJacobian(Eigen::MatrixXf Pn, vector<Eigen::MatrixXf> transformationMatrices, Eigen::MatrixXf translationMatrix, Eigen::MatrixXf axis);
 	void invertJacobian();
-	void computeJointAngleChange(QSMatrix<float> target_pos);
+	void computeJointAngleChange(Eigen::MatrixXf target_pos);
 };
 #endif // INVERSE_KINEMATICS_H
