@@ -127,3 +127,7 @@ void inverseKinematics::computeJointAngleChange(Eigen::MatrixXf target_pos){
 	x(2, 0) = temp(2, 0);
 	jointAngleChange = inverseJacobian*x;
 }
+
+Eigen::MatrixXf inverseKinematics::getJointAngleChange(){
+	return jointAngleChange;
+}

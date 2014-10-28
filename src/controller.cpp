@@ -18,10 +18,10 @@ controller::controller(ODEBodies * body_bag, float * root_position){
 	shoulderHeight = 470;		//in 0.1cm
     hipHeight = 450;
 
-    current_velocity[0] = 2000;		//in 0.1cm/s
+    current_velocity[0] = 0;		//in 0.1cm/s
     current_velocity[1] = 0;
     current_velocity[2] = 0;
-    desired_velocity[0] = 4000;
+    desired_velocity[0] = 1000;
     desired_velocity[1] = 0;
     desired_velocity[2] = 0;
 
@@ -29,6 +29,14 @@ controller::controller(ODEBodies * body_bag, float * root_position){
     lfHeight[1] = shoulderHeight;
     lfHeight[2] = hipHeight;
     lfHeight[3] = hipHeight;
+
+    for(int i = 0; i < 4; i++){
+    	for(int j = 0; j < 4; j++){
+    		foot_link_pd_error[i][j] = 0;
+    		foot_link_gain_kp[i][j] = 100;
+    		foot_link_gain_kd[i][j] = 100;
+    	}
+    }
 
     this->body_bag = body_bag;
     
@@ -101,6 +109,7 @@ void controller::legController(int leg_id, int phase){
 		//Get target position
 		setFootLocation(leg_id, phase);
 		vector<float> targetPosition = getTargetPosition(leg_id);
+
 		//Get link lengths
 		vector<float> lengths(2);
 		for(int i = 0; i < 2; i++){
@@ -179,9 +188,18 @@ void controller::legController(int leg_id, int phase){
 	    translationMatrix(2, 3) = center_location[2] + addition(2, 0);
 
 	    vector<float> angles = body_bag->getAngles(0);
-	    applyIK(lengths, transformationMatrices, angles, targetPosition, translationMatrix, axis);
-		//Apply IK and get change in angles
+	    Eigen::MatrixXf jointAngleChange = applyIK(lengths, transformationMatrices, angles, targetPosition, translationMatrix, axis);
+
 		//Use PD controllers to get torque
+	    float torque = foot_link_gain_kp[leg_id][0]*jointAngleChange(0,0) - foot_link_gain_kd[leg_id][0]*(jointAngleChange(0,0) - foot_link_pd_error[leg_id][0]);
+		dBodyAddTorque(body_bag->getFootLinkBody(leg_id,0), axis(0, 0)*torque, axis(1, 0)*torque, axis(2, 0)*torque);
+		cout << "torque 1 = " << torque << endl;
+		foot_link_pd_error[leg_id][0] = jointAngleChange(0,0);
+
+		torque = foot_link_gain_kp[leg_id][1]*jointAngleChange(1,0) - foot_link_gain_kd[leg_id][1]*(jointAngleChange(1,0) - foot_link_pd_error[leg_id][1]);
+		dBodyAddTorque(body_bag->getFootLinkBody(leg_id,1), axis(0, 0)*torque, axis(1, 0)*torque, axis(2, 0)*torque);
+		cout << "torque 2 = " << torque << endl;
+		foot_link_pd_error[leg_id][1] = jointAngleChange(1,0);
 	}
 	else{
 		stanceLegTreatment(leg_id);
@@ -239,9 +257,11 @@ vector<float> controller::getTargetPosition(int leg_id){
 	return endEffector;
 }
 
-void controller::applyIK(vector<float> lengths, vector<Eigen::MatrixXf> transformationMatrices, vector<float> angles, vector<float> endEffector, Eigen::MatrixXf translationMatrix, Eigen::MatrixXf axis){
+Eigen::MatrixXf controller::applyIK(vector<float> lengths, vector<Eigen::MatrixXf> transformationMatrices, vector<float> angles, vector<float> endEffector, Eigen::MatrixXf translationMatrix, Eigen::MatrixXf axis){
 	inverseKinematics * IKSolver = new inverseKinematics(lengths, transformationMatrices, angles, endEffector, translationMatrix, axis);
+	Eigen::MatrixXf jointAngleChange = IKSolver->getJointAngleChange();
 	delete IKSolver;
+	return jointAngleChange;
 }
 
 void controller::gravityCompensation(){

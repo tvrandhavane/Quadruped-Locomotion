@@ -31,6 +31,10 @@ private:
     float next_stepping_location[4][3];
     float current_foot_location[4][3];
 
+    float foot_link_pd_error[4][4];
+    float foot_link_gain_kp[4][4];
+    float foot_link_gain_kd[4][4];
+
     float * root_position;
 
     ODEBodies * body_bag;
@@ -49,7 +53,7 @@ public:
     
     //Public Methods
     void takeStep();
-    void applyIK(vector<float> lengths, vector<Eigen::MatrixXf> transformationMatrices, vector<float> angles, vector<float> endEffector, Eigen::MatrixXf translationMatrix, Eigen::MatrixXf axis);
+    Eigen::MatrixXf applyIK(vector<float> lengths, vector<Eigen::MatrixXf> transformationMatrices, vector<float> angles, vector<float> endEffector, Eigen::MatrixXf translationMatrix, Eigen::MatrixXf axis);
     void gravityCompensation();
 };
 

@@ -26,5 +26,6 @@ public:
 	void createJacobian(Eigen::MatrixXf Pn, vector<Eigen::MatrixXf> transformationMatrices, Eigen::MatrixXf translationMatrix, Eigen::MatrixXf axis);
 	void invertJacobian();
 	void computeJointAngleChange(Eigen::MatrixXf target_pos);
+	Eigen::MatrixXf getJointAngleChange();
 };
 #endif // INVERSE_KINEMATICS_H
