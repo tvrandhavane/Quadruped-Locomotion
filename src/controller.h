@@ -35,6 +35,9 @@ private:
     float foot_link_gain_kp[4][4];
     float foot_link_gain_kd[4][4];
 
+    float swing_torque[4][3];
+    bool swingFlag[4];
+
     float * root_position;
 
     ODEBodies * body_bag;

@@ -31,10 +31,14 @@ controller::controller(ODEBodies * body_bag, float * root_position){
     lfHeight[3] = hipHeight;
 
     for(int i = 0; i < 4; i++){
+    	swingFlag[i] = false;
     	for(int j = 0; j < 4; j++){
     		foot_link_pd_error[i][j] = 0;
     		foot_link_gain_kp[i][j] = 100;
     		foot_link_gain_kd[i][j] = 100;
+    	}
+    	for(int j = 0; j < 3; j++){
+    		swing_torque[i][j] = 0;
     	}
     }
 
@@ -106,6 +110,8 @@ void controller::legController(int leg_id, int phase){
 		setFootLocation(leg_id, phase);
 	}
 	else if(isInSwing(leg_id)){
+		swingFlag[leg_id] = true;
+
 		//Get target position
 		setFootLocation(leg_id, phase);
 		vector<float> targetPosition = getTargetPosition(leg_id);
@@ -194,14 +200,30 @@ void controller::legController(int leg_id, int phase){
 	    float torque = foot_link_gain_kp[leg_id][0]*jointAngleChange(0,0) - foot_link_gain_kd[leg_id][0]*(jointAngleChange(0,0) - foot_link_pd_error[leg_id][0]);
 		dBodyAddTorque(body_bag->getFootLinkBody(leg_id,0), axis(0, 0)*torque, axis(1, 0)*torque, axis(2, 0)*torque);
 		cout << "torque 1 = " << torque << endl;
+		for(int i = 0; i < 3; i++){
+			swing_torque[leg_id][i] = axis(i, 0)*torque;
+		}
+		
 		foot_link_pd_error[leg_id][0] = jointAngleChange(0,0);
 
 		torque = foot_link_gain_kp[leg_id][1]*jointAngleChange(1,0) - foot_link_gain_kd[leg_id][1]*(jointAngleChange(1,0) - foot_link_pd_error[leg_id][1]);
 		dBodyAddTorque(body_bag->getFootLinkBody(leg_id,1), axis(0, 0)*torque, axis(1, 0)*torque, axis(2, 0)*torque);
 		cout << "torque 2 = " << torque << endl;
 		foot_link_pd_error[leg_id][1] = jointAngleChange(1,0);
+
+		//Apply gravity compensation
+		if(leg_id < 2){
+    		dBodyAddForce(body_bag->getBackLink1Body(), 0.0, 392.4, 0.0);
+    	}
+    	else{
+    		dBodyAddForce(body_bag->getBackLink6Body(), 0.0, 392.4, 0.0);
+    	}
 	}
 	else{
+		swingFlag[leg_id] = false;
+		for(int i = 0; i < 3; i++){
+			swing_torque[leg_id][i] = 0;
+		}		
 		stanceLegTreatment(leg_id);
 	}
 }
@@ -281,7 +303,7 @@ void controller::gravityCompensation(){
     dBodyAddForce(body_bag->getTailLink2Body(), 0.0, 98.1, 0.0);
     dBodyAddForce(body_bag->getTailLink3Body(), 0.0, 98.1, 0.0);
     dBodyAddForce(body_bag->getTailLink4Body(), 0.0, 98.1, 0.0);
-    //Front left foot
+    /*//Front left foot
     dBodyAddForce(body_bag->getFootLinkBody(0,0), 0.0, 98.1, 0.0);
     dBodyAddForce(body_bag->getFootLinkBody(0,1), 0.0, 98.1, 0.0);
     dBodyAddForce(body_bag->getFootLinkBody(0,2), 0.0, 98.1, 0.0);
@@ -300,7 +322,7 @@ void controller::gravityCompensation(){
     dBodyAddForce(body_bag->getFootLinkBody(3,0), 0.0, 98.1, 0.0);
     dBodyAddForce(body_bag->getFootLinkBody(3,1), 0.0, 98.1, 0.0);
     dBodyAddForce(body_bag->getFootLinkBody(3,2), 0.0, 98.1, 0.0);
-    dBodyAddForce(body_bag->getFootLinkBody(3,3), 0.0, 98.1, 0.0);
+    dBodyAddForce(body_bag->getFootLinkBody(3,3), 0.0, 98.1, 0.0);*/
 }
 
 float controller::computeSwingPhase(int leg_id, int phase){
@@ -335,7 +357,28 @@ void controller::setFootLocation(int leg_id, int phase){
 }
 
 void controller::stanceLegTreatment(int leg_id){
-	cout << "stance leg treatment" << endl;
+	int other_leg_id;
+	if(leg_id == 0){
+		other_leg_id = 1;
+	}
+	else if(leg_id == 1){
+		other_leg_id = 0;
+	}
+	else if(leg_id == 2){
+		other_leg_id = 3;
+	}
+	else if(leg_id == 3){
+		other_leg_id = 2;
+	}
+	if(swingFlag[other_leg_id]){
+		int link_id;
+		if(leg_id < 2){
+			dBodyAddTorque(body_bag->getBackLink1Body(), -swing_torque[other_leg_id][0], -swing_torque[other_leg_id][1], -swing_torque[other_leg_id][2]);
+		}
+		else{
+			dBodyAddTorque(body_bag->getBackLink6Body(), -swing_torque[other_leg_id][0], -swing_torque[other_leg_id][1], -swing_torque[other_leg_id][2]);
+		}		
+	}
 }
 
 bool controller::isInSwing(int leg_id){
@@ -360,7 +403,6 @@ bool controller::isInSwing(int leg_id){
 }
 
 void controller::computePlacementLocation(int leg_id, float h){
-	cout << "compute placement location " << endl;
 	float df[3];
 
 	float velocitySqr = desired_velocity[0]*desired_velocity[0];
