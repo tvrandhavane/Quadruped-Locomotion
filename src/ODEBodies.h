@@ -104,6 +104,8 @@ private:
     dReal back_link_4_length;
     dReal back_link_5_length;
     dReal back_link_6_length;
+    dReal nnh_link_length[4];
+    dReal tail_link_length[4];
     dReal foot_link_length[4][4];
 
     float back_link_1_theta;
@@ -120,6 +122,9 @@ private:
     float back_foot_link_2_theta;
     float back_foot_link_3_theta;
     float back_foot_link_4_theta;
+
+    float total_link_length;
+    float density;
 
 	//Private Methods
     void set_ball();
@@ -162,6 +167,8 @@ public:
     dBodyID getTailLink3Body();
     dBodyID getTailLink4Body();
 
+    float getDensity();
+
     dBodyID getFootLinkBody(int leg_id, int link_id);
     float getFootLinkLength(int leg_id, int link_id);
 
@@ -170,9 +177,10 @@ public:
     float getBackLink3Length();
     float getBackLink4Length();
     float getBackLink5Length();
-    float getBackLink6Length();
+    float getBackLink6Length();    
 
-    
+    float getNnhLinkLength(int link_id);
+    float getTailLinkLength(int link_id);
 
     dGeomID getPlaneGeom();
     helper * getGlobalHelper();

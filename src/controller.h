@@ -38,6 +38,8 @@ private:
     float swing_torque[4][3];
     bool swingFlag[4];
 
+    float lf_velocity_force_kv[2];
+
     float * root_position;
 
     ODEBodies * body_bag;
@@ -50,6 +52,9 @@ private:
     float computeSwingPhase(int leg_id, int phase);
     void legController(int leg_id, int phase);
     vector<float> getTargetPosition(int leg_id);
+    void gravityCompensation();
+    void virtualForces();
+
 public:
     //Constructor
     controller(ODEBodies * body_bag, float * root_position);
@@ -57,7 +62,6 @@ public:
     //Public Methods
     void takeStep();
     Eigen::MatrixXf applyIK(vector<float> lengths, vector<Eigen::MatrixXf> transformationMatrices, vector<float> angles, vector<float> endEffector, Eigen::MatrixXf translationMatrix, Eigen::MatrixXf axis);
-    void gravityCompensation();
 };
 
 #endif // CONTROLLER_H

@@ -14,7 +14,7 @@ void helper::initWorld(){
 	world = dWorldCreate();
 
 	//Set world parameters
-    dWorldSetGravity(world, 0.0, -9.81, 0.0);
+    dWorldSetGravity(world, 0.0, -9.810, 0.0);
     dWorldSetERP(world, 0.2);
 	dWorldSetCFM(world, 1e-4);
     dWorldSetLinearDamping(world, 0.00001);
