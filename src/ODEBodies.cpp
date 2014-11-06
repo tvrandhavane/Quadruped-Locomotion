@@ -97,8 +97,8 @@ vector<float> ODEBodies::getAngles(int leg_id){
 void ODEBodies::init(){
 	//set_ball();
     set_back();
-    set_nnh();
-    set_tail();
+    //set_nnh();
+    //set_tail();
     set_leg();
 	set_plane();
 }
@@ -641,6 +641,8 @@ void ODEBodies::set_front_legs(){
     dJointAttach(front_right_foot_joint_right_3_right_4, foot_link_body[1][2], foot_link_body[1][3]);
     dJointSetHingeAnchor(front_right_foot_joint_right_3_right_4, front_right_foot_joint_right_3_right_4_position[0], front_right_foot_joint_right_3_right_4_position[1], front_right_foot_joint_right_3_right_4_position[2]);
     dJointSetHingeAxis(front_right_foot_joint_right_3_right_4, 0, 0, 1);
+    dJointSetHingeParam (front_right_foot_joint_right_3_right_4, dParamLoStop, -(120*M_PI)/180);
+    dJointSetHingeParam (front_right_foot_joint_right_3_right_4, dParamHiStop, -(60*M_PI)/180);
 }
 
 void ODEBodies::set_back_legs(){
