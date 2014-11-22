@@ -26,39 +26,39 @@ ODEBodies::ODEBodies(helper * global_helper, float * root_position){
     total_link_length += 60*4;
 
     front_foot_link_1_theta = (0*M_PI)/180;
-    front_foot_link_2_theta = (45*M_PI)/180;
-    front_foot_link_3_theta = -(30*M_PI)/180;
+    front_foot_link_2_theta = (0*M_PI)/180;
+    front_foot_link_3_theta = (20*M_PI)/180;
     front_foot_link_4_theta = (90*M_PI)/180;
 
-    dReal length_multiplier = 462/(5 + 4*cos(front_foot_link_2_theta) + 3*cos(front_foot_link_3_theta));    
+    dReal length_multiplier = 462/(3*cos(front_foot_link_1_theta) + 3*cos(front_foot_link_2_theta) + 1*cos(front_foot_link_3_theta));    
 
-    foot_link_length[0][0] = 5*length_multiplier;
-    foot_link_length[0][1] = 4*length_multiplier;
-    foot_link_length[0][2] = 3*length_multiplier;
+    foot_link_length[0][0] = 3*length_multiplier;
+    foot_link_length[0][1] = 3*length_multiplier;
+    foot_link_length[0][2] = 1*length_multiplier;
     foot_link_length[0][3] = 40;
     total_link_length +=  foot_link_length[0][0] + foot_link_length[0][1] + foot_link_length[0][2] + foot_link_length[0][3];
 
-    foot_link_length[1][0] = 5*length_multiplier;
-    foot_link_length[1][1] = 4*length_multiplier;
-    foot_link_length[1][2] = 3*length_multiplier;
+    foot_link_length[1][0] = 3*length_multiplier;
+    foot_link_length[1][1] = 3*length_multiplier;
+    foot_link_length[1][2] = 1*length_multiplier;
     foot_link_length[1][3] = 40;
     total_link_length +=  foot_link_length[1][0] + foot_link_length[1][1] + foot_link_length[1][2] + foot_link_length[1][3];
 
     back_foot_link_1_theta = (0*M_PI)/180;
-    back_foot_link_2_theta = (45*M_PI)/180;
-    back_foot_link_3_theta = -(30*M_PI)/180;
+    back_foot_link_2_theta = -(60*M_PI)/180;
+    back_foot_link_3_theta = (0*M_PI)/180;
     back_foot_link_4_theta = (90*M_PI)/180;
-    length_multiplier = 446/(5 + 4*cos(back_foot_link_2_theta) + 3*cos(back_foot_link_3_theta));   
+    length_multiplier = 446/(3*cos(back_foot_link_1_theta) + 3*cos(back_foot_link_2_theta) + 1*cos(back_foot_link_3_theta));   
   
-    foot_link_length[2][0] = 5*length_multiplier;
-    foot_link_length[2][1] = 4*length_multiplier;
-    foot_link_length[2][2] = 3*length_multiplier;
+    foot_link_length[2][0] = 3*length_multiplier;
+    foot_link_length[2][1] = 3*length_multiplier;
+    foot_link_length[2][2] = 1*length_multiplier;
     foot_link_length[2][3] = 40;
     total_link_length +=  foot_link_length[2][0] + foot_link_length[2][1] + foot_link_length[2][2] + foot_link_length[2][3];
 
-    foot_link_length[3][0] = 5*length_multiplier;
-    foot_link_length[3][1] = 4*length_multiplier;
-    foot_link_length[3][2] = 3*length_multiplier;
+    foot_link_length[3][0] = 3*length_multiplier;
+    foot_link_length[3][1] = 3*length_multiplier;
+    foot_link_length[3][2] = 1*length_multiplier;
     foot_link_length[3][3] = 40;
     total_link_length +=  foot_link_length[3][0] + foot_link_length[3][1] + foot_link_length[3][2] + foot_link_length[3][3];
 

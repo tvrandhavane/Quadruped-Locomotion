@@ -13,6 +13,7 @@ using namespace std;
 //Declare global objects
 quadrupedFramework * quadFramework;
 draw * draw_obj;
+bool step;
 
 static void nearCallback(void *data, dGeomID o1, dGeomID o2) {
     //Set up maximum number of contact points and contact array
@@ -121,16 +122,37 @@ void Initialize() {
     gluLookAt(0.0, 0.0, 1500.0, 0.0, 0.0, 0.0, 0.0f, 1.0f, 0.0f);    
 }
 
+void Keyboard(unsigned char key, int x, int y)
+{
+    switch (key){
+        case 27:             // ESCAPE key
+            exit (0);
+            break;
+        case 'w':
+            glutPostRedisplay();
+            break;
+    }   
+}
+
 void Timer(int iUnused){
     //Call the display function (Draw() function)
     glutPostRedisplay();
 
     //Set up next timer
-    glutTimerFunc(1, Timer, 0);
+    if(step == false){
+        glutTimerFunc(1, Timer, 0);
+    }    
 }
 
 
 int main(int argc, char** argv) {
+    if(argv[1][0] == '0'){
+        step = false;
+    }
+    else{
+        step = true;
+    }
+
     //Set up glut parameters
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE |  GLUT_DEPTH);
@@ -153,6 +175,7 @@ int main(int argc, char** argv) {
 
     //Set up display function which will be called in loop
     glutDisplayFunc(Draw);
+    glutKeyboardFunc (Keyboard);
 
     //Set up timer
     Timer(0);
